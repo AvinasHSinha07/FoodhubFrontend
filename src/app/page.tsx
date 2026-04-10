@@ -24,10 +24,11 @@ export default function HomePage() {
               FoodHub
             </h1>
           </Link>
-          <nav className="flex gap-4">
+          <nav className="flex gap-4 items-center">
             <Button variant="ghost" asChild><Link href="/login">Login</Link></Button>
             <Button asChild className="bg-orange-600 hover:bg-orange-700 text-white"><Link href="/register">Register</Link></Button>
             <Button variant="outline" className="border-orange-200 text-orange-700 hover:bg-orange-50" asChild><Link href="/customer/orders">My Orders</Link></Button>
+            <Button variant="ghost" asChild><Link href="/customer/profile">Profile</Link></Button>
           </nav>
         </div>
       </header>

@@ -2,16 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { OrderServices } from "@/services/order.services";
-import { IOrder } from "@/types/order.types";
+import { IOrder, IOrderItem } from "@/types/order.types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { ReviewModal } from "@/components/modules/Customer/ReviewModal";
+import { Star } from "lucide-react";
 
 export default function CustomerOrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string>("");
+  const [selectedItem, setSelectedItem] = useState<IOrderItem | null>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -26,6 +32,12 @@ export default function CustomerOrdersPage() {
     };
     fetchOrders();
   }, []);
+
+  const handleOpenReview = (orderId: string, item: IOrderItem) => {
+    setSelectedOrderId(orderId);
+    setSelectedItem(item);
+    setIsReviewOpen(true);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -81,14 +93,28 @@ export default function CustomerOrdersPage() {
               <CardContent className="pt-4">
                 <div className="space-y-3">
                   {order.orderItems?.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center text-sm">
-                      <div className="flex gap-3 items-center">
-                        <span className="font-medium px-2 py-0.5 bg-gray-100 rounded text-xs">
-                          {item.quantity}x
-                        </span>
-                        <span>{item.meal?.title || "Unknown Meal"}</span>
+                    <div key={item.id} className="flex justify-between items-center text-sm border-b pb-2 last:border-0 last:pb-0">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex gap-3 items-center">
+                          <span className="font-medium px-2 py-0.5 bg-gray-100 rounded text-xs">
+                            {item.quantity}x
+                          </span>
+                          <span className="font-medium">{item.meal?.title || "Unknown Meal"}</span>       
+                        </div>
+                        {order.orderStatus === "DELIVERED" && (
+                          <div className="pl-12">
+                             <Button 
+                               variant="ghost" 
+                               size="sm" 
+                               className="h-6 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 px-2"
+                               onClick={() => handleOpenReview(order.id, item)}
+                             >
+                                <Star className="w-3 h-3 mr-1" /> Leave Review
+                             </Button>
+                          </div>
+                        )}
                       </div>
-                      <span className="text-gray-600">${item.totalPrice.toFixed(2)}</span>
+                      <span className="text-gray-600 self-start">${item.totalPrice.toFixed(2)}</span>
                     </div>
                   ))}
                   <Separator className="my-2" />
@@ -105,6 +131,13 @@ export default function CustomerOrdersPage() {
           ))}
         </div>
       )}
+      
+      <ReviewModal 
+        isOpen={isReviewOpen} 
+        onClose={() => setIsReviewOpen(false)} 
+        orderId={selectedOrderId} 
+        orderItem={selectedItem} 
+      />
     </div>
   );
 }
