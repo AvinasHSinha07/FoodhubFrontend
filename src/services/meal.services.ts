@@ -9,6 +9,16 @@ export interface IMealFilters {
   isAvailable?: boolean;
 }
 
+export interface ICreateMealPayload {
+  categoryId: string;
+  title: string;
+  description: string;
+  price: number;
+  image?: string;
+  isAvailable?: boolean;
+  dietaryTag?: string;
+}
+
 const getAllMeals = async (
   filters?: IMealFilters
 ): Promise<IResponse<IMeal[]>> => {
@@ -28,10 +38,8 @@ const getMealById = async (id: string): Promise<IResponse<IMeal>> => {
   return result.data;
 };
 
-const createMeal = async (data: FormData): Promise<IResponse<IMeal>> => {
-  const result = await httpClient.post("/provider/meals", data, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+const createMeal = async (data: ICreateMealPayload): Promise<IResponse<IMeal>> => {
+  const result = await httpClient.post("/provider/meals", data);
   return result.data;
 };
 
