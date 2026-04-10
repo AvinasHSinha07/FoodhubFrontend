@@ -33,4 +33,6 @@ export interface IProviderProfile {
   bannerImage?: string | null;
   createdAt: string;
   updatedAt: string;
+
+  meals?: any[];
 }

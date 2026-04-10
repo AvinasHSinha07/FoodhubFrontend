@@ -30,8 +30,20 @@ const updateMyProfile = async (
   return result.data;
 };
 
+const getAllProviders = async (): Promise<IResponse<IProviderProfile[]>> => {
+  const result = await httpClient.get("/providers");
+  return result.data;
+};
+
+const getProviderById = async (id: string): Promise<IResponse<IProviderProfile>> => {
+  const result = await httpClient.get(`/providers/${id}`);
+  return result.data;
+};
+
 export const ProviderProfileServices = {
   getMyProfile,
   createMyProfile,
   updateMyProfile,
+  getAllProviders,
+  getProviderById,
 };

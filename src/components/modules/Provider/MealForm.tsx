@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea"
 
 import { createMealSchema } from "@/zod/meal.validation";
 import { MealServices } from "@/services/meal.services";
