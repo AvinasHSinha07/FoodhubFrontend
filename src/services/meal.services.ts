@@ -1,4 +1,4 @@
-import httpClient from "../lib/axios/httpClient";
+﻿import httpClient from "../lib/axios/httpClient";
 import { IResponse } from "../types/api.types";
 import { IMeal } from "../types/meal.types";
 
@@ -7,6 +7,9 @@ export interface IMealFilters {
   categoryId?: string;
   providerId?: string;
   isAvailable?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  dietaryTag?: string;
 }
 
 export interface ICreateMealPayload {
@@ -26,8 +29,10 @@ const getAllMeals = async (
   if (filters?.searchTerm) params.append("searchTerm", filters.searchTerm);
   if (filters?.categoryId) params.append("categoryId", filters.categoryId);
   if (filters?.providerId) params.append("providerId", filters.providerId);
-  if (filters?.isAvailable !== undefined)
-    params.append("isAvailable", String(filters.isAvailable));
+  if (filters?.minPrice !== undefined) params.append("minPrice", String(filters.minPrice));
+  if (filters?.maxPrice !== undefined) params.append("maxPrice", String(filters.maxPrice));
+  if (filters?.dietaryTag) params.append("dietaryTag", filters.dietaryTag);
+  if (filters?.isAvailable !== undefined) params.append("isAvailable", String(filters.isAvailable));
 
   const result = await httpClient.get(`/meals?${params.toString()}`);
   return result.data;
