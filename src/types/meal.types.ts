@@ -7,10 +7,8 @@ export interface IMeal {
   categoryId: string;
   title: string;
   description: string;
-  ingredients: string[];
   price: number;
-  portionSize: string;
-  dietaryTag: string;
+  dietaryTag?: string | null;
   image?: string;
   isAvailable: boolean;
   createdAt: string;

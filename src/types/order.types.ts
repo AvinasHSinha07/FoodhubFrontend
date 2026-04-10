@@ -4,7 +4,7 @@ import { IProviderProfile, IUser } from "./user.types";
 export enum OrderStatus {
   PLACED = "PLACED",
   PREPARING = "PREPARING",
-  OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
+  READY = "READY",
   DELIVERED = "DELIVERED",
   CANCELLED = "CANCELLED",
 }
@@ -13,6 +13,7 @@ export enum PaymentStatus {
   PENDING = "PENDING",
   PAID = "PAID",
   FAILED = "FAILED",
+  REFUNDED = "REFUNDED",
 }
 
 export interface IOrderItem {

@@ -8,6 +8,7 @@ export enum UserRole {
 export enum UserStatus {
   ACTIVE = "ACTIVE",
   BLOCKED = "BLOCKED",
+  DELETED = "DELETED",
 }
 
 export interface IUser {
@@ -25,10 +26,11 @@ export interface IProviderProfile {
   id: string;
   userId: string;
   restaurantName: string;
-  location: string;
-  cuisineOptions: string[];
-  bio?: string;
-  isVerified: boolean;
+  description?: string | null;
+  address: string;
+  cuisineType?: string | null;
+  logo?: string | null;
+  bannerImage?: string | null;
   createdAt: string;
   updatedAt: string;
 }
