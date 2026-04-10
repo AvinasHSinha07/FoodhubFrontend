@@ -54,7 +54,7 @@ export default function AdminOrdersPage() {
           <p className="text-gray-500">Monitor all platform food orders globally.</p>
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[180px] bg-white">
+          <SelectTrigger className="w-45 bg-white">
             <SelectValue placeholder="Filter by Status" />
           </SelectTrigger>
           <SelectContent>

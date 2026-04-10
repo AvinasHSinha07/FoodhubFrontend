@@ -16,18 +16,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { PaymentServices } from "@/services/payment.services";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { StripePaymentForm } from "@/components/modules/Payment/StripePaymentForm";
+
+// Make sure to set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env.local
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, providerId, providerInfo, totalPrice, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+  
+  // Calculate final total correctly exactly like shown in UI
+  const totalWithTax = totalPrice * 1.1;
 
   const form = useForm<CreateOrderPayload>({
     resolver: zodResolver(createOrderSchema),
     defaultValues: {
       providerId: providerId || "",
       deliveryAddress: "",
-      items: items.map((i) => ({ mealId: i.meal.id, quantity: i.quantity })),
+      items: items.map((i) => ({ mealId: i.meal.id, quantity: i.quantity })),   
     },
   });
 
@@ -42,12 +54,21 @@ export default function CheckoutPage() {
   const onSubmit = async (data: CreateOrderPayload) => {
     setIsSubmitting(true);
     try {
-      // In a real app, map the order total here or connect to Stripe Intent.
+      // Create initial order in database (Status: PLACED, Payment: PENDING)
       const response = await OrderServices.createOrder(data);
-      if (response.success) {
-        toast.success("Order placed successfully!");
-        clearCart();
-        router.push("/customer/orders");
+      if (response.success && response.data?.id) {
+        setPlacedOrderId(response.data.id);
+        toast.success("Order confirmed. Processing secure payment...");
+
+        // Connect to Stripe Intent
+        const paymentRes = await PaymentServices.createPaymentIntent(
+          response.data.id,
+          totalWithTax
+        );
+
+        if (paymentRes.success && paymentRes.data?.clientSecret) {
+           setClientSecret(paymentRes.data.clientSecret);
+        }
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Checkout failed. Please try again.");
@@ -55,6 +76,11 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   };
+
+  const handlePaymentSuccess = () => {
+    clearCart();
+    router.push("/customer/orders");
+  }
 
   if (items.length === 0) {
     return null; // Will redirect
@@ -73,9 +99,10 @@ export default function CheckoutPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Delivery Details</CardTitle>
+              <CardTitle>{clientSecret ? "Secure Payment" : "Delivery Details"}</CardTitle>
             </CardHeader>
             <CardContent>
+              {!clientSecret ? (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -96,10 +123,22 @@ export default function CheckoutPage() {
                     )}
                   />
                   <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Processing..." : `Place Order • $${totalPrice.toFixed(2)}`}
+                    {isSubmitting ? "Processing..." : `Proceed to Payment • $${totalWithTax.toFixed(2)}`}
                   </Button>
                 </form>
               </Form>
+              ) : (
+                <Elements 
+                  stripe={stripePromise} 
+                  options={{ clientSecret, appearance: { theme: 'stripe' } }}
+                >
+                  <StripePaymentForm 
+                    clientSecret={clientSecret} 
+                    orderId={placedOrderId!} 
+                    onSuccess={handlePaymentSuccess} 
+                  />
+                </Elements>
+              )}
             </CardContent>
           </Card>
         </div>
