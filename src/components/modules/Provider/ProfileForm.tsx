@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ProviderProfileServices } from "@/services/providerProfile.services";
+import { UploadServices } from "@/services/upload.services";
 import { IProviderProfile } from "@/types/user.types";
 import { useState } from "react";
 
@@ -27,6 +28,8 @@ export default function ProfileForm({
   initialData?: IProviderProfile | null;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   const form = useForm<CreateProviderProfileFormData>({
     resolver: zodResolver(createProviderProfileSchema),
@@ -118,16 +121,39 @@ export default function ProfileForm({
           )}
         />
 
-        {/* Temporary URL inputs for images until Cloudinary widget is fully integrated */}
-        <FormField
+<FormField
           control={form.control}
           name="logo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Logo URL</FormLabel>
+              <FormLabel>Logo Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/logo.png" {...field} />
+                <div className="flex gap-4 items-center">
+                  <Input 
+                    type="file" 
+                    accept="image/*"
+                    disabled={isUploadingLogo}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setIsUploadingLogo(true);
+                      try {
+                        const res = await UploadServices.uploadImage(file);
+                        field.onChange(res.data?.url || "");
+                        toast.success("Logo uploaded!");
+                      } catch (err) {
+                        toast.error("Failed to upload logo.");
+                      } finally {
+                        setIsUploadingLogo(false);
+                      }
+                    }} 
+                  />
+                  {field.value && (
+                    <img src={field.value} alt="Logo" className="w-12 h-12 object-cover rounded shadow-sm border border-gray-200" />
+                  )}
+                </div>
               </FormControl>
+              <p className="text-xs text-gray-500">{isUploadingLogo ? "Uploading logo..." : "Upload a logo for your restaurant."}</p>
               <FormMessage />
             </FormItem>
           )}
@@ -138,10 +164,34 @@ export default function ProfileForm({
           name="bannerImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Banner Image URL</FormLabel>
+              <FormLabel>Banner Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/banner.png" {...field} />
+                <div className="flex gap-4 items-center">
+                  <Input 
+                    type="file" 
+                    accept="image/*"
+                    disabled={isUploadingBanner}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setIsUploadingBanner(true);
+                      try {
+                        const res = await UploadServices.uploadImage(file);
+                        field.onChange(res.data?.url || "");
+                        toast.success("Banner uploaded!");
+                      } catch (err) {
+                        toast.error("Failed to upload banner.");
+                      } finally {
+                        setIsUploadingBanner(false);
+                      }
+                    }} 
+                  />
+                  {field.value && (
+                    <img src={field.value} alt="Banner" className="w-24 h-12 object-cover rounded shadow-sm border border-gray-200" />
+                  )}
+                </div>
               </FormControl>
+              <p className="text-xs text-gray-500">{isUploadingBanner ? "Uploading banner..." : "Upload a promotional banner for your page."}</p>
               <FormMessage />
             </FormItem>
           )}

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
+import { UploadServices } from "@/services/upload.services";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -44,6 +45,7 @@ export default function MealForm({
   const router = useRouter();
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -206,12 +208,34 @@ export default function MealForm({
             name="image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Image URL</FormLabel>
+                <FormLabel>Meal Image</FormLabel>
                 <FormControl>
-                  <Input placeholder="https://..." {...field} />
+                  <div className="flex gap-4 items-center">
+                    <Input 
+                      type="file" 
+                      accept="image/*"
+                      disabled={isUploadingImage}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setIsUploadingImage(true);
+                        try {
+                          const res = await UploadServices.uploadImage(file);
+                          field.onChange(res.data?.url || "");
+                        } catch (err) {
+                          toast.error("Failed to upload image");
+                        } finally {
+                          setIsUploadingImage(false);
+                        }
+                      }} 
+                    />
+                    {field.value && (
+                      <img src={field.value} alt="Preview" className="h-10 w-10 object-cover rounded-md" />
+                    )}
+                  </div>
                 </FormControl>
                 <FormDescription>
-                  Temporary URL field. We will implement Cloudinary upload later.
+                  {isUploadingImage ? "Uploading..." : "Upload an appealing picture of your meal."}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
