@@ -39,12 +39,17 @@ const getMealById = async (id: string): Promise<IResponse<IMeal>> => {
 };
 
 const createMeal = async (data: ICreateMealPayload): Promise<IResponse<IMeal>> => {
-  const result = await httpClient.post("/provider/meals", data);
+  const result = await httpClient.post("/meals", data);
   return result.data;
 };
 
 const deleteMeal = async (id: string): Promise<IResponse<null>> => {
-  const result = await httpClient.delete(`/provider/meals/${id}`);
+  const result = await httpClient.delete(`/meals/${id}`);
+  return result.data;
+};
+
+const updateMeal = async (id: string, data: Partial<ICreateMealPayload>): Promise<IResponse<IMeal>> => {
+  const result = await httpClient.patch(`/meals/${id}`, data);
   return result.data;
 };
 
@@ -52,5 +57,6 @@ export const MealServices = {
   getAllMeals,
   getMealById,
   createMeal,
+  updateMeal,
   deleteMeal,
 };
