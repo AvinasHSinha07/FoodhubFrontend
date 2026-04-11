@@ -12,11 +12,15 @@ const RestaurantMenuPage = async ({ params }: RestaurantMenuPageProps) => {
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.provider(id),
-    queryFn: () => ProviderProfileServices.getProviderById(id),
-    staleTime: 1000 * 60 * 10,
-  });
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.provider(id),
+      queryFn: () => ProviderProfileServices.getProviderById(id),
+      staleTime: 1000 * 60 * 10,
+    });
+  } catch {
+    // Render fallback UI in client when provider does not exist.
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

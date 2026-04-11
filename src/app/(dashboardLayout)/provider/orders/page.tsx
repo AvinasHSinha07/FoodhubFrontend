@@ -8,11 +8,15 @@ export const dynamic = "force-dynamic";
 const ProviderOrdersPage = async () => {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.providerOrders(),
-    queryFn: () => OrderServices.getCustomerOrders(),
-    staleTime: 1000 * 60 * 2,
-  });
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.providerOrders(),
+      queryFn: () => OrderServices.getProviderOrders(),
+      staleTime: 1000 * 60 * 2,
+    });
+  } catch {
+    // Keep rendering and let the client query show an empty/error state.
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

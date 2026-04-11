@@ -22,7 +22,7 @@ export default function Navbar() {
   const router = useRouter();
   const { items, providerId } = useCart();
   const cartItemsCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  const cartHref = providerId ? `/restaurant/${providerId}` : "/restaurants";
+  const cartHref = providerId ? `/restaurant/${providerId}` : cartItemsCount > 0 ? "/checkout" : "/restaurants";
 
   const handleLogout = async () => {
     try {
@@ -48,7 +48,7 @@ export default function Navbar() {
     } else if (role === "PROVIDER") {
       links.push({ label: "Provider Dashboard", href: "/provider/orders" });
     } else if (role === "ADMIN") {
-      links.push({ label: "Admin Dashboard", href: "/admin/dashboard" });
+      links.push({ label: "Admin Dashboard", href: "/admin" });
     }
 
     return links;

@@ -28,6 +28,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, providerId, providerInfo, totalPrice, clearCart } = useCart();
+  const backToMenuHref = providerId ? `/restaurant/${providerId}` : "/restaurants";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
@@ -92,7 +93,7 @@ export default function CheckoutPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="mb-8">
-          <Link href={`/restaurant/${providerId}`} className="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+          <Link href={backToMenuHref} className="inline-flex items-center text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Menu
           </Link>
         </div>

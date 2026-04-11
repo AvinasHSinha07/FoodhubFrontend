@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ProviderProfileServices } from "@/services/providerProfile.services";
@@ -20,7 +20,7 @@ type RestaurantMenuPageClientProps = {
 };
 
 export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuPageClientProps) {
-  const { items, addToCart, updateQuantity, totalPrice } = useCart();
+  const { items, addToCart, updateQuantity, totalPrice, clearCart, providerId: cartProviderId } = useCart();
   const [isReplaceCartModalOpen, setIsReplaceCartModalOpen] = useState(false);
   const [pendingMeal, setPendingMeal] = useState<IMeal | null>(null);
 
@@ -31,6 +31,12 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
   });
 
   const provider = (data?.data || null) as IProviderProfile | null;
+
+  useEffect(() => {
+    if (!isLoading && !provider && cartProviderId === providerId) {
+      clearCart();
+    }
+  }, [isLoading, provider, cartProviderId, providerId, clearCart]);
 
   const getCartQuantity = (mealId: string) => {
     return items.find((item) => item.meal.id === mealId)?.quantity || 0;
@@ -190,7 +196,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                       </div>
                     )}
 
-                    <CardHeader className="\ flex-1">
+                    <CardHeader className="flex-1">
                       {meal.image && (
                         <CardTitle className="text-xl font-bold text-slate-900 line-clamp-1 mb-1.5" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                           {meal.title}

@@ -11,6 +11,10 @@ const getCustomerOrders = async (): Promise<IResponse<IOrder[]>> => {
   return httpClient.get<IOrder[]>("/orders/my-orders");
 };
 
+const getProviderOrders = async (): Promise<IResponse<IOrder[]>> => {
+  return httpClient.get<IOrder[]>("/orders/my-orders");
+};
+
 const getOrderById = async (id: string): Promise<IResponse<IOrder>> => {
   return httpClient.get<IOrder>(`/orders/${id}`);
 };
@@ -23,6 +27,7 @@ const updateOrderStatus = async (id: string, status: string): Promise<IResponse<
 export const OrderServices = {
   createOrder,
   getCustomerOrders,
+  getProviderOrders,
   getOrderById,
   updateOrderStatus
 };

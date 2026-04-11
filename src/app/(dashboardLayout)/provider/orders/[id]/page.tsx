@@ -14,11 +14,15 @@ const ProviderOrderDetailsPage = async ({ params }: ProviderOrderDetailsPageProp
 
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.order(id),
-    queryFn: () => OrderServices.getOrderById(id),
-    staleTime: 1000 * 60 * 2,
-  });
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.order(id),
+      queryFn: () => OrderServices.getOrderById(id),
+      staleTime: 1000 * 60 * 2,
+    });
+  } catch {
+    // Render the page shell and let client state handle missing/inaccessible order.
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

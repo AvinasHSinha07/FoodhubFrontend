@@ -277,7 +277,7 @@ export default function MealsPageClient() {
                       <span className="font-bold text-slate-700 ml-1 truncate">{meal.provider?.restaurantName || "Unknown Chef"}</span>
                     </p>
                     <Button asChild className="w-full bg-slate-100 text-indigo-700 hover:bg-indigo-600 hover:text-white rounded-xl shadow-none transition-colors duration-300 font-bold group/btn">
-                      <Link href={`/restaurant/${meal.provider?.id || ""}`}>
+                      <Link href={meal.provider?.id ? `/restaurant/${meal.provider.id}` : "/restaurants"}>
                         View Restaurant <ArrowRight className="ml-2 w-4 h-4 opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all" />
                       </Link>
                     </Button>

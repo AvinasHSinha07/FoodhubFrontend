@@ -29,13 +29,14 @@ export default function ProviderOrdersPageClient() {
   const queryClient = useQueryClient();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.providerOrders(),
-    queryFn: () => OrderServices.getCustomerOrders(),
+    queryFn: () => OrderServices.getProviderOrders(),
     staleTime: 1000 * 60 * 2,
   });
 
   const orders = (data?.data || []) as IOrder[];
+  const isProviderProfileMissing = (error as any)?.response?.status === 404;
 
   const { mutateAsync: updateStatus } = useMutation({
     mutationFn: ({ orderId, newStatus }: { orderId: string; newStatus: string }) =>
@@ -79,6 +80,14 @@ export default function ProviderOrdersPageClient() {
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-32 w-full" />
         </div>
+      ) : isProviderProfileMissing ? (
+        <Card className="text-center py-20 bg-gray-50">
+          <h2 className="text-xl font-semibold text-gray-700">Complete Your Provider Profile</h2>
+          <p className="text-gray-500 mt-2">Create your profile first to start receiving orders.</p>
+          <Button asChild className="mt-6">
+            <Link href="/provider/profile">Set Up Profile</Link>
+          </Button>
+        </Card>
       ) : orders.length === 0 ? (
         <Card className="text-center py-20 bg-gray-50">
           <h2 className="text-xl font-semibold text-gray-700">No Orders Yet</h2>
