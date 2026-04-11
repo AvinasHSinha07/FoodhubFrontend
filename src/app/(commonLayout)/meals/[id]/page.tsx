@@ -1,50 +1,145 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+import { ShoppingCart, Star } from "lucide-react";
 import { MealServices } from "@/services/meal.services";
-import { ShoppingCart } from "lucide-react";
+import { ReviewServices } from "@/services/review.services";
+import { IMeal } from "@/types/meal.types";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface MealDetailsProps {
-  params: Promise<{ id: string }>;
-}
+type ReviewItem = {
+  id: string;
+  rating: number;
+  comment?: string | null;
+  customer?: {
+    name?: string;
+  };
+};
 
-export default async function MealDetailsPage({ params }: MealDetailsProps) {
-  const resolvedParams = await params;
-  // Fallback to avoid error if getMealById is not fully matching this signature yet
-  // const meal = await getMealById(resolvedParams.id);
-  
+export default function MealDetailsPage() {
+  const params = useParams<{ id: string }>();
+  const [meal, setMeal] = useState<IMeal | null>(null);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!params.id) {
+        return;
+      }
+
+      try {
+        const [mealResponse, reviewResponse] = await Promise.all([
+          MealServices.getMealById(params.id),
+          ReviewServices.getMealReviews(params.id),
+        ]);
+
+        setMeal(mealResponse.data);
+        setReviews((reviewResponse.data || []) as ReviewItem[]);
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || "Failed to load meal details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [params.id]);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-5xl mx-auto py-10 px-4 space-y-6">
+        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-10 w-60" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    );
+  }
+
+  if (!meal) {
+    return (
+      <Card className="max-w-3xl mx-auto mt-10 p-8 text-center">
+        <h2 className="text-xl font-semibold">Meal not found</h2>
+        <p className="text-gray-500 mt-2">The requested meal may not exist.</p>
+        <Button asChild className="mt-6">
+          <Link href="/meals">Back to Meals</Link>
+        </Button>
+      </Card>
+    );
+  }
+
+  const averageRating =
+    reviews.length > 0
+      ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+      : null;
+
   return (
-    <div className="container mx-auto py-10 px-4 md:px-0 max-w-5xl">
+    <div className="container mx-auto py-10 px-4 md:px-0 max-w-5xl space-y-10">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="relative h-96 w-full rounded-xl overflow-hidden shadow-lg">
-          {/* Placeholder for actual image */}
-          <div className="absolute inset-0 bg-muted flex items-center justify-center">
-            <span className="text-muted-foreground">Meal Image</span>
-          </div>
+        <div className="relative h-96 w-full rounded-xl overflow-hidden shadow-lg bg-gray-100">
+          {meal.image ? (
+            <img src={meal.image} alt={meal.title} className="h-full w-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">No Image</div>
+          )}
         </div>
-        
+
         <div className="flex flex-col space-y-6 justify-center">
           <div>
-            <Badge className="mb-2">Category Name</Badge>
-            <h1 className="text-4xl font-bold tracking-tight text-primary">Meal Name</h1>
-            <p className="text-2xl font-semibold text-primary/80 mt-2">$24.99</p>
-          </div>
-          
-          <div className="prose prose-sm dark:prose-invert">
-            <p className="space-y-4 text-muted-foreground leading-relaxed">
-              Detailed description of the meal goes here. This placeholder text shows where you can provide comprehensive details about the ingredients, preparation methods, dietary information, and flavor profile of the dish.
-            </p>
+            <Badge className="mb-2">{meal.category?.name || "Meal"}</Badge>
+            <h1 className="text-4xl font-bold tracking-tight text-primary">{meal.title}</h1>
+            <p className="text-2xl font-semibold text-primary/80 mt-2">${meal.price.toFixed(2)}</p>
+            {averageRating ? (
+              <p className="text-sm text-gray-600 mt-2 flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                {averageRating} ({reviews.length} reviews)
+              </p>
+            ) : null}
           </div>
 
-          <div className="pt-4 flex gap-4 border-t">
-            <Button size="lg" className="w-full sm:w-auto">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Add to Cart
+          <p className="text-muted-foreground leading-relaxed">{meal.description}</p>
+
+          <div className="pt-4 flex gap-4 border-t flex-wrap">
+            <Button asChild size="lg" className="w-full sm:w-auto">
+              <Link href={`/restaurant/${meal.providerId}`}>
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                View Restaurant Menu
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+              <Link href="/meals">Browse More Meals</Link>
             </Button>
           </div>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Customer Reviews</CardTitle>
+          <CardDescription>What customers are saying about this meal</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {reviews.length === 0 ? (
+            <p className="text-sm text-gray-500">No reviews yet for this meal.</p>
+          ) : (
+            reviews.map((review) => (
+              <div key={review.id} className="border rounded-lg p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-sm">{review.customer?.name || "Customer"}</p>
+                  <p className="text-xs text-gray-500">Rating: {review.rating}/5</p>
+                </div>
+                {review.comment ? <p className="text-sm text-gray-700">{review.comment}</p> : null}
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

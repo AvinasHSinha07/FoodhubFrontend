@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { OrderServices } from "@/services/order.services";
 import { IOrder, IOrderItem } from "@/types/order.types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -122,6 +123,9 @@ export default function CustomerOrdersPage() {
                     <span>Total Paid</span>
                     <span>${order.totalPrice.toFixed(2)}</span>
                   </div>
+                  <Button asChild variant="outline" className="w-full mt-2">
+                    <Link href={`/customer/orders/${order.id}`}>View Order Details</Link>
+                  </Button>
                   <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-dashed">
                     <span className="font-medium">Delivery to:</span> {order.deliveryAddress}
                   </p>

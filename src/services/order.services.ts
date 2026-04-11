@@ -20,7 +20,7 @@ const getOrderById = async (id: string): Promise<IResponse<IOrder>> => {
 
 // Also for provider logic (can split or keep here)
 const updateOrderStatus = async (id: string, status: string): Promise<IResponse<IOrder>> => {
-  const result = await httpClient.patch(`/orders/${id}/status`, { orderStatus: status });
+  const result = await httpClient.patch(`/orders/${id}/status`, { status });
   return result.data;
 };
 

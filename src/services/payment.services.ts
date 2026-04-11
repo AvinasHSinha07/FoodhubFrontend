@@ -2,12 +2,10 @@ import httpClient from "../lib/axios/httpClient";
 import { IResponse } from "../types/api.types";
 
 const createPaymentIntent = async (
-  orderId: string,
-  amount: number
+  orderId: string
 ): Promise<IResponse<{ clientSecret: string; paymentIntentId: string }>> => {
   const result = await httpClient.post("/payments/create-intent", {
     orderId,
-    amount,
   });
   return result.data;
 };

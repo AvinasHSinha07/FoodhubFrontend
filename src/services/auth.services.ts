@@ -2,12 +2,27 @@
 
 import { authClient } from "@/lib/authClient";
 import { LoginFormData, RegisterFormData } from "@/zod/auth.validation";
+import { deleteCookie, setCookie } from "cookies-next";
 
 const loginUser = async (data: LoginFormData) => {
-  return await authClient.signIn.email({
+  const result = await authClient.signIn.email({
     email: data.email,
     password: data.password,
   });
+
+  const role =
+    (result as any)?.data?.user?.role ||
+    (result as any)?.user?.role;
+
+  if (role) {
+    setCookie("userRole", role, {
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24,
+    });
+  }
+
+  return result;
 };
 
 const registerUser = async (data: RegisterFormData) => {
@@ -20,7 +35,9 @@ const registerUser = async (data: RegisterFormData) => {
 };
 
 const logoutUser = async () => {
-  return await authClient.signOut();
+  const result = await authClient.signOut();
+  deleteCookie("userRole", { path: "/" });
+  return result;
 };
 
 export const AuthServices = {

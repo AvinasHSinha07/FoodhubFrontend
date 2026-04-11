@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { OrderServices } from "@/services/order.services";
 import { IOrder, OrderStatus } from "@/types/order.types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -16,6 +17,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+
+const getAllowedTransitions = (currentStatus: OrderStatus): OrderStatus[] => {
+  switch (currentStatus) {
+    case OrderStatus.PLACED:
+      return [OrderStatus.PREPARING, OrderStatus.CANCELLED];
+    case OrderStatus.PREPARING:
+      return [OrderStatus.READY, OrderStatus.CANCELLED];
+    case OrderStatus.READY:
+      return [OrderStatus.DELIVERED, OrderStatus.CANCELLED];
+    default:
+      return [];
+  }
+};
 
 export default function ProviderOrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
@@ -106,17 +120,18 @@ export default function ProviderOrdersPage() {
                   <Select
                     defaultValue={order.orderStatus}
                     onValueChange={(val) => handleStatusChange(order.id, val)}
-                    disabled={updatingId === order.id}
+                    disabled={updatingId === order.id || getAllowedTransitions(order.orderStatus).length === 0}
                   >
                     <SelectTrigger className={`w-[140px] font-medium border ${getStatusColor(order.orderStatus)}`}>
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
-                      <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
-                      <SelectItem value={OrderStatus.READY}>Ready</SelectItem>
-                      <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
-                      <SelectItem value={OrderStatus.CANCELLED}>Cancelled</SelectItem>
+                      <SelectItem value={order.orderStatus}>{order.orderStatus}</SelectItem>
+                      {getAllowedTransitions(order.orderStatus).map((nextStatus) => (
+                        <SelectItem key={nextStatus} value={nextStatus}>
+                          {nextStatus}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -146,6 +161,9 @@ export default function ProviderOrdersPage() {
                         <span>Total</span>
                         <span>${order.totalPrice.toFixed(2)}</span>
                       </div>
+                      <Button asChild variant="outline" className="w-full mt-4">
+                        <Link href={`/provider/orders/${order.id}`}>View Details</Link>
+                      </Button>
                     </div>
                   </div>
                 </div>

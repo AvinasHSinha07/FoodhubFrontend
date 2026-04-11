@@ -18,3 +18,4 @@ export interface IMeal {
   category?: ICategory;
   provider?: IProviderProfile;
 }
+export interface IMealFilters { searchTerm?: string; categoryId?: string; minPrice?: number; maxPrice?: number; dietaryTag?: string; isAvailable?: boolean; }

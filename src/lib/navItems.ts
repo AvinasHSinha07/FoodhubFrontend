@@ -3,8 +3,8 @@
  */
 export const RouteDefinitions = {
   adminHome: "/admin",
-  providerHome: "/provider",
-  customerHome: "/customer",
+  providerHome: "/provider/orders",
+  customerHome: "/customer/orders",
   publicHome: "/",
   login: "/login",
   register: "/register",

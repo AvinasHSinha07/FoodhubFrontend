@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,9 +17,16 @@ import {
 } from "@/components/ui/form";
 import { LoginFormData, loginSchema } from "@/zod/auth.validation";
 import { AuthServices } from "@/services/auth.services";
+import {
+  getDefaultDashboardRoute,
+  isValidRedirectForRole,
+  UserRole,
+} from "@/lib/authUtils";
+import { getCookie } from "cookies-next";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<LoginFormData>({
@@ -41,8 +48,18 @@ export default function LoginForm() {
     }
 
     toast.success("Successfully logged in!");
-    // For simplicity routing them strictly to a shared location, in production we route based on user roles
-    router.push("/");
+
+    const redirectPath = searchParams.get("redirect");
+    const userRole = getCookie("userRole") as UserRole | undefined;
+
+    if (redirectPath && isValidRedirectForRole(redirectPath, userRole)) {
+      router.push(redirectPath);
+    } else if (userRole) {
+      router.push(getDefaultDashboardRoute(userRole));
+    } else {
+      router.push("/");
+    }
+
     router.refresh();
   };
 
