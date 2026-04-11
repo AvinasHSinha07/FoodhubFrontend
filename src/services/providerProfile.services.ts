@@ -27,8 +27,29 @@ const updateMyProfile = async (
   return httpClient.patch<IProviderProfile, Partial<ICreateProviderProfilePayload>>("/providers/me", data);
 };
 
-const getAllProviders = async (queryString = ""): Promise<IResponse<IProviderProfile[]>> => {
+const getAllProviders = async (
+  params?: {
+    searchTerm?: string;
+    cuisineType?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }
+): Promise<IResponse<IProviderProfile[]>> => {
+  const query = new URLSearchParams();
+  if (params?.searchTerm) query.append("search", params.searchTerm);
+  if (params?.cuisineType) query.append("cuisineType", params.cuisineType);
+  if (params?.status) query.append("status", params.status);
+  if (params?.page) query.append("page", String(params.page));
+  if (params?.limit) query.append("limit", String(params.limit));
+  if (params?.sortBy) query.append("sortBy", params.sortBy);
+  if (params?.sortOrder) query.append("sortOrder", params.sortOrder);
+
+  const queryString = query.toString();
   const path = queryString ? `/providers?${queryString}` : "/providers";
+
   return httpClient.get<IProviderProfile[]>(path);
 };
 

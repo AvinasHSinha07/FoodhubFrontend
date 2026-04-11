@@ -2,24 +2,27 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProviderProfileServices } from "@/services/providerProfile.services";
+import { FavoriteServices } from "@/services/favorite.services";
 import { IProviderProfile } from "@/types/user.types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/CartProvider";
-import { ShoppingCart, Plus, Minus, ArrowLeft, Utensils, MapPin, Star, ArrowRight } from "lucide-react";
+import { ShoppingCart, Plus, Minus, ArrowLeft, Utensils, MapPin, Star, ArrowRight, Heart } from "lucide-react";
 import { IMeal } from "@/types/meal.types";
 import { queryKeys } from "@/lib/query/query-keys";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 type RestaurantMenuPageClientProps = {
   providerId: string;
 };
 
 export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuPageClientProps) {
+  const queryClient = useQueryClient();
   const { items, addToCart, updateQuantity, totalPrice, clearCart, providerId: cartProviderId } = useCart();
   const [isReplaceCartModalOpen, setIsReplaceCartModalOpen] = useState(false);
   const [pendingMeal, setPendingMeal] = useState<IMeal | null>(null);
@@ -31,6 +34,49 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
   });
 
   const provider = (data?.data || null) as IProviderProfile | null;
+
+  const { data: mealFavoritesResponse } = useQuery({
+    queryKey: queryKeys.mealFavorites(`restaurant-${providerId}`),
+    queryFn: () => FavoriteServices.getMealFavorites({ page: 1, limit: 100 }),
+    staleTime: 1000 * 60,
+    retry: false,
+  });
+
+  const { data: providerFavoriteStateResponse } = useQuery({
+    queryKey: queryKeys.providerFavoriteState(providerId),
+    queryFn: () => FavoriteServices.getProviderFavoriteState(providerId),
+    staleTime: 1000 * 60,
+    retry: false,
+  });
+
+  const favoriteMealIds = new Set(
+    ((mealFavoritesResponse?.data || []) as any[])
+      .map((favorite) => favorite.meal?.id)
+      .filter(Boolean)
+  );
+  const isProviderFavorited = providerFavoriteStateResponse?.data?.favorited || false;
+
+  const toggleMealFavoriteMutation = useMutation({
+    mutationFn: (mealId: string) => FavoriteServices.toggleMealFavorite(mealId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["meal-favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["meal-favorite-state"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Unable to update favorites.");
+    },
+  });
+
+  const toggleProviderFavoriteMutation = useMutation({
+    mutationFn: () => FavoriteServices.toggleProviderFavorite(providerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["provider-favorites"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.providerFavoriteState(providerId) });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Unable to update favorites.");
+    },
+  });
 
   useEffect(() => {
     if (!isLoading && !provider && cartProviderId === providerId) {
@@ -132,6 +178,16 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                   {provider.restaurantName}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="bg-white/20 text-white hover:bg-white/30 border-none"
+                    onClick={() => toggleProviderFavoriteMutation.mutate()}
+                  >
+                    <Heart className={`mr-2 h-4 w-4 ${isProviderFavorited ? "fill-red-500 text-red-500" : "text-white"}`} />
+                    {isProviderFavorited ? "Saved" : "Save"}
+                  </Button>
                   {provider.cuisineType && (
                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-3 py-1 text-sm font-medium transition-all">
                       <Utensils className="w-3 h-3 mr-1.5 inline-block" />
@@ -213,6 +269,20 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                     </CardHeader>
 
                     <div className="p-5 pt-4 border-t border-slate-50 mt-auto">
+                      <div className="mb-3 flex justify-end">
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          onClick={() => toggleMealFavoriteMutation.mutate(meal.id)}
+                          aria-label="Toggle favorite meal"
+                        >
+                          <Heart
+                            className={`h-4 w-4 ${favoriteMealIds.has(meal.id) ? "fill-red-500 text-red-500" : "text-slate-500"}`}
+                          />
+                        </Button>
+                      </div>
                       {qty === 0 ? (
                         <Button
                           className="w-full rounded-2xl h-12 bg-slate-900 hover:bg-indigo-600 text-white transition-colors duration-300 font-bold shadow-sm group-hover:shadow-md"

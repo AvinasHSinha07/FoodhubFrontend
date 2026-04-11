@@ -2,7 +2,8 @@ export interface IMeta {
   page: number;
   limit: number;
   total: number;
-  totalPage: number;
+  totalPages: number;
+  totalPage?: number;
 }
 
 export interface ApiResponse<T> {

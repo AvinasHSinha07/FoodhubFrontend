@@ -16,7 +16,14 @@ const RestaurantsPage = async ({ searchParams }: RestaurantsPageProps) => {
 
   await queryClient.prefetchQuery({
     queryKey: queryKeys.providers(queryString),
-    queryFn: () => ProviderProfileServices.getAllProviders(queryString),
+    queryFn: () =>
+      ProviderProfileServices.getAllProviders({
+        searchTerm: resolvedSearchParams.search as string | undefined,
+        page: resolvedSearchParams.page ? Number(resolvedSearchParams.page) : 1,
+        limit: 9,
+        sortBy: (resolvedSearchParams.sortBy as string | undefined) || "createdAt",
+        sortOrder: ((resolvedSearchParams.sortOrder as "asc" | "desc" | undefined) || "desc"),
+      }),
     staleTime: 1000 * 60 * 10,
   });
 

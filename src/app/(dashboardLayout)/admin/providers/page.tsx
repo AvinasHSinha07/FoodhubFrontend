@@ -10,7 +10,7 @@ const AdminProvidersPage = async () => {
 
   await queryClient.prefetchQuery({
     queryKey: queryKeys.providers(""),
-    queryFn: () => ProviderProfileServices.getAllProviders(),
+    queryFn: () => ProviderProfileServices.getAllProviders({ page: 1, limit: 10 }),
     staleTime: 1000 * 60 * 10,
   });
 

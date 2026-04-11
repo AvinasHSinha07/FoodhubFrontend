@@ -1,31 +1,127 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { OrderServices } from "@/services/order.services";
-import { IOrder, IOrderItem } from "@/types/order.types";
+import { IOrder, IOrderItem, OrderStatus, PaymentStatus } from "@/types/order.types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ReviewModal } from "@/components/modules/Customer/ReviewModal";
-import { Star } from "lucide-react";
+import { RotateCcw, Star } from "lucide-react";
 import { queryKeys } from "@/lib/query/query-keys";
+import { useCart } from "@/providers/CartProvider";
+import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PaginationControls from "@/components/shared/list/PaginationControls";
+import SortControl from "@/components/shared/list/SortControl";
+import { getOrderFiltersFromSearchParams } from "@/lib/query/order-filters";
+import { setReorderDraftDeliveryAddress } from "@/lib/reorder-draft";
 
 export default function CustomerOrdersPageClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const queryString = searchParams?.toString() || "";
+  const { items, providerId, replaceCartFromOrder } = useCart();
+
+  const [selectedOrderStatus, setSelectedOrderStatus] = useState(
+    searchParams?.get("orderStatus") || "ALL"
+  );
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(
+    searchParams?.get("paymentStatus") || "ALL"
+  );
+  const [sortValue, setSortValue] = useState(
+    `${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`
+  );
+
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState("");
   const [selectedItem, setSelectedItem] = useState<IOrderItem | null>(null);
 
+  useEffect(() => {
+    setSelectedOrderStatus(searchParams?.get("orderStatus") || "ALL");
+    setSelectedPaymentStatus(searchParams?.get("paymentStatus") || "ALL");
+    setSortValue(`${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`);
+  }, [searchParams]);
+
+  const filters = useMemo(() => {
+    return getOrderFiltersFromSearchParams(new URLSearchParams(queryString));
+  }, [queryString]);
+
   const { data, isLoading } = useQuery({
-    queryKey: queryKeys.customerOrders(),
-    queryFn: () => OrderServices.getCustomerOrders(),
+    queryKey: queryKeys.customerOrders(queryString),
+    queryFn: () => OrderServices.getCustomerOrders(filters),
     staleTime: 1000 * 60 * 3,
   });
 
   const orders = (data?.data || []) as IOrder[];
+  const ordersMeta = data?.meta;
+
+  const updateParams = (updates: Record<string, string | null>) => {
+    const nextParams = new URLSearchParams(searchParams?.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value || value === "ALL") {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
+    });
+
+    const nextQueryString = nextParams.toString();
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, { scroll: false });
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortValue(value);
+    const [sortBy, sortOrder] = value.split(":");
+    updateParams({ sortBy, sortOrder, page: "1" });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    updateParams({ page: String(nextPage) });
+  };
+
+  const reorderMutation = useMutation({
+    mutationFn: (orderId: string) => OrderServices.reorderOrder(orderId),
+    onSuccess: (response) => {
+      const payload = response.data;
+
+      if (!payload) {
+        toast.error("Unable to reorder this order right now.");
+        return;
+      }
+
+      if (providerId && items.length > 0 && providerId !== payload.provider.id) {
+        const confirmed = window.confirm(
+          "Your cart has items from another restaurant. Replace cart and continue to checkout?"
+        );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      replaceCartFromOrder({
+        provider: payload.provider,
+        items: payload.items.map((item) => ({ meal: item.meal, quantity: item.quantity })),
+      });
+
+      setReorderDraftDeliveryAddress(payload.deliveryAddress || "");
+
+      toast.success("Reorder items added to cart.");
+      router.push("/checkout");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to reorder this order.");
+    },
+  });
 
   const handleOpenReview = (orderId: string, item: IOrderItem) => {
     setSelectedOrderId(orderId);
@@ -49,6 +145,60 @@ export default function CustomerOrdersPageClient() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">My Orders</h1>
         <p className="text-gray-500">View and track your previous food orders.</p>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-3">
+          <Select
+            value={selectedOrderStatus}
+            onValueChange={(value) => {
+              setSelectedOrderStatus(value);
+              updateParams({ orderStatus: value, page: "1" });
+            }}
+          >
+            <SelectTrigger className="w-45 bg-white">
+              <SelectValue placeholder="Order status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
+              <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
+              <SelectItem value={OrderStatus.READY}>Ready</SelectItem>
+              <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
+              <SelectItem value={OrderStatus.CANCELLED}>Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedPaymentStatus}
+            onValueChange={(value) => {
+              setSelectedPaymentStatus(value);
+              updateParams({ paymentStatus: value, page: "1" });
+            }}
+          >
+            <SelectTrigger className="w-45 bg-white">
+              <SelectValue placeholder="Payment status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Payments</SelectItem>
+              <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
+              <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <SortControl
+          value={sortValue}
+          onValueChange={handleSortChange}
+          options={[
+            { label: "Newest", value: "createdAt:desc" },
+            { label: "Oldest", value: "createdAt:asc" },
+            { label: "Total: High to Low", value: "totalPrice:desc" },
+            { label: "Total: Low to High", value: "totalPrice:asc" },
+          ]}
+        />
       </div>
 
       {isLoading ? (
@@ -116,9 +266,20 @@ export default function CustomerOrdersPageClient() {
                     <span>Total Paid</span>
                     <span>${order.totalPrice.toFixed(2)}</span>
                   </div>
-                  <Button asChild variant="outline" className="w-full mt-2">
-                    <Link href={`/customer/orders/${order.id}`}>View Order Details</Link>
-                  </Button>
+                  <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href={`/customer/orders/${order.id}`}>View Order Details</Link>
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => reorderMutation.mutate(order.id)}
+                      disabled={reorderMutation.isPending}
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      {reorderMutation.isPending ? "Reordering..." : "Reorder"}
+                    </Button>
+                  </div>
                   <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-dashed">
                     <span className="font-medium">Delivery to:</span> {order.deliveryAddress}
                   </p>
@@ -126,6 +287,7 @@ export default function CustomerOrdersPageClient() {
               </CardContent>
             </Card>
           ))}
+          <PaginationControls meta={ordersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
         </div>
       )}
 

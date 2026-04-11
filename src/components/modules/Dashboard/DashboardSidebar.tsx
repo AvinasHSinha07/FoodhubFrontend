@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, Settings, User, ShoppingBag, PieChart, ChefHat } from "lucide-react";
+import { Home, Settings, User, ShoppingBag, PieChart, ChefHat, Heart } from "lucide-react";
 import { getDashboardNavItems, isNavItemActive } from "@/lib/dashboardNav";
 
 const iconByLabel = {
@@ -12,6 +12,7 @@ const iconByLabel = {
   Providers: ChefHat,
   Categories: Settings,
   Orders: ShoppingBag,
+  Favorites: Heart,
   Meals: UtensilsIcon,
   Profile: User,
 } as const;

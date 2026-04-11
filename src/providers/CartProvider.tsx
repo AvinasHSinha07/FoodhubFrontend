@@ -16,6 +16,7 @@ type AddToCartOptions = {
 export type AddToCartResult = "added" | "provider_mismatch";
 
 interface CartContextProps {
+  isInitialized: boolean;
   items: ICartItem[];
   providerId: string | null;
   providerInfo: IProviderProfile | null;
@@ -28,6 +29,10 @@ interface CartContextProps {
   removeFromCart: (mealId: string) => void;
   updateQuantity: (mealId: string, quantity: number) => void;
   clearCart: () => void;
+  replaceCartFromOrder: (payload: {
+    provider: IProviderProfile;
+    items: Array<{ meal: IMeal; quantity: number }>;
+  }) => void;
   totalItems: number;
   totalPrice: number;
 }
@@ -125,12 +130,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProviderInfo(null);
   };
 
+  const replaceCartFromOrder = (payload: {
+    provider: IProviderProfile;
+    items: Array<{ meal: IMeal; quantity: number }>;
+  }) => {
+    setProviderId(payload.provider.id);
+    setProviderInfo(payload.provider);
+    setItems(payload.items.map((item) => ({ meal: item.meal, quantity: item.quantity })));
+  };
+
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
   const totalPrice = items.reduce((acc, item) => acc + item.meal.price * item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
+        isInitialized,
         items,
         providerId,
         providerInfo,
@@ -138,6 +153,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeFromCart,
         updateQuantity,
         clearCart,
+        replaceCartFromOrder,
         totalItems,
         totalPrice,
       }}

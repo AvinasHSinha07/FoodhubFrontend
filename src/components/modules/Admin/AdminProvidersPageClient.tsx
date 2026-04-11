@@ -42,7 +42,7 @@ export default function AdminProvidersPageClient() {
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.providers(""),
-    queryFn: () => ProviderProfileServices.getAllProviders(),
+    queryFn: () => ProviderProfileServices.getAllProviders({ page: 1, limit: 50 }),
     staleTime: 1000 * 60 * 10,
   });
 

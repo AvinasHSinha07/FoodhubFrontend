@@ -19,6 +19,7 @@ const PROVIDER_NAV_ITEMS: DashboardNavItem[] = [
 
 const CUSTOMER_NAV_ITEMS: DashboardNavItem[] = [
   { href: "/customer/orders", label: "Orders" },
+  { href: "/customer/favorites", label: "Favorites" },
   { href: "/customer/profile", label: "Profile" },
 ];
 

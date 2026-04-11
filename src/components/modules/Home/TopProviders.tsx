@@ -16,7 +16,7 @@ export default function TopProviders() {
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const response = await ProviderProfileServices.getAllProviders();
+        const response = await ProviderProfileServices.getAllProviders({ page: 1, limit: 12 });
         setProviders(response.data?.slice(0, 6) || []); 
       } catch (error) {
         console.error("Failed to fetch restaurants");

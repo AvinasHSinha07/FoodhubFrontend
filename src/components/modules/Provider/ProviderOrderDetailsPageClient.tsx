@@ -58,7 +58,7 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
     try {
       await updateStatus(status);
       await queryClient.invalidateQueries({ queryKey: queryKeys.order(orderId) });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.providerOrders() });
+      await queryClient.invalidateQueries({ queryKey: ["provider-orders"] });
       toast.success(`Order updated to ${status}`);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to update order status");

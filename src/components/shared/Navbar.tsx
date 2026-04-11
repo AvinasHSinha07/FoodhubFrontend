@@ -45,6 +45,7 @@ export default function Navbar() {
 
     if (role === "CUSTOMER") {
       links.push({ label: "My Orders", href: "/customer/orders" });
+      links.push({ label: "Favorites", href: "/customer/favorites" });
     } else if (role === "PROVIDER") {
       links.push({ label: "Provider Dashboard", href: "/provider/orders" });
     } else if (role === "ADMIN") {

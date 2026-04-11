@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProviderProfileServices } from "@/services/providerProfile.services";
+import { FavoriteServices } from "@/services/favorite.services";
 import { IProviderProfile } from "@/types/user.types";
 import { queryKeys } from "@/lib/query/query-keys";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,9 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Utensils, Star, ArrowRight } from "lucide-react";
+import { Search, MapPin, Utensils, Star, ArrowRight, Heart } from "lucide-react";
+import PaginationControls from "@/components/shared/list/PaginationControls";
+import SortControl from "@/components/shared/list/SortControl";
+import { toast } from "sonner";
 
 export default function RestaurantsPageClient() {
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -23,18 +28,59 @@ export default function RestaurantsPageClient() {
   const searchValueFromUrl = searchParams?.get("search")?.trim() || "";
 
   const [searchTerm, setSearchTerm] = useState(searchValueFromUrl);
+  const [sortValue, setSortValue] = useState(
+    `${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`
+  );
 
   useEffect(() => {
     setSearchTerm(searchValueFromUrl);
+    setSortValue(`${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`);
   }, [searchValueFromUrl]);
+
+  const page = Number(searchParams?.get("page") || "1");
+  const [sortBy, sortOrder] = sortValue.split(":");
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.providers(queryString),
-    queryFn: () => ProviderProfileServices.getAllProviders(queryString),
+    queryFn: () =>
+      ProviderProfileServices.getAllProviders({
+        searchTerm: searchValueFromUrl || undefined,
+        page,
+        limit: 9,
+        sortBy,
+        sortOrder: (sortOrder as "asc" | "desc") || "desc",
+      }),
     staleTime: 1000 * 60 * 10,
   });
 
   const providers = data?.data || [];
+  const providersMeta = data?.meta;
+
+  const { data: providerFavoritesResponse } = useQuery({
+    queryKey: queryKeys.providerFavorites("restaurants-page"),
+    queryFn: () => FavoriteServices.getProviderFavorites({ page: 1, limit: 100 }),
+    staleTime: 1000 * 60,
+    retry: false,
+  });
+
+  const favoriteProviderIds = useMemo(() => {
+    return new Set(
+      ((providerFavoritesResponse?.data || []) as any[])
+        .map((favorite) => favorite.provider?.id)
+        .filter(Boolean)
+    );
+  }, [providerFavoritesResponse?.data]);
+
+  const toggleProviderFavoriteMutation = useMutation({
+    mutationFn: (providerId: string) => FavoriteServices.toggleProviderFavorite(providerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["provider-favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["provider-favorite-state"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Unable to update favorites.");
+    },
+  });
 
   const filteredProviders = useMemo(() => {
     if (!searchValueFromUrl) {
@@ -63,6 +109,33 @@ export default function RestaurantsPageClient() {
     router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
       scroll: false,
     });
+  };
+
+  const updateParams = (updates: Record<string, string | null>) => {
+    const nextParams = new URLSearchParams(searchParams?.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value) {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
+    });
+
+    const nextQueryString = nextParams.toString();
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
+      scroll: false,
+    });
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortValue(value);
+    const [nextSortBy, nextSortOrder] = value.split(":");
+    updateParams({ sortBy: nextSortBy, sortOrder: nextSortOrder, page: "1" });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    updateParams({ page: String(nextPage) });
   };
 
   return (
@@ -102,6 +175,19 @@ export default function RestaurantsPageClient() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full -mt-8 relative z-20">
+        <div className="flex justify-end mb-4 mt-6">
+          <SortControl
+            value={sortValue}
+            onValueChange={handleSortChange}
+            options={[
+              { label: "Newest", value: "createdAt:desc" },
+              { label: "Oldest", value: "createdAt:asc" },
+              { label: "Name: A-Z", value: "restaurantName:asc" },
+              { label: "Name: Z-A", value: "restaurantName:desc" },
+            ]}
+          />
+        </div>
+
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -132,8 +218,9 @@ export default function RestaurantsPageClient() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-            {filteredProviders.map((provider) => {
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+              {filteredProviders.map((provider) => {
               const reviews = provider.meals?.flatMap((meal: any) => meal.reviews || []) || [];
               const averageRating =
                 reviews.length > 0
@@ -186,6 +273,18 @@ export default function RestaurantsPageClient() {
                           </span>
                         </div>
                       </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => toggleProviderFavoriteMutation.mutate(provider.id)}
+                        aria-label="Toggle favorite restaurant"
+                      >
+                        <Heart
+                          className={`h-4 w-4 ${favoriteProviderIds.has(provider.id) ? "fill-red-500 text-red-500" : "text-slate-500"}`}
+                        />
+                      </Button>
                     </div>
                   </CardHeader>
 
@@ -212,8 +311,10 @@ export default function RestaurantsPageClient() {
                   </CardContent>
                 </Card>
               );
-            })}
-          </div>
+              })}
+            </div>
+            <PaginationControls meta={providersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
+          </>
         )}
       </div>
     </div>

@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { OrderServices } from "@/services/order.services";
-import { IOrder, OrderStatus } from "@/types/order.types";
+import { IOrder, OrderStatus, PaymentStatus } from "@/types/order.types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { queryKeys } from "@/lib/query/query-keys";
+import PaginationControls from "@/components/shared/list/PaginationControls";
+import SortControl from "@/components/shared/list/SortControl";
+import { getOrderFiltersFromSearchParams } from "@/lib/query/order-filters";
 
 const getAllowedTransitions = (currentStatus: OrderStatus): OrderStatus[] => {
   switch (currentStatus) {
@@ -27,15 +31,41 @@ const getAllowedTransitions = (currentStatus: OrderStatus): OrderStatus[] => {
 
 export default function ProviderOrdersPageClient() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const queryString = searchParams?.toString() || "";
+
+  const [selectedOrderStatus, setSelectedOrderStatus] = useState(
+    searchParams?.get("orderStatus") || "ALL"
+  );
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(
+    searchParams?.get("paymentStatus") || "ALL"
+  );
+  const [sortValue, setSortValue] = useState(
+    `${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`
+  );
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    setSelectedOrderStatus(searchParams?.get("orderStatus") || "ALL");
+    setSelectedPaymentStatus(searchParams?.get("paymentStatus") || "ALL");
+    setSortValue(`${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`);
+  }, [searchParams]);
+
+  const filters = useMemo(() => {
+    return getOrderFiltersFromSearchParams(new URLSearchParams(queryString));
+  }, [queryString]);
+
   const { data, isLoading, error } = useQuery({
-    queryKey: queryKeys.providerOrders(),
-    queryFn: () => OrderServices.getProviderOrders(),
+    queryKey: queryKeys.providerOrders(queryString),
+    queryFn: () => OrderServices.getProviderOrders(filters),
     staleTime: 1000 * 60 * 2,
   });
 
   const orders = (data?.data || []) as IOrder[];
+  const ordersMeta = data?.meta;
   const isProviderProfileMissing = (error as any)?.response?.status === 404;
 
   const { mutateAsync: updateStatus } = useMutation({
@@ -48,12 +78,37 @@ export default function ProviderOrdersPageClient() {
     try {
       await updateStatus({ orderId, newStatus });
       toast.success(`Order status updated to ${newStatus}`);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.providerOrders() });
+      await queryClient.invalidateQueries({ queryKey: ["provider-orders"] });
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to update status");
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const updateParams = (updates: Record<string, string | null>) => {
+    const nextParams = new URLSearchParams(searchParams?.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value || value === "ALL") {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
+    });
+
+    const nextQueryString = nextParams.toString();
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, { scroll: false });
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortValue(value);
+    const [sortBy, sortOrder] = value.split(":");
+    updateParams({ sortBy, sortOrder, page: "1" });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    updateParams({ page: String(nextPage) });
   };
 
   const getStatusColor = (status: string) => {
@@ -72,6 +127,61 @@ export default function ProviderOrdersPageClient() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Manage Orders</h1>
         <p className="text-gray-500">View and update incoming customer orders.</p>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-3">
+          <Select
+            value={selectedOrderStatus}
+            onValueChange={(value) => {
+              setSelectedOrderStatus(value);
+              updateParams({ orderStatus: value, page: "1" });
+            }}
+          >
+            <SelectTrigger className="w-45 bg-white">
+              <SelectValue placeholder="Order status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Statuses</SelectItem>
+              <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
+              <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
+              <SelectItem value={OrderStatus.READY}>Ready</SelectItem>
+              <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
+              <SelectItem value={OrderStatus.CANCELLED}>Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedPaymentStatus}
+            onValueChange={(value) => {
+              setSelectedPaymentStatus(value);
+              updateParams({ paymentStatus: value, page: "1" });
+            }}
+          >
+            <SelectTrigger className="w-45 bg-white">
+              <SelectValue placeholder="Payment status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Payments</SelectItem>
+              <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
+              <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <SortControl
+          value={sortValue}
+          onValueChange={handleSortChange}
+          options={[
+            { label: "Newest", value: "createdAt:desc" },
+            { label: "Oldest", value: "createdAt:asc" },
+            { label: "Updated: Newest", value: "updatedAt:desc" },
+            { label: "Total: High to Low", value: "totalPrice:desc" },
+            { label: "Total: Low to High", value: "totalPrice:asc" },
+          ]}
+        />
       </div>
 
       {isLoading ? (
@@ -167,6 +277,7 @@ export default function ProviderOrdersPageClient() {
               </CardContent>
             </Card>
           ))}
+          <PaginationControls meta={ordersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
         </div>
       )}
     </div>

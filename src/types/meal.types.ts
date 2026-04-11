@@ -18,4 +18,15 @@ export interface IMeal {
   category?: ICategory;
   provider?: IProviderProfile;
 }
-export interface IMealFilters { searchTerm?: string; categoryId?: string; minPrice?: number; maxPrice?: number; dietaryTag?: string; isAvailable?: boolean; }
+export interface IMealFilters {
+  searchTerm?: string;
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  dietaryTag?: string;
+  isAvailable?: boolean;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}

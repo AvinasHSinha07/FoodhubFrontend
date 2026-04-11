@@ -21,13 +21,17 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { StripePaymentForm } from "@/components/modules/Payment/StripePaymentForm";
 import Image from "next/image";
+import {
+  clearReorderDraftDeliveryAddress,
+  getReorderDraftDeliveryAddress,
+} from "@/lib/reorder-draft";
 
 // Make sure to set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env.local
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, providerId, providerInfo, totalPrice, clearCart } = useCart();
+  const { isInitialized, items, providerId, providerInfo, totalPrice, clearCart } = useCart();
   const backToMenuHref = providerId ? `/restaurant/${providerId}` : "/restaurants";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -47,11 +51,36 @@ export default function CheckoutPage() {
 
   // Redirect if cart is empty
   useEffect(() => {
-    if (items.length === 0) {
+    if (isInitialized && items.length === 0) {
       toast.error("Your cart is empty");
       router.push("/");
     }
-  }, [items, router]);
+  }, [isInitialized, items, router]);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
+    form.setValue("providerId", providerId || "");
+    form.setValue(
+      "items",
+      items.map((item) => ({ mealId: item.meal.id, quantity: item.quantity }))
+    );
+  }, [form, isInitialized, items, providerId]);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      return;
+    }
+
+    const draftDeliveryAddress = getReorderDraftDeliveryAddress();
+    const currentAddress = form.getValues("deliveryAddress");
+
+    if (draftDeliveryAddress && !currentAddress) {
+      form.setValue("deliveryAddress", draftDeliveryAddress);
+    }
+  }, [form, isInitialized]);
 
   const onSubmit = async (data: CreateOrderPayload) => {
     setIsSubmitting(true);
@@ -80,8 +109,13 @@ export default function CheckoutPage() {
 
   const handlePaymentSuccess = () => {
     clearCart();
+    clearReorderDraftDeliveryAddress();
     toast.success("Payment Successful! Your order is on the way.");
     router.push("/customer/orders");
+  }
+
+  if (!isInitialized) {
+    return null;
   }
 
   if (items.length === 0) {

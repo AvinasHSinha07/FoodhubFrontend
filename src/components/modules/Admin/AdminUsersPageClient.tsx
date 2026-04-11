@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { UserCheck, UserX, Shield } from "lucide-react";
 import { queryKeys } from "@/lib/query/query-keys";
 import { getAdminUsersFiltersFromSearchParams } from "@/lib/query/admin-users-filters";
+import PaginationControls from "@/components/shared/list/PaginationControls";
+import SortControl from "@/components/shared/list/SortControl";
 
 export default function AdminUsersPageClient() {
   const queryClient = useQueryClient();
@@ -24,6 +26,7 @@ export default function AdminUsersPageClient() {
   const queryString = searchParams?.toString() || "";
   const search = searchParams?.get("search") || "";
   const filterRole = searchParams?.get("role") || "ALL";
+  const sortValue = `${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`;
 
   const filters = useMemo(() => {
     const parsed = getAdminUsersFiltersFromSearchParams(new URLSearchParams(queryString));
@@ -41,6 +44,7 @@ export default function AdminUsersPageClient() {
   });
 
   const users = (data?.data || []) as IUser[];
+  const usersMeta = data?.meta;
 
   const { mutateAsync: updateUserStatus, isPending: isUpdating } = useMutation({
     mutationFn: ({ userId, newStatus }: { userId: string; newStatus: UserStatus }) =>
@@ -70,6 +74,15 @@ export default function AdminUsersPageClient() {
     } catch {
       toast.error("Failed to update status");
     }
+  };
+
+  const handleSortChange = (value: string) => {
+    const [sortBy, sortOrder] = value.split(":");
+    updateParams({ sortBy, sortOrder, page: "1" });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    updateParams({ page: String(nextPage) });
   };
 
   const getStatusBadge = (status: UserStatus) => {
@@ -109,7 +122,7 @@ export default function AdminUsersPageClient() {
           onSubmit={(event) => {
             event.preventDefault();
             const target = event.currentTarget.elements.namedItem("search") as HTMLInputElement | null;
-            updateParams({ search: target?.value || null });
+            updateParams({ search: target?.value || null, page: "1" });
           }}
           className="flex-1"
         >
@@ -120,7 +133,7 @@ export default function AdminUsersPageClient() {
             className="max-w-md bg-white"
           />
         </form>
-        <Select value={filterRole} onValueChange={(value) => updateParams({ role: value })}>
+        <Select value={filterRole} onValueChange={(value) => updateParams({ role: value, page: "1" })}>
           <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="All Roles" />
           </SelectTrigger>
@@ -131,6 +144,18 @@ export default function AdminUsersPageClient() {
             <SelectItem value="ADMIN">Admins</SelectItem>
           </SelectContent>
         </Select>
+        <SortControl
+          value={sortValue}
+          onValueChange={handleSortChange}
+          options={[
+            { label: "Newest", value: "createdAt:desc" },
+            { label: "Oldest", value: "createdAt:asc" },
+            { label: "Name: A-Z", value: "name:asc" },
+            { label: "Name: Z-A", value: "name:desc" },
+            { label: "Email: A-Z", value: "email:asc" },
+            { label: "Email: Z-A", value: "email:desc" },
+          ]}
+        />
       </div>
 
       {isLoading ? (
@@ -145,54 +170,57 @@ export default function AdminUsersPageClient() {
           <p className="text-gray-500 mt-2">Try adjusting your search criteria.</p>
         </Card>
       ) : (
-        <div className="bg-white rounded-md border shadow-sm overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs font-semibold">
-              <tr>
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Joined</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50/50">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">{user.name}</div>
-                    <div className="text-xs text-gray-500">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {getRoleIcon(user.role)}
-                      <span className="font-medium text-xs">{user.role}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
-                  <td className="px-6 py-4 text-gray-500">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Select
-                      defaultValue={user.status}
-                      onValueChange={(val) => handleStatusChange(user.id, val as UserStatus)}
-                      disabled={user.role === "SUPER_ADMIN" || isUpdating}
-                    >
-                      <SelectTrigger className="w-[110px] h-8 text-xs ml-auto">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={UserStatus.ACTIVE}>Activate</SelectItem>
-                        <SelectItem value={UserStatus.BLOCKED}>Block</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
+        <>
+          <div className="bg-white rounded-md border shadow-sm overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs font-semibold">
+                <tr>
+                  <th className="px-6 py-4">User</th>
+                  <th className="px-6 py-4">Role</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Joined</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {users.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50/50">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-gray-900">{user.name}</div>
+                      <div className="text-xs text-gray-500">{user.email}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        {getRoleIcon(user.role)}
+                        <span className="font-medium text-xs">{user.role}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
+                    <td className="px-6 py-4 text-gray-500">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Select
+                        defaultValue={user.status}
+                        onValueChange={(val) => handleStatusChange(user.id, val as UserStatus)}
+                        disabled={user.role === "SUPER_ADMIN" || isUpdating}
+                      >
+                        <SelectTrigger className="w-[110px] h-8 text-xs ml-auto">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={UserStatus.ACTIVE}>Activate</SelectItem>
+                          <SelectItem value={UserStatus.BLOCKED}>Block</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <PaginationControls meta={usersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
+        </>
       )}
     </div>
   );

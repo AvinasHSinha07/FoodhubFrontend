@@ -1,30 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { AdminServices } from "@/services/admin.services";
-import { IOrder, OrderStatus } from "@/types/order.types";
+import { IOrder, OrderStatus, PaymentStatus } from "@/types/order.types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ShoppingBag, ArrowRight, UserCheck, Store } from "lucide-react";
 import { queryKeys } from "@/lib/query/query-keys";
+import PaginationControls from "@/components/shared/list/PaginationControls";
+import SortControl from "@/components/shared/list/SortControl";
+import { getOrderFiltersFromSearchParams } from "@/lib/query/order-filters";
 
 export default function AdminOrdersPageClient() {
-  const [filterStatus, setFilterStatus] = useState("ALL");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const queryString = searchParams?.toString() || "";
+
+  const [selectedOrderStatus, setSelectedOrderStatus] = useState(
+    searchParams?.get("orderStatus") || "ALL"
+  );
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(
+    searchParams?.get("paymentStatus") || "ALL"
+  );
+  const [sortValue, setSortValue] = useState(
+    `${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`
+  );
+
+  useEffect(() => {
+    setSelectedOrderStatus(searchParams?.get("orderStatus") || "ALL");
+    setSelectedPaymentStatus(searchParams?.get("paymentStatus") || "ALL");
+    setSortValue(`${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`);
+  }, [searchParams]);
+
+  const filters = useMemo(() => {
+    return getOrderFiltersFromSearchParams(new URLSearchParams(queryString));
+  }, [queryString]);
 
   const { data, isLoading } = useQuery({
-    queryKey: queryKeys.adminOrders(),
-    queryFn: () => AdminServices.getAllOrders(),
+    queryKey: queryKeys.adminOrders(queryString),
+    queryFn: () => AdminServices.getAllOrders(filters),
     staleTime: 1000 * 60 * 3,
   });
 
   const orders = (data?.data || []) as IOrder[];
+  const ordersMeta = data?.meta;
 
-  const filteredOrders = filterStatus === "ALL"
-    ? orders
-    : orders.filter((order) => order.orderStatus === filterStatus);
+  const updateParams = (updates: Record<string, string | null>) => {
+    const nextParams = new URLSearchParams(searchParams?.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value || value === "ALL") {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
+    });
+
+    const nextQueryString = nextParams.toString();
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, { scroll: false });
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortValue(value);
+    const [sortBy, sortOrder] = value.split(":");
+    updateParams({ sortBy, sortOrder, page: "1" });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    updateParams({ page: String(nextPage) });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -44,19 +94,61 @@ export default function AdminOrdersPageClient() {
           <h1 className="text-3xl font-bold tracking-tight">Order Monitoring</h1>
           <p className="text-gray-500">Monitor all platform food orders globally.</p>
         </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-45 bg-white">
-            <SelectValue placeholder="Filter by Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Orders</SelectItem>
-            <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
-            <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
-            <SelectItem value={OrderStatus.READY}>Ready</SelectItem>
-            <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
-            <SelectItem value={OrderStatus.CANCELLED}>Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-3">
+          <Select
+            value={selectedOrderStatus}
+            onValueChange={(value) => {
+              setSelectedOrderStatus(value);
+              updateParams({ orderStatus: value, page: "1" });
+            }}
+          >
+            <SelectTrigger className="w-45 bg-white">
+              <SelectValue placeholder="Order status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Orders</SelectItem>
+              <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
+              <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
+              <SelectItem value={OrderStatus.READY}>Ready</SelectItem>
+              <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
+              <SelectItem value={OrderStatus.CANCELLED}>Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={selectedPaymentStatus}
+            onValueChange={(value) => {
+              setSelectedPaymentStatus(value);
+              updateParams({ paymentStatus: value, page: "1" });
+            }}
+          >
+            <SelectTrigger className="w-45 bg-white">
+              <SelectValue placeholder="Payment status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Payments</SelectItem>
+              <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
+              <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <SortControl
+          value={sortValue}
+          onValueChange={handleSortChange}
+          options={[
+            { label: "Newest", value: "createdAt:desc" },
+            { label: "Oldest", value: "createdAt:asc" },
+            { label: "Updated: Newest", value: "updatedAt:desc" },
+            { label: "Total: High to Low", value: "totalPrice:desc" },
+            { label: "Total: Low to High", value: "totalPrice:asc" },
+          ]}
+        />
       </div>
 
       {isLoading ? (
@@ -65,7 +157,7 @@ export default function AdminOrdersPageClient() {
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-32 w-full" />
         </div>
-      ) : filteredOrders.length === 0 ? (
+      ) : orders.length === 0 ? (
         <Card className="text-center py-20 bg-gray-50">
           <ShoppingBag className="mx-auto h-12 w-12 text-gray-300 mb-3" />
           <h2 className="text-xl font-semibold text-gray-700">No orders found</h2>
@@ -73,7 +165,7 @@ export default function AdminOrdersPageClient() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {filteredOrders.map((order) => (
+          {orders.map((order) => (
             <Card key={order.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b bg-gray-50/30 gap-4">
                 <div>
@@ -135,6 +227,7 @@ export default function AdminOrdersPageClient() {
               </CardContent>
             </Card>
           ))}
+          <PaginationControls meta={ordersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
         </div>
       )}
     </div>

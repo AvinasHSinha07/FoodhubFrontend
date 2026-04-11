@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MealServices } from "@/services/meal.services";
 import { CategoryServices } from "@/services/category.services";
+import { FavoriteServices } from "@/services/favorite.services";
 import { IMeal } from "@/types/meal.types";
 import { ICategory } from "@/types/category.types";
 import { queryKeys } from "@/lib/query/query-keys";
@@ -15,7 +16,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, ArrowRight, Utensils } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowRight, Utensils, Heart } from "lucide-react";
+import PaginationControls from "@/components/shared/list/PaginationControls";
+import SortControl from "@/components/shared/list/SortControl";
+import { toast } from "sonner";
 
 const dietOptions = [
   "VEGETARIAN",
@@ -29,6 +33,7 @@ const dietOptions = [
 ];
 
 export default function MealsPageClient() {
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -40,6 +45,9 @@ export default function MealsPageClient() {
   const [minPrice, setMinPrice] = useState(searchParams?.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams?.get("maxPrice") || "");
   const [dietaryTag, setDietaryTag] = useState(searchParams?.get("dietaryTag") || "");
+  const [sortValue, setSortValue] = useState(
+    `${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`
+  );
 
   useEffect(() => {
     setSearchTerm(searchParams?.get("search") || "");
@@ -47,6 +55,7 @@ export default function MealsPageClient() {
     setMinPrice(searchParams?.get("minPrice") || "");
     setMaxPrice(searchParams?.get("maxPrice") || "");
     setDietaryTag(searchParams?.get("dietaryTag") || "");
+    setSortValue(`${searchParams?.get("sortBy") || "createdAt"}:${searchParams?.get("sortOrder") || "desc"}`);
   }, [searchParams]);
 
   const filters = useMemo(() => {
@@ -67,8 +76,57 @@ export default function MealsPageClient() {
   });
 
   const meals = (mealsResponse?.data || []) as IMeal[];
+  const mealsMeta = mealsResponse?.meta;
   const categories = (categoriesResponse?.data || []) as ICategory[];
+
+  const { data: mealFavoritesResponse } = useQuery({
+    queryKey: queryKeys.mealFavorites("meals-page"),
+    queryFn: () => FavoriteServices.getMealFavorites({ page: 1, limit: 100 }),
+    staleTime: 1000 * 60,
+    retry: false,
+  });
+
+  const favoriteMealIds = useMemo(() => {
+    return new Set(
+      ((mealFavoritesResponse?.data || []) as any[])
+        .map((favorite) => favorite.meal?.id)
+        .filter(Boolean)
+    );
+  }, [mealFavoritesResponse?.data]);
+
+  const toggleMealFavoriteMutation = useMutation({
+    mutationFn: (mealId: string) => FavoriteServices.toggleMealFavorite(mealId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["meal-favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["meal-favorite-state"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Unable to update favorites.");
+    },
+  });
+
   const isLoading = isMealsLoading || isCategoriesLoading;
+
+  const handleToggleMealFavorite = (mealId: string) => {
+    toggleMealFavoriteMutation.mutate(mealId);
+  };
+
+  const updateParams = (updates: Record<string, string | null>) => {
+    const nextParams = new URLSearchParams(searchParams?.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value) {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
+    });
+
+    const nextQueryString = nextParams.toString();
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
+      scroll: false,
+    });
+  };
 
   const handleApplyFilters = (event: React.FormEvent) => {
     event.preventDefault();
@@ -79,6 +137,10 @@ export default function MealsPageClient() {
     if (minPrice) nextParams.set("minPrice", minPrice);
     if (maxPrice) nextParams.set("maxPrice", maxPrice);
     if (dietaryTag) nextParams.set("dietaryTag", dietaryTag);
+    const [sortBy, sortOrder] = sortValue.split(":");
+    nextParams.set("sortBy", sortBy || "createdAt");
+    nextParams.set("sortOrder", sortOrder || "desc");
+    nextParams.set("page", "1");
 
     const nextQueryString = nextParams.toString();
     router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
@@ -92,7 +154,18 @@ export default function MealsPageClient() {
     setMinPrice("");
     setMaxPrice("");
     setDietaryTag("");
+    setSortValue("createdAt:desc");
     router.replace(pathname, { scroll: false });
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortValue(value);
+    const [sortBy, sortOrder] = value.split(":");
+    updateParams({ sortBy, sortOrder, page: "1" });
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    updateParams({ page: String(nextPage) });
   };
 
   return (
@@ -203,6 +276,21 @@ export default function MealsPageClient() {
         </div>
 
         <div className="lg:col-span-3 mt-8 lg:mt-0">
+          <div className="mb-4 flex justify-end">
+            <SortControl
+              value={sortValue}
+              onValueChange={handleSortChange}
+              options={[
+                { label: "Newest", value: "createdAt:desc" },
+                { label: "Oldest", value: "createdAt:asc" },
+                { label: "Price: Low to High", value: "price:asc" },
+                { label: "Price: High to Low", value: "price:desc" },
+                { label: "Title: A-Z", value: "title:asc" },
+                { label: "Title: Z-A", value: "title:desc" },
+              ]}
+            />
+          </div>
+
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -224,8 +312,9 @@ export default function MealsPageClient() {
               <Button onClick={handleResetFilters} variant="outline" className="mt-6 rounded-full font-bold">Clear All Filters</Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {meals.map((meal) => (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {meals.map((meal) => (
                 <Card key={meal.id} className="overflow-hidden border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
                   {meal.image ? (
                     <div className="relative h-48 overflow-hidden">
@@ -272,10 +361,24 @@ export default function MealsPageClient() {
                   </CardHeader>
 
                   <CardContent className="px-5 pb-5 pt-4 mt-auto bg-white border-t border-slate-50 flex flex-col gap-4">
-                    <p className="text-xs text-slate-400 flex items-center">
-                      <span>By</span>
-                      <span className="font-bold text-slate-700 ml-1 truncate">{meal.provider?.restaurantName || "Unknown Chef"}</span>
-                    </p>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs text-slate-400 flex items-center min-w-0">
+                        <span>By</span>
+                        <span className="font-bold text-slate-700 ml-1 truncate">{meal.provider?.restaurantName || "Unknown Chef"}</span>
+                      </p>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => handleToggleMealFavorite(meal.id)}
+                        aria-label="Toggle favorite meal"
+                      >
+                        <Heart
+                          className={`h-4 w-4 ${favoriteMealIds.has(meal.id) ? "fill-red-500 text-red-500" : "text-slate-500"}`}
+                        />
+                      </Button>
+                    </div>
                     <Button asChild className="w-full bg-slate-100 text-indigo-700 hover:bg-indigo-600 hover:text-white rounded-xl shadow-none transition-colors duration-300 font-bold group/btn">
                       <Link href={meal.provider?.id ? `/restaurant/${meal.provider.id}` : "/restaurants"}>
                         View Restaurant <ArrowRight className="ml-2 w-4 h-4 opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all" />
@@ -283,8 +386,10 @@ export default function MealsPageClient() {
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+              <PaginationControls meta={mealsMeta} onPageChange={handlePageChange} isLoading={isLoading} />
+            </>
           )}
         </div>
       </div>

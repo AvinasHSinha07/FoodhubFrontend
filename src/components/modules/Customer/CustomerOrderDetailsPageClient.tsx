@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { OrderServices } from "@/services/order.services";
 import { IOrder } from "@/types/order.types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useCart } from "@/providers/CartProvider";
+import { RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 import { queryKeys } from "@/lib/query/query-keys";
+import { setReorderDraftDeliveryAddress } from "@/lib/reorder-draft";
 
 type CustomerOrderDetailsPageClientProps = {
   orderId: string;
@@ -36,10 +41,48 @@ const getStatusBadgeClass = (status: string) => {
 };
 
 export default function CustomerOrderDetailsPageClient({ orderId }: CustomerOrderDetailsPageClientProps) {
+  const router = useRouter();
+  const { items, providerId, replaceCartFromOrder } = useCart();
+
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.order(orderId),
     queryFn: () => OrderServices.getOrderById(orderId),
     staleTime: 1000 * 60 * 3,
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: () => OrderServices.reorderOrder(orderId),
+    onSuccess: (response) => {
+      const payload = response.data;
+
+      if (!payload) {
+        toast.error("Unable to reorder this order right now.");
+        return;
+      }
+
+      if (providerId && items.length > 0 && providerId !== payload.provider.id) {
+        const confirmed = window.confirm(
+          "Your cart has items from another restaurant. Replace cart and continue to checkout?"
+        );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      replaceCartFromOrder({
+        provider: payload.provider,
+        items: payload.items.map((item) => ({ meal: item.meal, quantity: item.quantity })),
+      });
+
+      setReorderDraftDeliveryAddress(payload.deliveryAddress || "");
+
+      toast.success("Reorder items added to cart.");
+      router.push("/checkout");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to reorder this order.");
+    },
   });
 
   const order = (data?.data || null) as IOrder | null;
@@ -69,9 +112,19 @@ export default function CustomerOrderDetailsPageClient({ orderId }: CustomerOrde
     <div className="container mx-auto py-8 max-w-4xl space-y-6">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Order #{order.id.slice(-6)}</h1>
-        <Badge variant="outline" className={getStatusBadgeClass(order.orderStatus)}>
-          {order.orderStatus}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className={getStatusBadgeClass(order.orderStatus)}>
+            {order.orderStatus}
+          </Badge>
+          <Button
+            variant="secondary"
+            onClick={() => reorderMutation.mutate()}
+            disabled={reorderMutation.isPending}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            {reorderMutation.isPending ? "Reordering..." : "Reorder"}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -113,9 +166,19 @@ export default function CustomerOrderDetailsPageClient({ orderId }: CustomerOrde
         </Card>
       </div>
 
-      <Button asChild variant="outline">
-        <Link href="/customer/orders">Back to Orders</Link>
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button asChild variant="outline">
+          <Link href="/customer/orders">Back to Orders</Link>
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => reorderMutation.mutate()}
+          disabled={reorderMutation.isPending}
+        >
+          <RotateCcw className="mr-2 h-4 w-4" />
+          {reorderMutation.isPending ? "Reordering..." : "Reorder This Order"}
+        </Button>
+      </div>
     </div>
   );
 }

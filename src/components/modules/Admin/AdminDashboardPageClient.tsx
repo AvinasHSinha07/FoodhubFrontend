@@ -24,7 +24,7 @@ export default function AdminDashboardPageClient() {
 
   const { data: providersRes, isLoading: isProvidersLoading } = useQuery({
     queryKey: queryKeys.providers(""),
-    queryFn: () => ProviderProfileServices.getAllProviders(),
+    queryFn: () => ProviderProfileServices.getAllProviders({ page: 1, limit: 20 }),
     staleTime: 1000 * 60 * 10,
   });
 

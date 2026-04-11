@@ -1,4 +1,11 @@
-import { IMealFilters } from "@/types/meal.types";
+type OrderListFilters = {
+  orderStatus?: string;
+  paymentStatus?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+};
 
 const toOptionalNumber = (value: string | null): number | undefined => {
   if (!value) {
@@ -9,16 +16,12 @@ const toOptionalNumber = (value: string | null): number | undefined => {
   return Number.isNaN(parsedValue) ? undefined : parsedValue;
 };
 
-export const getMealFiltersFromSearchParams = (
+export const getOrderFiltersFromSearchParams = (
   searchParams: URLSearchParams
-): IMealFilters => {
+): OrderListFilters => {
   return {
-    searchTerm: searchParams.get("search") || undefined,
-    categoryId: searchParams.get("categoryId") || undefined,
-    minPrice: toOptionalNumber(searchParams.get("minPrice")),
-    maxPrice: toOptionalNumber(searchParams.get("maxPrice")),
-    dietaryTag: searchParams.get("dietaryTag") || undefined,
-    isAvailable: true,
+    orderStatus: searchParams.get("orderStatus") || undefined,
+    paymentStatus: searchParams.get("paymentStatus") || undefined,
     page: toOptionalNumber(searchParams.get("page")),
     limit: toOptionalNumber(searchParams.get("limit")),
     sortBy: searchParams.get("sortBy") || undefined,

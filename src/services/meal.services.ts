@@ -10,6 +10,10 @@ export interface IMealFilters {
   minPrice?: number;
   maxPrice?: number;
   dietaryTag?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export interface ICreateMealPayload {
@@ -33,6 +37,10 @@ const getAllMeals = async (
   if (filters?.maxPrice !== undefined) params.append("maxPrice", String(filters.maxPrice));
   if (filters?.dietaryTag) params.append("dietaryTag", filters.dietaryTag);
   if (filters?.isAvailable !== undefined) params.append("isAvailable", String(filters.isAvailable));
+  if (filters?.page) params.append("page", String(filters.page));
+  if (filters?.limit) params.append("limit", String(filters.limit));
+  if (filters?.sortBy) params.append("sortBy", filters.sortBy);
+  if (filters?.sortOrder) params.append("sortOrder", filters.sortOrder);
 
   return httpClient.get<IMeal[]>(`/meals?${params.toString()}`);
 };
