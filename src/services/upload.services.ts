@@ -5,18 +5,20 @@ const uploadImage = async (file: File): Promise<IResponse<{ url: string; publicI
   const formData = new FormData();
   formData.append("file", file);
 
-  const result = await httpClient.post("/upload/image", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-  return result.data;
+  return httpClient.post<{ url: string; publicId: string }, FormData>(
+    "/upload/image",
+    formData,
+    undefined,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
 };
 
 const deleteImage = async (publicId: string): Promise<IResponse<any>> => {
-  const result = await httpClient.delete(`/upload/image/${publicId}`);
-  return result.data;
+  return httpClient.delete<any>(`/upload/image/${publicId}`);
 };
 
 export const UploadServices = {

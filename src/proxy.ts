@@ -7,7 +7,10 @@ import {
   UserRole,
 } from "./lib/authUtils";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:5000/api/v1";
 
 const normalizeRole = (role?: string): UserRole | undefined => {
   if (!role) {

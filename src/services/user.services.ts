@@ -2,13 +2,11 @@
 import { IResponse } from "../types/api.types";
 
 const getMyProfile = async (): Promise<IResponse<any>> => {
-  const result = await httpClient.get("/users/me");
-  return result.data;
+  return httpClient.get<any>("/users/me");
 };
 
 const updateMyProfile = async (payload: { name?: string, profileImage?: string }): Promise<IResponse<any>> => {
-  const result = await httpClient.patch("/users/me", payload);
-  return result.data;
+  return httpClient.patch<any, { name?: string; profileImage?: string }>("/users/me", payload);
 };
 
 export const UserServices = {

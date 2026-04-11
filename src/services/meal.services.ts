@@ -34,28 +34,23 @@ const getAllMeals = async (
   if (filters?.dietaryTag) params.append("dietaryTag", filters.dietaryTag);
   if (filters?.isAvailable !== undefined) params.append("isAvailable", String(filters.isAvailable));
 
-  const result = await httpClient.get(`/meals?${params.toString()}`);
-  return result.data;
+  return httpClient.get<IMeal[]>(`/meals?${params.toString()}`);
 };
 
 const getMealById = async (id: string): Promise<IResponse<IMeal>> => {
-  const result = await httpClient.get(`/meals/${id}`);
-  return result.data;
+  return httpClient.get<IMeal>(`/meals/${id}`);
 };
 
 const createMeal = async (data: ICreateMealPayload): Promise<IResponse<IMeal>> => {
-  const result = await httpClient.post("/meals", data);
-  return result.data;
+  return httpClient.post<IMeal, ICreateMealPayload>("/meals", data);
 };
 
 const deleteMeal = async (id: string): Promise<IResponse<null>> => {
-  const result = await httpClient.delete(`/meals/${id}`);
-  return result.data;
+  return httpClient.delete<null>(`/meals/${id}`);
 };
 
 const updateMeal = async (id: string, data: Partial<ICreateMealPayload>): Promise<IResponse<IMeal>> => {
-  const result = await httpClient.patch(`/meals/${id}`, data);
-  return result.data;
+  return httpClient.patch<IMeal, Partial<ICreateMealPayload>>(`/meals/${id}`, data);
 };
 
 export const MealServices = {

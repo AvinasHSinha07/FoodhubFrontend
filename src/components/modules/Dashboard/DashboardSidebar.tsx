@@ -43,11 +43,11 @@ export default function DashboardSidebar() {
 
   return (
     <div className="hidden border-r border-slate-100 bg-white md:block md:w-72 shadow-sm relative z-40" style={{ fontFamily: "var(--font-sora)" }}>
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-pink-500"></div>
+      <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 to-pink-500"></div>
       
       <div className="flex h-20 items-center justify-center border-b border-slate-100 px-6 font-semibold shrink-0 mb-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
              <ChefHat className="w-6 h-6 text-white" />
           </div>
           <span className="text-2xl font-extrabold text-slate-800 tracking-tight" style={{ fontFamily: "var(--font-space-grotesk)" }}>FoodHub</span>
@@ -79,7 +79,7 @@ export default function DashboardSidebar() {
       </div>
       
       {/* Background decoration */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none opacity-50"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-slate-50 to-transparent pointer-events-none opacity-50"></div>
     </div>
   );
 }

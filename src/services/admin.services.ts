@@ -13,23 +13,20 @@ const getAllUsers = async (filters?: {
   if (filters?.status) params.append("status", filters.status);
   if (filters?.searchTerm) params.append("searchTerm", filters.searchTerm);
 
-  const result = await httpClient.get(`/admin/users?${params.toString()}`);
-  return result.data;
+  return httpClient.get<IUser[]>(`/admin/users?${params.toString()}`);
 };
 
 const updateUserStatus = async (
   id: string,
   status: UserStatus
 ): Promise<IResponse<IUser>> => {
-  const result = await httpClient.patch(`/admin/users/${id}/status`, {
+  return httpClient.patch<IUser, { status: UserStatus }>(`/admin/users/${id}/status`, {
     status,
   });
-  return result.data;
 };
 
 const getAllOrders = async (): Promise<IResponse<IOrder[]>> => {
-  const result = await httpClient.get("/admin/orders");
-  return result.data;
+  return httpClient.get<IOrder[]>("/admin/orders");
 };
 
 export const AdminServices = {

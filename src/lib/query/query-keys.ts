@@ -1,0 +1,16 @@
+export const queryKeys = {
+  adminOrders: () => ["admin-orders"] as const,
+  adminUsers: (queryString: string) => ["admin-users", queryString] as const,
+  categories: () => ["categories"] as const,
+  customerOrders: () => ["customer-orders"] as const,
+  meals: (queryString: string) => ["meals", queryString] as const,
+  meal: (id: string) => ["meal", id] as const,
+  mealReviews: (mealId: string) => ["meal-reviews", mealId] as const,
+  myProviderProfile: () => ["my-provider-profile"] as const,
+  myUserProfile: () => ["my-user-profile"] as const,
+  order: (id: string) => ["order", id] as const,
+  providerMeals: (providerId: string) => ["provider-meals", providerId] as const,
+  providerOrders: () => ["provider-orders"] as const,
+  providers: (queryString: string) => ["providers", queryString] as const,
+  provider: (id: string) => ["provider", id] as const,
+} as const;

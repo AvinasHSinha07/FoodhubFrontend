@@ -7,20 +7,17 @@ export interface ICreateCategoryPayload {
 }
 
 const getCategories = async (): Promise<IResponse<ICategory[]>> => {
-  const result = await httpClient.get("/categories");
-  return result.data;
+  return httpClient.get<ICategory[]>("/categories");
 };
 
 const createCategory = async (
   data: ICreateCategoryPayload
 ): Promise<IResponse<ICategory>> => {
-  const result = await httpClient.post("/admin/categories", data);
-  return result.data;
+  return httpClient.post<ICategory, ICreateCategoryPayload>("/admin/categories", data);
 };
 
 const deleteCategory = async (id: string): Promise<IResponse<null>> => {
-  const result = await httpClient.delete(`/admin/categories/${id}`);
-  return result.data;
+  return httpClient.delete<null>(`/admin/categories/${id}`);
 };
 
 export const CategoryServices = {

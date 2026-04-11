@@ -12,32 +12,28 @@ export interface ICreateProviderProfilePayload {
 }
 
 const getMyProfile = async (): Promise<IResponse<IProviderProfile>> => {
-  const result = await httpClient.get("/providers/me");
-  return result.data;
+  return httpClient.get<IProviderProfile>("/providers/me");
 };
 
 const createMyProfile = async (
   data: ICreateProviderProfilePayload
 ): Promise<IResponse<IProviderProfile>> => {
-  const result = await httpClient.post("/providers/me", data);
-  return result.data;
+  return httpClient.post<IProviderProfile, ICreateProviderProfilePayload>("/providers/me", data);
 };
 
 const updateMyProfile = async (
   data: Partial<ICreateProviderProfilePayload>
 ): Promise<IResponse<IProviderProfile>> => {
-  const result = await httpClient.patch("/providers/me", data);
-  return result.data;
+  return httpClient.patch<IProviderProfile, Partial<ICreateProviderProfilePayload>>("/providers/me", data);
 };
 
-const getAllProviders = async (): Promise<IResponse<IProviderProfile[]>> => {
-  const result = await httpClient.get("/providers");
-  return result.data;
+const getAllProviders = async (queryString = ""): Promise<IResponse<IProviderProfile[]>> => {
+  const path = queryString ? `/providers?${queryString}` : "/providers";
+  return httpClient.get<IProviderProfile[]>(path);
 };
 
 const getProviderById = async (id: string): Promise<IResponse<IProviderProfile>> => {
-  const result = await httpClient.get(`/providers/${id}`);
-  return result.data;
+  return httpClient.get<IProviderProfile>(`/providers/${id}`);
 };
 
 export const ProviderProfileServices = {

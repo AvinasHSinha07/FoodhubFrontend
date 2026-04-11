@@ -17,7 +17,7 @@ export default function TopProviders() {
     const fetchProviders = async () => {
       try {
         const response = await ProviderProfileServices.getAllProviders();
-        setProviders(response.data?.slice(0, 6) || []); // Limit 6
+        setProviders(response.data?.slice(0, 6) || []); 
       } catch (error) {
         console.error("Failed to fetch restaurants");
       } finally {

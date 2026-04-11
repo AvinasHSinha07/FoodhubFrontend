@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Sora } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, Truck, ShoppingCart } from "lucide-react";
 import {
@@ -18,16 +17,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCart } from "@/providers/CartProvider";
 
-const sora = Sora({
-  subsets: ["latin"],
-  weight: ["500", "700", "800"],
-});
-
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
-  const { items } = useCart();
+  const { items, providerId } = useCart();
   const cartItemsCount = items.reduce((acc, item) => acc + item.quantity, 0);
+  const cartHref = providerId ? `/restaurant/${providerId}` : "/restaurants";
 
   const handleLogout = async () => {
     try {
@@ -89,7 +84,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-2 lg:flex">
             {(!session || (session?.user as any)?.role === "CUSTOMER") && (
               <Button variant="ghost" size="icon" asChild className="relative mr-2">
-                <Link href="/checkout">
+                <Link href={cartHref}>
                   <ShoppingCart className="h-5 w-5 text-slate-700" />
                   {cartItemsCount > 0 && (
                     <span className="absolute top-1 right-1 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[10px] font-bold text-white">
@@ -121,7 +116,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 lg:hidden">
             {(!session || (session?.user as any)?.role === "CUSTOMER") && (
               <Button variant="ghost" size="icon" asChild className="relative">
-                <Link href="/checkout">
+                <Link href={cartHref}>
                   <ShoppingCart className="h-5 w-5 text-slate-700" />
                   {cartItemsCount > 0 && (
                     <span className="absolute top-1 right-1 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-600 text-[10px] font-bold text-white">

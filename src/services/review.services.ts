@@ -9,13 +9,11 @@ export interface ICreateReviewPayload {
 }
 
 const createReview = async (data: ICreateReviewPayload): Promise<IResponse<any>> => {
-  const result = await httpClient.post("/reviews", data);
-  return result.data;
+  return httpClient.post<any, ICreateReviewPayload>("/reviews", data);
 };
 
 const getMealReviews = async (mealId: string): Promise<IResponse<any[]>> => {
-  const result = await httpClient.get(`/reviews/meal/${mealId}`);
-  return result.data;
+  return httpClient.get<any[]>(`/reviews/meal/${mealId}`);
 };
 
 export const ReviewServices = {

@@ -1,19 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { Sora, Space_Grotesk } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import { ArrowRight, Leaf, ShieldCheck, Truck, Utensils, Star, Store, MapPin } from "lucide-react";
 
-const sora = Sora({ subsets: ["latin"], weight: ["500", "700", "800"] });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "700"] });
-
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans transition-all" style={{ fontFamily: sora.style.fontFamily }}>
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans transition-all" style={{ fontFamily: "var(--font-sora)" }}>
       <Navbar />
 
       <main className="flex-1">

@@ -4,21 +4,19 @@ import { IResponse } from "../types/api.types";
 const createPaymentIntent = async (
   orderId: string
 ): Promise<IResponse<{ clientSecret: string; paymentIntentId: string }>> => {
-  const result = await httpClient.post("/payments/create-intent", {
+  return httpClient.post<{ clientSecret: string; paymentIntentId: string }, { orderId: string }>("/payments/create-intent", {
     orderId,
   });
-  return result.data;
 };
 
 const confirmPayment = async (
   orderId: string,
   paymentIntentId: string
 ): Promise<IResponse<null>> => {
-  const result = await httpClient.post("/payments/confirm", {
+  return httpClient.post<null, { orderId: string; paymentIntentId: string }>("/payments/confirm", {
     orderId,
     paymentIntentId,
   });
-  return result.data;
 };
 
 export const PaymentServices = {

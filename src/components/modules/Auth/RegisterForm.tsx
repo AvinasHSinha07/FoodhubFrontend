@@ -2,8 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function RegisterForm() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: AuthServices.registerUser,
+  });
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -34,9 +37,7 @@ export default function RegisterForm() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    setLoading(true);
-    const { error } = await AuthServices.registerUser(data);
-    setLoading(false);
+    const { error } = await mutateAsync(data);
 
     if (error) {
       toast.error(error.message || "Failed to register!");
@@ -114,8 +115,8 @@ export default function RegisterForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full mt-6" disabled={loading}>
-              {loading ? "Creating account..." : "Sign up"}
+            <Button type="submit" className="w-full mt-6" disabled={isPending}>
+              {isPending ? "Creating account..." : "Sign up"}
             </Button>
           </form>
         </Form>

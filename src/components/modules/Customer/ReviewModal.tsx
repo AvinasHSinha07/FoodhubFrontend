@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ReviewServices } from "@/services/review.services";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createReviewAction } from "@/app/_actions/review.actions";
 import { IOrderItem } from "@/types/order.types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Star } from "lucide-react";
+import { queryKeys } from "@/lib/query/query-keys";
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -19,25 +21,32 @@ interface ReviewModalProps {
 export function ReviewModal({ isOpen, onClose, orderId, orderItem }: ReviewModalProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: createReviewAction,
+  });
 
   const handleSubmit = async () => {
     if (!orderItem) return;
-    setIsSubmitting(true);
-    try {
-      await ReviewServices.createReview({
-        orderId,
-        mealId: orderItem.mealId,
-        rating,
-        comment
-      });
-      toast.success("Review submitted successfully!");
-      onClose();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to submit review.");
-    } finally {
-      setIsSubmitting(false);
+
+    const result = await mutateAsync({
+      orderId,
+      mealId: orderItem.mealId,
+      rating,
+      comment,
+    });
+
+    if (!result.success) {
+      toast.error(result.message || "Failed to submit review.");
+      return;
     }
+
+    toast.success(result.message || "Review submitted successfully!");
+    await queryClient.invalidateQueries({
+      queryKey: queryKeys.mealReviews(orderItem.mealId),
+    });
+    onClose();
   };
 
   return (
@@ -80,9 +89,9 @@ export function ReviewModal({ isOpen, onClose, orderId, orderItem }: ReviewModal
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-orange-600 hover:bg-orange-700 text-white">
-            {isSubmitting ? "Submitting..." : "Submit Review"}
+          <Button variant="outline" onClick={onClose} disabled={isPending}>Cancel</Button>
+          <Button onClick={handleSubmit} disabled={isPending} className="bg-orange-600 hover:bg-orange-700 text-white">
+            {isPending ? "Submitting..." : "Submit Review"}
           </Button>
         </DialogFooter>
       </DialogContent>

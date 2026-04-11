@@ -9,11 +9,22 @@ export interface ICartItem {
   quantity: number;
 }
 
+type AddToCartOptions = {
+  forceReplace?: boolean;
+};
+
+export type AddToCartResult = "added" | "provider_mismatch";
+
 interface CartContextProps {
   items: ICartItem[];
   providerId: string | null;
   providerInfo: IProviderProfile | null;
-  addToCart: (meal: IMeal, providerInfo: IProviderProfile, quantity?: number) => void;
+  addToCart: (
+    meal: IMeal,
+    providerInfo: IProviderProfile,
+    quantity?: number,
+    options?: AddToCartOptions
+  ) => AddToCartResult;
   removeFromCart: (mealId: string) => void;
   updateQuantity: (mealId: string, quantity: number) => void;
   clearCart: () => void;
@@ -55,13 +66,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [items, providerId, providerInfo, isInitialized]);
 
-  const addToCart = (meal: IMeal, updatedProviderInfo: IProviderProfile, quantity = 1) => {
-    // If adding from a different restaurant, clear cart first or warn.
-    // For simplicity, auto-clear if different provider.
+  const addToCart = (
+    meal: IMeal,
+    updatedProviderInfo: IProviderProfile,
+    quantity = 1,
+    options?: AddToCartOptions
+  ): AddToCartResult => {
     if (providerId && providerId !== updatedProviderInfo.id) {
-      if (!confirm("Adding this item will clear your current cart from another restaurant. Continue?")) {
-        return;
+      if (!options?.forceReplace) {
+        return "provider_mismatch";
       }
+
       setItems([]);
     }
 
@@ -79,6 +94,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prev, { meal, quantity }];
     });
+
+    return "added";
   };
 
   const removeFromCart = (mealId: string) => {
