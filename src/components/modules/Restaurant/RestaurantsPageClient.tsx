@@ -244,6 +244,15 @@ export default function RestaurantsPageClient() {
                           {provider.cuisineType}
                         </Badge>
                       )}
+                      <Badge
+                        className={
+                          provider.isOpenNow
+                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none"
+                            : "bg-rose-100 text-rose-700 hover:bg-rose-100 border-none"
+                        }
+                      >
+                        {provider.isOpenNow ? "Open" : "Closed"}
+                      </Badge>
                     </div>
 
                     {provider.logo ? (
@@ -298,6 +307,13 @@ export default function RestaurantsPageClient() {
                         <MapPin className="w-4 h-4 text-indigo-500 mr-2 mt-0.5 shrink-0" />
                         <span className="line-clamp-2">{provider.address || "Address not provided"}</span>
                       </div>
+
+                      <p className="text-xs text-slate-500">
+                        {provider.availabilityLabel || "Availability not configured"}
+                        {provider.estimatedReadyInMinutes
+                          ? ` • Approx ${provider.estimatedReadyInMinutes} min prep`
+                          : ""}
+                      </p>
                     </div>
 
                     <Button asChild className="w-full bg-slate-900 hover:bg-indigo-600 text-white rounded-xl shadow-md py-6 group-hover:shadow-lg transition-all duration-300 font-bold overflow-hidden relative">

@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { OrderServices } from "@/services/order.services";
-import { IOrder, OrderStatus, PaymentStatus } from "@/types/order.types";
+import { IOrder, OrderStatus, PaymentMethod, PaymentStatus } from "@/types/order.types";
+import { PaymentServices } from "@/services/payment.services";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -73,6 +74,10 @@ export default function ProviderOrdersPageClient() {
       OrderServices.updateOrderStatus(orderId, newStatus),
   });
 
+  const { mutateAsync: collectCodPayment, isPending: isCollectingCod } = useMutation({
+    mutationFn: (orderId: string) => PaymentServices.collectCodPayment(orderId),
+  });
+
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId);
     try {
@@ -83,6 +88,17 @@ export default function ProviderOrdersPageClient() {
       toast.error(error?.response?.data?.message || "Failed to update status");
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleCollectCod = async (orderId: string) => {
+    try {
+      await collectCodPayment(orderId);
+      toast.success("COD payment marked as collected.");
+      await queryClient.invalidateQueries({ queryKey: ["provider-orders"] });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.order(orderId) });
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to collect COD payment.");
     }
   };
 
@@ -164,7 +180,9 @@ export default function ProviderOrdersPageClient() {
             <SelectContent>
               <SelectItem value="ALL">All Payments</SelectItem>
               <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={PaymentStatus.COD_PENDING}>COD Pending</SelectItem>
               <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={PaymentStatus.COD_COLLECTED}>COD Collected</SelectItem>
               <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
               <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
             </SelectContent>
@@ -221,7 +239,7 @@ export default function ProviderOrdersPageClient() {
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                   <div className="text-right">
                     <p className="text-xs text-gray-500 uppercase font-medium mb-1">
-                      Payment: {order.paymentStatus}
+                      Payment: {order.paymentMethod} / {order.paymentStatus}
                     </p>
                   </div>
                   <Select
@@ -263,6 +281,17 @@ export default function ProviderOrdersPageClient() {
                   <div className="space-y-3 bg-gray-50 p-4 rounded-lg border">
                     <h4 className="text-sm font-semibold border-b pb-2">Delivery Info</h4>
                     <p className="text-sm whitespace-pre-wrap">{order.deliveryAddress}</p>
+                    {order.paymentMethod === PaymentMethod.COD && order.paymentStatus === PaymentStatus.COD_PENDING ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="mt-2 w-full"
+                        onClick={() => handleCollectCod(order.id)}
+                        disabled={isCollectingCod}
+                      >
+                        Mark COD Collected
+                      </Button>
+                    ) : null}
                     <div className="pt-4 mt-auto">
                       <div className="flex justify-between items-center font-bold text-lg">
                         <span>Total</span>

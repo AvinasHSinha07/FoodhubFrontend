@@ -8,19 +8,22 @@ import { toast } from "sonner";
 import { createOrderSchema, CreateOrderPayload } from "@/zod/order.validation";
 import { OrderServices } from "@/services/order.services";
 import { useCart } from "@/providers/CartProvider";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, ShoppingBag, Lock, MapPin, Truck, Utensils, ArrowRight } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Lock, MapPin, Utensils, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Separator } from "@/components/ui/separator";
 import { PaymentServices } from "@/services/payment.services";
+import { UserServices } from "@/services/user.services";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { StripePaymentForm } from "@/components/modules/Payment/StripePaymentForm";
-import Image from "next/image";
+import { PaymentMethod } from "@/types/order.types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/query-keys";
 import {
   clearReorderDraftDeliveryAddress,
   getReorderDraftDeliveryAddress,
@@ -36,15 +39,39 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.STRIPE);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+  const [couponPreview, setCouponPreview] = useState<{
+    subtotalPrice: number;
+    discountAmount: number;
+    totalPrice: number;
+    coupon: { code: string } | null;
+  } | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   
-  // Calculate final total correctly exactly like shown in UI
-  const totalWithTax = totalPrice * 1.1;
+  const discountAmount = couponPreview?.discountAmount || 0;
+  const discountedSubtotal = Math.max(0, totalPrice - discountAmount);
+  const taxAmount = discountedSubtotal * 0.1;
+  const totalWithTax = discountedSubtotal + taxAmount;
+
+  const { data: profileResponse } = useQuery({
+    queryKey: queryKeys.myUserProfile(),
+    queryFn: () => UserServices.getMyProfile(),
+    staleTime: 1000 * 60 * 2,
+  });
+
+  const savedAddresses = (profileResponse?.data?.addresses || []) as Array<any>;
 
   const form = useForm<CreateOrderPayload>({
     resolver: zodResolver(createOrderSchema),
     defaultValues: {
       providerId: providerId || "",
       deliveryAddress: "",
+      addressId: undefined,
+      paymentMethod: PaymentMethod.STRIPE,
+      couponCode: undefined,
       items: items.map((i) => ({ mealId: i.meal.id, quantity: i.quantity })),   
     },
   });
@@ -63,11 +90,12 @@ export default function CheckoutPage() {
     }
 
     form.setValue("providerId", providerId || "");
+    form.setValue("paymentMethod", paymentMethod);
     form.setValue(
       "items",
       items.map((item) => ({ mealId: item.meal.id, quantity: item.quantity }))
     );
-  }, [form, isInitialized, items, providerId]);
+  }, [form, isInitialized, items, paymentMethod, providerId]);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -80,24 +108,89 @@ export default function CheckoutPage() {
     if (draftDeliveryAddress && !currentAddress) {
       form.setValue("deliveryAddress", draftDeliveryAddress);
     }
-  }, [form, isInitialized]);
+
+    if (savedAddresses.length > 0) {
+      const defaultAddress = savedAddresses.find((address) => address.isDefault) || savedAddresses[0];
+      if (defaultAddress) {
+        setSelectedAddressId(defaultAddress.id);
+        form.setValue("addressId", defaultAddress.id);
+      }
+    }
+  }, [form, isInitialized, savedAddresses]);
+
+  useEffect(() => {
+    if (!couponPreview || !appliedCouponCode) {
+      return;
+    }
+
+    if (couponCode.trim().toUpperCase() !== appliedCouponCode) {
+      setCouponPreview(null);
+      setAppliedCouponCode(null);
+    }
+  }, [appliedCouponCode, couponCode, couponPreview]);
+
+  useEffect(() => {
+    if (!providerId || items.length === 0) {
+      setCouponPreview(null);
+      setAppliedCouponCode(null);
+    }
+  }, [items, providerId]);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error("Enter a coupon code first.");
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    try {
+      const response = await OrderServices.previewCoupon({
+        providerId: providerId || "",
+        couponCode: couponCode.trim(),
+        items: items.map((item) => ({ mealId: item.meal.id, quantity: item.quantity })),
+      });
+
+      setCouponPreview(response.data || null);
+      setAppliedCouponCode(couponCode.trim().toUpperCase());
+      toast.success(`Coupon ${couponCode.trim().toUpperCase()} applied.`);
+    } catch (error: any) {
+      setCouponPreview(null);
+      setAppliedCouponCode(null);
+      toast.error(error?.response?.data?.message || "Failed to apply coupon.");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
 
   const onSubmit = async (data: CreateOrderPayload) => {
     setIsSubmitting(true);
     try {
+      const orderPayload = {
+        ...data,
+        providerId: providerId || data.providerId,
+        paymentMethod,
+        addressId: selectedAddressId || undefined,
+        couponCode: appliedCouponCode || undefined,
+      };
+
       // Create initial order in database (Status: PLACED, Payment: PENDING)
-      const response = await OrderServices.createOrder(data);
+      const response = await OrderServices.createOrder(orderPayload);
       if (response.success && response.data?.id) {
         setPlacedOrderId(response.data.id);
+        if (paymentMethod === PaymentMethod.COD) {
+          clearCart();
+          clearReorderDraftDeliveryAddress();
+          toast.success("Order placed! Pay cash on delivery.");
+          router.push("/customer/orders");
+          return;
+        }
+
         toast.success("Order confirmed. Processing secure payment...");
 
-        // Connect to Stripe Intent
-        const paymentRes = await PaymentServices.createPaymentIntent(
-          response.data.id
-        );
+        const paymentRes = await PaymentServices.createPaymentIntent(response.data.id);
 
         if (paymentRes.success && paymentRes.data?.clientSecret) {
-           setClientSecret(paymentRes.data.clientSecret);
+          setClientSecret(paymentRes.data.clientSecret);
         }
       }
     } catch (error: any) {
@@ -161,6 +254,35 @@ export default function CheckoutPage() {
                 {!clientSecret ? (
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <div className="space-y-2">
+                        <FormLabel className="text-slate-700 font-bold">Saved Address</FormLabel>
+                        <Select
+                          value={selectedAddressId || "manual"}
+                          onValueChange={(value) => {
+                            if (value === "manual") {
+                              setSelectedAddressId("");
+                              form.setValue("addressId", undefined);
+                              return;
+                            }
+
+                            setSelectedAddressId(value);
+                            form.setValue("addressId", value);
+                          }}
+                        >
+                          <SelectTrigger className="rounded-2xl border-slate-200 bg-slate-50">
+                            <SelectValue placeholder="Choose a saved address or manual entry" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="manual">Use manual address entry</SelectItem>
+                            {savedAddresses.map((address) => (
+                              <SelectItem key={address.id} value={address.id}>
+                                {address.label} {address.isDefault ? "(Default)" : ""}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
                       <FormField
                         control={form.control}
                         name="deliveryAddress"
@@ -171,13 +293,60 @@ export default function CheckoutPage() {
                               <Textarea 
                                 placeholder="e.g. 123 Main St, Apt 4B. Please leave at the door." 
                                 className="resize-none rounded-2xl border-slate-200 focus-visible:ring-indigo-500 min-h-[120px] p-4 bg-slate-50"
+                                disabled={Boolean(selectedAddressId)}
                                 {...field} 
                               />
                             </FormControl>
+                            {selectedAddressId ? (
+                              <p className="text-xs text-slate-500">Using selected saved address for this order.</p>
+                            ) : null}
                             <FormMessage className="text-pink-500" />
                           </FormItem>
                         )}
                       />
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <FormLabel className="text-slate-700 font-bold">Payment Method</FormLabel>
+                          <Select
+                            value={paymentMethod}
+                            onValueChange={(value) => {
+                              const nextMethod = value as PaymentMethod;
+                              setPaymentMethod(nextMethod);
+                              form.setValue("paymentMethod", nextMethod);
+                            }}
+                          >
+                            <SelectTrigger className="rounded-2xl border-slate-200 bg-slate-50">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={PaymentMethod.STRIPE}>Card Payment (Stripe)</SelectItem>
+                              <SelectItem value={PaymentMethod.COD}>Cash on Delivery</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <FormLabel className="text-slate-700 font-bold">Coupon Code</FormLabel>
+                          <div className="flex gap-2">
+                            <Input
+                              value={couponCode}
+                              onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+                              placeholder="e.g. FOOD10"
+                              className="rounded-2xl"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={applyCoupon}
+                              disabled={isApplyingCoupon}
+                            >
+                              {isApplyingCoupon ? "Applying..." : "Apply"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
                       <Button 
                         type="submit" 
                         size="lg" 
@@ -188,7 +357,7 @@ export default function CheckoutPage() {
                           <span className="flex items-center"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>Processing...</span>
                         ) : (
                           <span className="flex items-center justify-center w-full">
-                            Proceed to Payment
+                            {paymentMethod === PaymentMethod.COD ? "Place COD Order" : "Proceed to Payment"}
                             <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                           </span>
                         )}
@@ -266,9 +435,15 @@ export default function CheckoutPage() {
                     <span>Subtotal</span>
                     <span>${totalPrice.toFixed(2)}</span>
                   </div>
+                  {discountAmount > 0 ? (
+                    <div className="flex justify-between text-emerald-300 font-medium">
+                      <span>Coupon Discount</span>
+                      <span>- ${discountAmount.toFixed(2)}</span>
+                    </div>
+                  ) : null}
                   <div className="flex justify-between text-slate-300 font-medium">
                     <span>Tax & Fees (10%)</span>
-                    <span>${(totalPrice * 0.1).toFixed(2)}</span>
+                    <span>${taxAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-300 font-medium">
                     <span>Delivery</span>
@@ -285,6 +460,9 @@ export default function CheckoutPage() {
                     ${totalWithTax.toFixed(2)}
                   </span>
                 </div>
+                {couponPreview?.coupon?.code ? (
+                  <p className="text-xs text-emerald-300">Coupon applied: {couponPreview.coupon.code}</p>
+                ) : null}
               </CardContent>
             </Card>
           </div>

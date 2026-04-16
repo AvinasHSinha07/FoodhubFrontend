@@ -5,13 +5,16 @@ export type DashboardNavItem = {
 
 const ADMIN_NAV_ITEMS: DashboardNavItem[] = [
   { href: "/admin", label: "Admin Console" },
+  { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/providers", label: "Providers" },
   { href: "/admin/categories", label: "Categories" },
+  { href: "/admin/coupons", label: "Coupons" },
   { href: "/admin/orders", label: "Orders" },
 ];
 
 const PROVIDER_NAV_ITEMS: DashboardNavItem[] = [
+  { href: "/provider/analytics", label: "Analytics" },
   { href: "/provider/orders", label: "Orders" },
   { href: "/provider/meals", label: "Meals" },
   { href: "/provider/profile", label: "Profile" },

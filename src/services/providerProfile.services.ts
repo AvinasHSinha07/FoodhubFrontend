@@ -1,14 +1,17 @@
 import httpClient from "../lib/axios/httpClient";
 import { IResponse } from "../types/api.types";
-import { IProviderProfile } from "../types/user.types";
+import { IProviderAvailabilityWindow, IProviderProfile } from "../types/user.types";
 
 export interface ICreateProviderProfilePayload {
   restaurantName: string;
   description?: string;
   address: string;
   cuisineType?: string;
+  preparationTimeMinutes?: number;
+  timezone?: string;
   logo?: string;
   bannerImage?: string;
+  availabilityWindows?: IProviderAvailabilityWindow[];
 }
 
 const getMyProfile = async (): Promise<IResponse<IProviderProfile>> => {
@@ -32,6 +35,7 @@ const getAllProviders = async (
     searchTerm?: string;
     cuisineType?: string;
     status?: string;
+    isOpenNow?: boolean;
     page?: number;
     limit?: number;
     sortBy?: string;
@@ -42,6 +46,7 @@ const getAllProviders = async (
   if (params?.searchTerm) query.append("search", params.searchTerm);
   if (params?.cuisineType) query.append("cuisineType", params.cuisineType);
   if (params?.status) query.append("status", params.status);
+  if (params?.isOpenNow !== undefined) query.append("isOpenNow", String(params.isOpenNow));
   if (params?.page) query.append("page", String(params.page));
   if (params?.limit) query.append("limit", String(params.limit));
   if (params?.sortBy) query.append("sortBy", params.sortBy);

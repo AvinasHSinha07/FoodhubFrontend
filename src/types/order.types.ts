@@ -11,9 +11,23 @@ export enum OrderStatus {
 
 export enum PaymentStatus {
   PENDING = "PENDING",
+  COD_PENDING = "COD_PENDING",
   PAID = "PAID",
+  COD_COLLECTED = "COD_COLLECTED",
   FAILED = "FAILED",
   REFUNDED = "REFUNDED",
+}
+
+export enum PaymentMethod {
+  STRIPE = "STRIPE",
+  COD = "COD",
+}
+
+export interface IAppliedCoupon {
+  id: string;
+  code: string;
+  discountType: "PERCENTAGE" | "FIXED";
+  discountValue: number;
 }
 
 export interface IOrderItem {
@@ -30,10 +44,15 @@ export interface IOrder {
   id: string;
   customerId: string;
   providerId: string;
+  subtotalPrice: number;
+  discountAmount: number;
   totalPrice: number;
   deliveryAddress: string;
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
+  paymentMethod: PaymentMethod;
+  couponId?: string | null;
+  coupon?: IAppliedCoupon | null;
   stripePaymentIntentId?: string;
   createdAt: string;
   updatedAt: string;

@@ -147,7 +147,9 @@ export default function CustomerOrderDetailsPageClient({ orderId }: CustomerOrde
               <span>Total</span>
               <span>${order.totalPrice.toFixed(2)}</span>
             </div>
-            <p className="text-xs uppercase text-gray-500 tracking-wide">Payment Status: {order.paymentStatus}</p>
+            <p className="text-xs uppercase text-gray-500 tracking-wide">
+              Payment: {order.paymentMethod} / {order.paymentStatus}
+            </p>
           </CardContent>
         </Card>
 

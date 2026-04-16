@@ -5,7 +5,8 @@ import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { OrderServices } from "@/services/order.services";
-import { IOrder, OrderStatus } from "@/types/order.types";
+import { IOrder, OrderStatus, PaymentMethod, PaymentStatus } from "@/types/order.types";
+import { PaymentServices } from "@/services/payment.services";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,10 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
     mutationFn: (status: OrderStatus) => OrderServices.updateOrderStatus(orderId, status),
   });
 
+  const { mutateAsync: collectCodPayment, isPending: isCollectingCod } = useMutation({
+    mutationFn: () => PaymentServices.collectCodPayment(orderId),
+  });
+
   const handleUpdateStatus = async (status: OrderStatus) => {
     try {
       await updateStatus(status);
@@ -62,6 +67,17 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
       toast.success(`Order updated to ${status}`);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to update order status");
+    }
+  };
+
+  const handleCollectCod = async () => {
+    try {
+      await collectCodPayment();
+      await queryClient.invalidateQueries({ queryKey: queryKeys.order(orderId) });
+      await queryClient.invalidateQueries({ queryKey: ["provider-orders"] });
+      toast.success("COD payment marked as collected.");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Failed to collect COD payment");
     }
   };
 
@@ -132,7 +148,20 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
               <span>Total</span>
               <span>${order.totalPrice.toFixed(2)}</span>
             </div>
-            <p className="text-xs uppercase text-gray-500 tracking-wide">Payment Status: {order.paymentStatus}</p>
+            <p className="text-xs uppercase text-gray-500 tracking-wide">
+              Payment: {order.paymentMethod} / {order.paymentStatus}
+            </p>
+            {order.paymentMethod === PaymentMethod.COD && order.paymentStatus === PaymentStatus.COD_PENDING ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-3"
+                onClick={handleCollectCod}
+                disabled={isCollectingCod}
+              >
+                Mark COD Collected
+              </Button>
+            ) : null}
           </CardContent>
         </Card>
 

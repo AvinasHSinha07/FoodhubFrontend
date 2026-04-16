@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, Settings, User, ShoppingBag, PieChart, ChefHat, Heart } from "lucide-react";
+import { Home, Settings, User, ShoppingBag, PieChart, ChefHat, Heart, TicketPercent } from "lucide-react";
 import { getDashboardNavItems, isNavItemActive } from "@/lib/dashboardNav";
 
 const iconByLabel = {
   "Admin Console": PieChart,
+  Analytics: PieChart,
   Users: User,
   Providers: ChefHat,
   Categories: Settings,
+  Coupons: TicketPercent,
   Orders: ShoppingBag,
   Favorites: Heart,
   Meals: UtensilsIcon,

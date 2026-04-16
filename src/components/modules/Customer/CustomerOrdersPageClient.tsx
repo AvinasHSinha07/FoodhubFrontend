@@ -182,7 +182,9 @@ export default function CustomerOrdersPageClient() {
             <SelectContent>
               <SelectItem value="ALL">All Payments</SelectItem>
               <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={PaymentStatus.COD_PENDING}>COD Pending</SelectItem>
               <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={PaymentStatus.COD_COLLECTED}>COD Collected</SelectItem>
               <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
               <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
             </SelectContent>
@@ -230,7 +232,7 @@ export default function CustomerOrdersPageClient() {
                     {order.orderStatus}
                   </Badge>
                   <p className="text-xs text-gray-500 mt-1 uppercase font-medium">
-                    {order.paymentStatus}
+                    {order.paymentMethod} / {order.paymentStatus}
                   </p>
                 </div>
               </CardHeader>

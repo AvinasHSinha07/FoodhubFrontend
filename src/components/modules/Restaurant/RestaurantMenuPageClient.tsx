@@ -202,6 +202,18 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                     <Star className="w-3.5 h-3.5 fill-current mr-1" />
                     {averageRating} {reviewCount > 0 && <span className="text-slate-200 font-normal ml-1">({reviewCount})</span>}
                   </div>
+                  <Badge
+                    className={
+                      provider.isOpenNow
+                        ? "bg-emerald-500/90 text-white border-none"
+                        : "bg-rose-500/90 text-white border-none"
+                    }
+                  >
+                    {provider.isOpenNow ? "Open Now" : provider.nextOpenAt ? `Opens ${provider.nextOpenAt}` : "Closed"}
+                  </Badge>
+                  <Badge className="bg-white/20 text-white border-none">
+                    Prep ~ {provider.estimatedReadyInMinutes || provider.preparationTimeMinutes || 30} min
+                  </Badge>
                 </div>
               </div>
             </div>

@@ -131,7 +131,9 @@ export default function AdminOrdersPageClient() {
             <SelectContent>
               <SelectItem value="ALL">All Payments</SelectItem>
               <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
+              <SelectItem value={PaymentStatus.COD_PENDING}>COD Pending</SelectItem>
               <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
+              <SelectItem value={PaymentStatus.COD_COLLECTED}>COD Collected</SelectItem>
               <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
               <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
             </SelectContent>
@@ -175,7 +177,7 @@ export default function AdminOrdersPageClient() {
                       {order.orderStatus}
                     </Badge>
                     <Badge variant="secondary" className="uppercase text-[10px] tracking-widest">
-                      {order.paymentStatus}
+                      {order.paymentMethod} / {order.paymentStatus}
                     </Badge>
                   </div>
                   <CardDescription className="text-xs mt-1">

@@ -1,6 +1,6 @@
 import httpClient from "../lib/axios/httpClient";
 import { IResponse } from "../types/api.types";
-import { IOrder } from "../types/order.types";
+import { IAppliedCoupon, IOrder } from "../types/order.types";
 import { IMeal } from "../types/meal.types";
 import { IProviderProfile } from "../types/user.types";
 import { CreateOrderPayload } from "../zod/order.validation";
@@ -24,6 +24,28 @@ export type OrderListFilters = {
   sortOrder?: "asc" | "desc";
 };
 
+export type CouponPreviewPayload = {
+  providerId: string;
+  couponCode: string;
+  items: Array<{
+    mealId: string;
+    quantity: number;
+  }>;
+};
+
+export type CouponPreviewResult = {
+  subtotalPrice: number;
+  discountAmount: number;
+  totalPrice: number;
+  coupon: IAppliedCoupon | null;
+};
+
+export type ExtendedCreateOrderPayload = CreateOrderPayload & {
+  paymentMethod?: "STRIPE" | "COD";
+  couponCode?: string;
+  addressId?: string;
+};
+
 const buildOrderListQuery = (filters?: OrderListFilters) => {
   const params = new URLSearchParams();
   if (filters?.orderStatus) params.append("orderStatus", filters.orderStatus);
@@ -36,8 +58,12 @@ const buildOrderListQuery = (filters?: OrderListFilters) => {
   return params.toString();
 };
 
-const createOrder = async (data: CreateOrderPayload): Promise<IResponse<IOrder>> => {
-  return httpClient.post<IOrder, CreateOrderPayload>("/orders", data);
+const createOrder = async (data: ExtendedCreateOrderPayload): Promise<IResponse<IOrder>> => {
+  return httpClient.post<IOrder, ExtendedCreateOrderPayload>("/orders", data);
+};
+
+const previewCoupon = async (payload: CouponPreviewPayload): Promise<IResponse<CouponPreviewResult>> => {
+  return httpClient.post<CouponPreviewResult, CouponPreviewPayload>("/orders/coupon-preview", payload);
 };
 
 const getCustomerOrders = async (filters?: OrderListFilters): Promise<IResponse<IOrder[]>> => {
@@ -65,6 +91,7 @@ const reorderOrder = async (id: string): Promise<IResponse<ReorderPayload>> => {
 
 export const OrderServices = {
   createOrder,
+  previewCoupon,
   getCustomerOrders,
   getProviderOrders,
   getOrderById,

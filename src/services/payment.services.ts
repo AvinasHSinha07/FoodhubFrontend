@@ -19,7 +19,14 @@ const confirmPayment = async (
   });
 };
 
+const collectCodPayment = async (orderId: string): Promise<IResponse<any>> => {
+  return httpClient.post<any, { orderId: string }>("/payments/cod/collect", {
+    orderId,
+  });
+};
+
 export const PaymentServices = {
   createPaymentIntent,
   confirmPayment,
+  collectCodPayment,
 };
