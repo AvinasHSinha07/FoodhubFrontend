@@ -1,10 +1,16 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { ApiResponse } from "@/types/api.types";
 
-const API_BASE_URL =
+const fallbackApiUrl = "http://localhost:5000/api/v1";
+
+const fullApiUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:5000/api/v1";
+  fallbackApiUrl;
+
+// Use relative URL on client to hit Next.js rewrites proxy
+// On server, use the full URL to reach the backend directly
+const API_BASE_URL = typeof window !== 'undefined' ? '/api/v1' : fullApiUrl;
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

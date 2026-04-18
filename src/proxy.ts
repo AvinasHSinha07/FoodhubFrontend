@@ -48,8 +48,8 @@ const resolveRoleFromBackend = async (
             headers: {
                 "cookie": cookieHeader,
                 "Content-Type": "application/json",
-                // ✅ FIX 4: Forward origin so backend CORS + trustedOrigins accepts it
-                "Origin": "https://foodhub-frontend-vyqi.vercel.app",
+                // dynamically forward the origin so backend CORS + trustedOrigins accepts it
+                "Origin": request.nextUrl.origin,
             },
             cache: "no-store",
         });
