@@ -104,7 +104,7 @@ export default function AdminAnalyticsPageClient() {
         <CardHeader>
           <CardTitle>Orders and Revenue Trend</CardTitle>
         </CardHeader>
-        <CardContent className="h-[340px]">
+        <CardContent className="h-85">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={analytics.ordersByDay}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -125,7 +125,7 @@ export default function AdminAnalyticsPageClient() {
           <CardHeader>
             <CardTitle>Payment Method Mix</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-75">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -150,7 +150,7 @@ export default function AdminAnalyticsPageClient() {
           <CardHeader>
             <CardTitle>Top Providers by Revenue</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-75">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analytics.topProviders}>
                 <CartesianGrid strokeDasharray="3 3" />
