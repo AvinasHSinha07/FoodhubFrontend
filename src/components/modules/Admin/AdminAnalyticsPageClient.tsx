@@ -20,6 +20,7 @@ import {
 import { AdminServices } from "@/services/admin.services";
 import { queryKeys } from "@/lib/query/query-keys";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -28,10 +29,14 @@ const PIE_COLORS = ["#2563eb", "#16a34a", "#ea580c", "#7c3aed", "#dc2626", "#089
 export default function AdminAnalyticsPageClient() {
   const [days, setDays] = useState(30);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: queryKeys.adminAnalytics(days),
     queryFn: () => AdminServices.getAdminAnalyticsOverview(days),
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 20,
+    refetchInterval: 1000 * 20,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMount: "always",
   });
 
   const analytics = data?.data;
@@ -53,16 +58,21 @@ export default function AdminAnalyticsPageClient() {
           <h1 className="text-3xl font-bold tracking-tight">Platform Analytics</h1>
           <p className="text-sm text-gray-500">Revenue, payments, and order trends across FoodHub.</p>
         </div>
-        <Select value={String(days)} onValueChange={(value) => setDays(Number(value))}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 90 days</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? "Refreshing..." : "Refresh"}
+          </Button>
+          <Select value={String(days)} onValueChange={(value) => setDays(Number(value))}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">

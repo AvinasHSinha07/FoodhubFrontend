@@ -20,6 +20,7 @@ import { Search, SlidersHorizontal, ArrowRight, Utensils, Heart } from "lucide-r
 import PaginationControls from "@/components/shared/list/PaginationControls";
 import SortControl from "@/components/shared/list/SortControl";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 const dietOptions = [
   "VEGETARIAN",
@@ -63,13 +64,23 @@ export default function MealsPageClient() {
     return getMealFiltersFromSearchParams(currentParams);
   }, [queryString]);
 
-  const { data: mealsResponse, isLoading: isMealsLoading } = useQuery({
+  const {
+    data: mealsResponse,
+    isLoading: isMealsLoading,
+    isError: isMealsError,
+    error: mealsError,
+  } = useQuery({
     queryKey: queryKeys.meals(queryString),
     queryFn: () => MealServices.getAllMeals(filters),
     staleTime: 1000 * 60 * 10,
   });
 
-  const { data: categoriesResponse, isLoading: isCategoriesLoading } = useQuery({
+  const {
+    data: categoriesResponse,
+    isLoading: isCategoriesLoading,
+    isError: isCategoriesError,
+    error: categoriesError,
+  } = useQuery({
     queryKey: queryKeys.categories(),
     queryFn: () => CategoryServices.getCategories(),
     staleTime: 1000 * 60 * 60,
@@ -100,12 +111,17 @@ export default function MealsPageClient() {
       queryClient.invalidateQueries({ queryKey: ["meal-favorites"] });
       queryClient.invalidateQueries({ queryKey: ["meal-favorite-state"] });
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Unable to update favorites.");
+    onError: (mutationError: unknown) => {
+      toast.error(getApiErrorMessage(mutationError, "Unable to update favorites."));
     },
   });
 
   const isLoading = isMealsLoading || isCategoriesLoading;
+  const hasQueryError = isMealsError || isCategoriesError;
+  const queryErrorMessage = getApiErrorMessage(
+    mealsError || categoriesError,
+    "Unable to load meals right now."
+  );
 
   const handleToggleMealFavorite = (mealId: string) => {
     toggleMealFavoriteMutation.mutate(mealId);
@@ -301,6 +317,14 @@ export default function MealsPageClient() {
                   <Skeleton className="h-10 w-full rounded-xl" />
                 </div>
               ))}
+            </div>
+          ) : hasQueryError ? (
+            <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm col-span-full">
+              <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Utensils className="w-10 h-10 text-rose-300" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>Failed to load meals</h3>
+              <p className="text-slate-500 text-lg max-w-md mx-auto">{queryErrorMessage}</p>
             </div>
           ) : meals.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm col-span-full">

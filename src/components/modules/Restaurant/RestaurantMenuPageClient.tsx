@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProviderProfileServices } from "@/services/providerProfile.services";
 import { FavoriteServices } from "@/services/favorite.services";
@@ -22,12 +23,13 @@ type RestaurantMenuPageClientProps = {
 };
 
 export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuPageClientProps) {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { items, addToCart, updateQuantity, totalPrice, clearCart, providerId: cartProviderId } = useCart();
   const [isReplaceCartModalOpen, setIsReplaceCartModalOpen] = useState(false);
   const [pendingMeal, setPendingMeal] = useState<IMeal | null>(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching: isProviderFetching, refetch: refetchProvider } = useQuery({
     queryKey: queryKeys.provider(providerId),
     queryFn: () => ProviderProfileServices.getProviderById(providerId),
     staleTime: 1000 * 60 * 10,
@@ -140,6 +142,20 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
     addToCart(pendingMeal, provider, 1, { forceReplace: true });
     setPendingMeal(null);
     setIsReplaceCartModalOpen(false);
+  };
+
+  const handleProceedToCheckout = async () => {
+    if (cartProviderId === providerId) {
+      const latestProviderResponse = await refetchProvider();
+      const latestProvider = (latestProviderResponse.data?.data || provider) as IProviderProfile | null;
+
+      if (!latestProvider?.isOpenNow) {
+        toast.error("Restaurant is currently closed. Please order during open hours.");
+        return;
+      }
+    }
+
+    router.push("/checkout");
   };
 
   return (
@@ -397,10 +413,14 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                         </div>
                       </div>
 
-                      <Button className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 group" asChild>
-                        <Link href="/checkout" className="flex items-center justify-center">
+                      <Button
+                        className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 group"
+                        onClick={handleProceedToCheckout}
+                        disabled={isProviderFetching}
+                      >
+                        <span className="flex items-center justify-center">
                           Proceed to Checkout <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </Link>
+                        </span>
                       </Button>
                     </div>
                   </div>

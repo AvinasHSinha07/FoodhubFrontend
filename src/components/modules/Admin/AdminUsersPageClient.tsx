@@ -16,6 +16,7 @@ import { queryKeys } from "@/lib/query/query-keys";
 import { getAdminUsersFiltersFromSearchParams } from "@/lib/query/admin-users-filters";
 import PaginationControls from "@/components/shared/list/PaginationControls";
 import SortControl from "@/components/shared/list/SortControl";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 export default function AdminUsersPageClient() {
   const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ export default function AdminUsersPageClient() {
     };
   }, [queryString]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: queryKeys.adminUsers(queryString),
     queryFn: () => AdminServices.getAllUsers(filters),
     staleTime: 1000 * 60 * 3,
@@ -71,8 +72,8 @@ export default function AdminUsersPageClient() {
       await updateUserStatus({ userId, newStatus });
       toast.success(`User set to ${newStatus}`);
       await queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers(queryString) });
-    } catch {
-      toast.error("Failed to update status");
+    } catch (mutationError: unknown) {
+      toast.error(getApiErrorMessage(mutationError, "Failed to update status"));
     }
   };
 
@@ -164,6 +165,11 @@ export default function AdminUsersPageClient() {
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-24 w-full" />
         </div>
+      ) : isError ? (
+        <Card className="text-center py-20 bg-gray-50">
+          <h2 className="text-xl font-semibold text-gray-700">Unable to load users</h2>
+          <p className="text-gray-500 mt-2">{getApiErrorMessage(error, "Please refresh and try again.")}</p>
+        </Card>
       ) : users.length === 0 ? (
         <Card className="text-center py-20 bg-gray-50">
           <h2 className="text-xl font-semibold text-gray-700">No users found</h2>

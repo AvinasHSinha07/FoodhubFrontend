@@ -50,6 +50,7 @@ export default function CheckoutPage() {
     coupon: { code: string } | null;
   } | null>(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [skipEmptyCartRedirect, setSkipEmptyCartRedirect] = useState(false);
   
   const discountAmount = couponPreview?.discountAmount || 0;
   const discountedSubtotal = Math.max(0, totalPrice - discountAmount);
@@ -78,11 +79,11 @@ export default function CheckoutPage() {
 
   // Redirect if cart is empty
   useEffect(() => {
-    if (isInitialized && items.length === 0) {
+    if (isInitialized && items.length === 0 && !skipEmptyCartRedirect) {
       toast.error("Your cart is empty");
       router.push("/");
     }
-  }, [isInitialized, items, router]);
+  }, [isInitialized, items, router, skipEmptyCartRedirect]);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -178,6 +179,7 @@ export default function CheckoutPage() {
       if (response.success && response.data?.id) {
         setPlacedOrderId(response.data.id);
         if (paymentMethod === PaymentMethod.COD) {
+          setSkipEmptyCartRedirect(true);
           clearCart();
           clearReorderDraftDeliveryAddress();
           toast.success("Order placed! Pay cash on delivery.");
@@ -201,6 +203,7 @@ export default function CheckoutPage() {
   };
 
   const handlePaymentSuccess = () => {
+    setSkipEmptyCartRedirect(true);
     clearCart();
     clearReorderDraftDeliveryAddress();
     toast.success("Payment Successful! Your order is on the way.");

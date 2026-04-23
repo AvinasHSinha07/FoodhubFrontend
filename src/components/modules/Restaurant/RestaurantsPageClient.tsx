@@ -17,6 +17,7 @@ import { Search, MapPin, Utensils, Star, ArrowRight, Heart } from "lucide-react"
 import PaginationControls from "@/components/shared/list/PaginationControls";
 import SortControl from "@/components/shared/list/SortControl";
 import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 export default function RestaurantsPageClient() {
   const queryClient = useQueryClient();
@@ -40,7 +41,7 @@ export default function RestaurantsPageClient() {
   const page = Number(searchParams?.get("page") || "1");
   const [sortBy, sortOrder] = sortValue.split(":");
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: queryKeys.providers(queryString),
     queryFn: () =>
       ProviderProfileServices.getAllProviders({
@@ -77,8 +78,8 @@ export default function RestaurantsPageClient() {
       queryClient.invalidateQueries({ queryKey: ["provider-favorites"] });
       queryClient.invalidateQueries({ queryKey: ["provider-favorite-state"] });
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Unable to update favorites.");
+    onError: (mutationError: unknown) => {
+      toast.error(getApiErrorMessage(mutationError, "Unable to update favorites."));
     },
   });
 
@@ -198,6 +199,14 @@ export default function RestaurantsPageClient() {
                 <Skeleton className="h-12 w-full rounded-xl" />
               </div>
             ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-32 bg-white rounded-3xl shadow-sm border border-slate-100 mt-16 max-w-3xl mx-auto">
+            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search className="w-10 h-10 text-rose-300" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-800 mb-3" style={{ fontFamily: "var(--font-space-grotesk)" }}>Unable to load restaurants</h3>
+            <p className="text-slate-500 text-lg">{getApiErrorMessage(error, "Please refresh and try again.")}</p>
           </div>
         ) : filteredProviders.length === 0 ? (
           <div className="text-center py-32 bg-white rounded-3xl shadow-sm border border-slate-100 mt-16 max-w-3xl mx-auto">

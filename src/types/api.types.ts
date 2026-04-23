@@ -16,6 +16,10 @@ export interface ApiResponse<T> {
 export interface ApiErrorResponse {
   success: false;
   message: string;
+  errorSources?: Array<{
+    path: string | number;
+    message: string;
+  }>;
   errors?: unknown;
 }
 

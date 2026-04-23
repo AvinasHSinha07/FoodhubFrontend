@@ -16,6 +16,7 @@ import { queryKeys } from "@/lib/query/query-keys";
 import PaginationControls from "@/components/shared/list/PaginationControls";
 import SortControl from "@/components/shared/list/SortControl";
 import { getOrderFiltersFromSearchParams } from "@/lib/query/order-filters";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 const getAllowedTransitions = (currentStatus: OrderStatus): OrderStatus[] => {
   switch (currentStatus) {
@@ -84,8 +85,8 @@ export default function ProviderOrdersPageClient() {
       await updateStatus({ orderId, newStatus });
       toast.success(`Order status updated to ${newStatus}`);
       await queryClient.invalidateQueries({ queryKey: ["provider-orders"] });
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to update status");
+    } catch (mutationError: unknown) {
+      toast.error(getApiErrorMessage(mutationError, "Failed to update status"));
     } finally {
       setUpdatingId(null);
     }
@@ -97,8 +98,8 @@ export default function ProviderOrdersPageClient() {
       toast.success("COD payment marked as collected.");
       await queryClient.invalidateQueries({ queryKey: ["provider-orders"] });
       await queryClient.invalidateQueries({ queryKey: queryKeys.order(orderId) });
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to collect COD payment.");
+    } catch (mutationError: unknown) {
+      toast.error(getApiErrorMessage(mutationError, "Failed to collect COD payment."));
     }
   };
 
@@ -215,6 +216,11 @@ export default function ProviderOrdersPageClient() {
           <Button asChild className="mt-6">
             <Link href="/provider/profile">Set Up Profile</Link>
           </Button>
+        </Card>
+      ) : error ? (
+        <Card className="text-center py-20 bg-gray-50">
+          <h2 className="text-xl font-semibold text-gray-700">Unable to load orders</h2>
+          <p className="text-gray-500 mt-2">{getApiErrorMessage(error, "Please refresh and try again.")}</p>
         </Card>
       ) : orders.length === 0 ? (
         <Card className="text-center py-20 bg-gray-50">

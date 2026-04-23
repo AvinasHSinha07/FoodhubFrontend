@@ -194,6 +194,7 @@ export default function MealForm({
                     <SelectItem value="VEGAN">Vegan</SelectItem>
                     <SelectItem value="VEGETARIAN">Vegetarian</SelectItem>
                     <SelectItem value="HALAL">Halal</SelectItem>
+                    <SelectItem value="Non-Veg">Non-Veg</SelectItem>
                     <SelectItem value="GLUTEN_FREE">Gluten Free</SelectItem>
                     <SelectItem value="NONE">None</SelectItem>
                   </SelectContent>
