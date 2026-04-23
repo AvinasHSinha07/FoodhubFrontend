@@ -229,7 +229,7 @@ export default function RestaurantsPageClient() {
               const reviewCount = reviews.length;
 
               return (
-                <Card key={provider.id} className="overflow-hidden border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
+                <Card key={provider.id} className="overflow-hidden py-0 border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
                   <div className="relative h-64 overflow-hidden">
                     <img
                       src={provider.bannerImage || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"}

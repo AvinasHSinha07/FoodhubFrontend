@@ -315,7 +315,7 @@ export default function MealsPageClient() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {meals.map((meal) => (
-                <Card key={meal.id} className="overflow-hidden border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
+                <Card key={meal.id} className="overflow-hidden py-0 border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
                   {meal.image ? (
                     <div className="relative h-48 overflow-hidden">
                       <img

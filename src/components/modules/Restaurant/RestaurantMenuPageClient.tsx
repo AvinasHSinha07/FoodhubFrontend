@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/CartProvider";
-import { ShoppingCart, Plus, Minus, ArrowLeft, Utensils, MapPin, Star, ArrowRight, Heart } from "lucide-react";
+import { ShoppingCart, Plus, Minus, ArrowLeft, Utensils, MapPin, Star, ArrowRight, Heart, Clock } from "lucide-react";
 import { IMeal } from "@/types/meal.types";
 import { queryKeys } from "@/lib/query/query-keys";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -143,80 +143,95 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
-      <div className="relative pt-24 pb-12 lg:pt-32 lg:pb-20 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-[-10%] w-96 h-96 bg-purple-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-          <div className="absolute bottom-0 left-[-10%] w-96 h-96 bg-pink-200/40 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-slate-50/80 backdrop-blur-sm"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <Link href="/restaurants" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 mb-8 transition-colors">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to all restaurants
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
+      {/* Header Section */}
+      <div className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Link href="/restaurants" className="inline-flex items-center text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors group">
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Back to Restaurants
           </Link>
+        </div>
+      </div>
 
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-white border border-slate-100">
+      {/* Restaurant Hero Banner */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="rounded-2xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+          {/* Banner Image */}
+          <div className="relative h-56 sm:h-72 lg:h-80 w-full overflow-hidden">
             <div
-              className="h-48 sm:h-64 lg:h-80 w-full bg-cover bg-center"
+              className="w-full h-full bg-cover bg-center transition-transform duration-500"
               style={{ backgroundImage: `url(${bannerImage})` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
             </div>
 
-            <div className="relative px-6 pb-6 sm:px-10 sm:pb-10 -mt-16 sm:-mt-20 flex flex-col sm:flex-row gap-6 items-end">
-              {provider.logo ? (
-                <img src={provider.logo} alt="Logo" className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl border-4 border-white shadow-xl object-cover bg-white" />
-              ) : (
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl border-4 border-white shadow-xl bg-indigo-100 flex items-center justify-center">
-                  <Utensils className="h-12 w-12 text-indigo-400" />
-                </div>
-              )}
+            {/* Restaurant Info Overlay */}
+            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+              <div className="flex items-end gap-6">
+                {/* Logo */}
+                {provider.logo ? (
+                  <img src={provider.logo} alt="Logo" className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg border-4 border-white shadow-lg object-cover bg-white flex-shrink-0" />
+                ) : (
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg border-4 border-white shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <Utensils className="h-10 w-10 text-indigo-500" />
+                  </div>
+                )}
 
-              <div className="flex-1 pb-2">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                  {provider.restaurantName}
-                </h1>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    className="bg-white/20 text-white hover:bg-white/30 border-none"
-                    onClick={() => toggleProviderFavoriteMutation.mutate()}
-                  >
-                    <Heart className={`mr-2 h-4 w-4 ${isProviderFavorited ? "fill-red-500 text-red-500" : "text-white"}`} />
-                    {isProviderFavorited ? "Saved" : "Save"}
-                  </Button>
-                  {provider.cuisineType && (
-                    <Badge className="bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-3 py-1 text-sm font-medium transition-all">
-                      <Utensils className="w-3 h-3 mr-1.5 inline-block" />
-                      {provider.cuisineType}
-                    </Badge>
-                  )}
-                  <div className="flex items-center text-slate-200 text-sm font-medium">
-                    <MapPin className="w-4 h-4 mr-1 text-pink-400" />
-                    {provider.address || "No address provided"}
+                {/* Restaurant Details */}
+                <div className="flex-1 text-white pb-2">
+                  <h1 className="text-3xl sm:text-4xl font-bold mb-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                    {provider.restaurantName}
+                  </h1>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {provider.cuisineType && (
+                      <span className="text-sm font-medium text-white/90 bg-white/20 px-3 py-1 rounded-full">
+                        {provider.cuisineType}
+                      </span>
+                    )}
+                    <div className="flex items-center text-sm text-white/90">
+                      <Star className="w-4 h-4 fill-yellow-300 text-yellow-300 mr-1" />
+                      <span className="font-semibold">{averageRating}</span>
+                      {reviewCount > 0 && <span className="ml-1">({reviewCount} reviews)</span>}
+                    </div>
                   </div>
-                  <div className="flex items-center text-yellow-400 text-sm font-bold bg-gray-900/40 px-2 py-0.5 rounded backdrop-blur-sm">
-                    <Star className="w-3.5 h-3.5 fill-current mr-1" />
-                    {averageRating} {reviewCount > 0 && <span className="text-slate-200 font-normal ml-1">({reviewCount})</span>}
-                  </div>
-                  <Badge
-                    className={
-                      provider.isOpenNow
-                        ? "bg-emerald-500/90 text-white border-none"
-                        : "bg-rose-500/90 text-white border-none"
-                    }
-                  >
-                    {provider.isOpenNow ? "Open Now" : provider.nextOpenAt ? `Opens ${provider.nextOpenAt}` : "Closed"}
-                  </Badge>
-                  <Badge className="bg-white/20 text-white border-none">
-                    Prep ~ {provider.estimatedReadyInMinutes || provider.preparationTimeMinutes || 30} min
-                  </Badge>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Info Bar */}
+          <div className="px-6 sm:px-8 py-5 border-t border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-6">
+              {/* Address */}
+              <div className="flex items-center text-slate-600 text-sm">
+                <MapPin className="w-4 h-4 mr-2 text-slate-400" />
+                <span className="font-medium">{provider.address || "No address provided"}</span>
+              </div>
+
+              {/* Status */}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${provider.isOpenNow ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                <div className={`w-2 h-2 rounded-full ${provider.isOpenNow ? "bg-emerald-500" : "bg-rose-500"}`}></div>
+                {provider.isOpenNow ? "Open Now" : provider.nextOpenAt ? `Opens ${provider.nextOpenAt}` : "Closed"}
+              </div>
+
+              {/* Prep Time */}
+              <div className="flex items-center text-slate-600 text-sm">
+                <Clock className="w-4 h-4 mr-2 text-slate-400" />
+                <span className="font-medium">~{provider.estimatedReadyInMinutes || provider.preparationTimeMinutes || 30} min</span>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="rounded-full border-slate-200 hover:border-red-300 hover:bg-red-50"
+              onClick={() => toggleProviderFavoriteMutation.mutate()}
+            >
+              <Heart className={`mr-2 h-4 w-4 ${isProviderFavorited ? "fill-red-500 text-red-500" : "text-slate-400"}`} />
+              {isProviderFavorited ? "Saved" : "Save"}
+            </Button>
           </div>
         </div>
       </div>
@@ -240,7 +255,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
               {availableMeals.map((meal: IMeal) => {
                 const qty = getCartQuantity(meal.id);
                 return (
-                  <Card key={meal.id} className="group overflow-hidden border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl bg-white flex flex-col h-full">
+                  <Card key={meal.id} className="group py-0 overflow-hidden border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl bg-white flex flex-col h-full">
                     {meal.image ? (
                       <div className="h-48 w-full overflow-hidden relative">
                         <img src={meal.image} alt={meal.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
