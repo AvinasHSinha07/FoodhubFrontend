@@ -253,7 +253,7 @@ export default function ProviderOrdersPageClient() {
                     onValueChange={(val) => handleStatusChange(order.id, val)}
                     disabled={updatingId === order.id || getAllowedTransitions(order.orderStatus).length === 0}
                   >
-                    <SelectTrigger className={`w-[140px] font-medium border ${getStatusColor(order.orderStatus)}`}>
+                    <SelectTrigger className={`w-35 font-medium border ${getStatusColor(order.orderStatus)}`}>
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>

@@ -188,15 +188,15 @@ export default function MealsPageClient() {
     <div className="bg-slate-50 min-h-screen pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
       <div className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden bg-slate-900 border-b border-slate-800">
         <div className="absolute inset-0 z-0">
-          <div className="absolute -top-[20%] left-[10%] w-[500px] h-[500px] bg-indigo-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob"></div>
-          <div className="absolute bottom-[-10%] right-[20%] w-[400px] h-[400px] bg-pink-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] flex items-center justify-center opacity-10 rounded-full blur-3xl"></div>
+          <div className="absolute -top-[20%] left-[10%] w-125 h-125 bg-indigo-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob"></div>
+          <div className="absolute bottom-[-10%] right-[20%] w-100 h-100 bg-pink-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 flex items-center justify-center opacity-10 rounded-full blur-3xl"></div>
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-            Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400">Amazing Dishes</span>
+            Explore <span className="text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-indigo-400">Amazing Dishes</span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-medium mb-4">
             Find the perfect meal for your cravings using our advanced filters. From healthy salads to indulgent pizzas, we have it all.
@@ -207,7 +207,7 @@ export default function MealsPageClient() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-4 gap-8 -mt-8 relative z-20">
         <div className="lg:col-span-1">
           <Card className="sticky top-24 shadow-xl border-slate-100 rounded-3xl bg-white/90 backdrop-blur-xl overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-pink-500"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 to-pink-500"></div>
             <CardHeader className="pb-4 border-b border-slate-100/50 bg-white/50 backdrop-blur-sm">
               <CardTitle className="text-xl flex items-center gap-2 font-bold text-slate-800" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                 <SlidersHorizontal className="w-5 h-5 text-indigo-600" />

@@ -135,7 +135,7 @@ export default function AdminUsersPageClient() {
           />
         </form>
         <Select value={filterRole} onValueChange={(value) => updateParams({ role: value, page: "1" })}>
-          <SelectTrigger className="w-[180px] bg-white">
+          <SelectTrigger className="w-45 bg-white">
             <SelectValue placeholder="All Roles" />
           </SelectTrigger>
           <SelectContent>
@@ -211,7 +211,7 @@ export default function AdminUsersPageClient() {
                         onValueChange={(val) => handleStatusChange(user.id, val as UserStatus)}
                         disabled={user.role === "SUPER_ADMIN" || isUpdating}
                       >
-                        <SelectTrigger className="w-[110px] h-8 text-xs ml-auto">
+                        <SelectTrigger className="w-27.5 h-8 text-xs ml-auto">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>

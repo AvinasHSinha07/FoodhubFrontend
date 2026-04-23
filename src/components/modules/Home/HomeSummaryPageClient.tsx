@@ -254,7 +254,7 @@ export default function HomeSummaryPageClient() {
                     )}
                     
                     {/* Gradient overlay for better button contrast */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-linear-to-b from-slate-900/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     
                     <Button
                       type="button"

@@ -143,22 +143,22 @@ export default function RestaurantsPageClient() {
     <div className="bg-slate-50 min-h-screen pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
       <div className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden bg-slate-900">
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-pink-500/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-[-20%] left-[-10%] w-125 h-125 bg-indigo-500/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob"></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-125 h-125 bg-pink-500/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-20"></div>
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-            Discover Local <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400">Culinary Stars</span>
+            Discover Local <span className="text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-indigo-400">Culinary Stars</span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-medium">
             Explore highly-rated restaurants, uncover hidden gems, and find your next favorite meal.
           </p>
 
           <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 bg-linear-to-r from-pink-500 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
             <div className="relative flex items-center bg-white/10 backdrop-blur-xl rounded-full border border-white/20 p-2 shadow-2xl">
               <Search className="ml-4 h-6 w-6 text-slate-300" />
               <Input
@@ -245,7 +245,7 @@ export default function RestaurantsPageClient() {
                       alt={provider.restaurantName}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80" />
+                    <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80" />
 
                     <div className="absolute top-4 left-4 flex gap-2">
                       {provider.cuisineType && (

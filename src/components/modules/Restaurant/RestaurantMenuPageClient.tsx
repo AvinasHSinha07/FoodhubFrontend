@@ -93,7 +93,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto py-20 px-4 mt-20">
-        <Skeleton className="h-[400px] w-full mb-12 rounded-3xl" />
+        <Skeleton className="h-100 w-full mb-12 rounded-3xl" />
         <Skeleton className="h-12 w-64 mb-8" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -106,7 +106,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
 
   if (!provider) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-24 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-24 bg-linear-to-br from-indigo-50 via-white to-purple-50">
         <h2 className="text-3xl font-extrabold tracking-tight mb-4 text-slate-800" style={{ fontFamily: "var(--font-space-grotesk)" }}>Restaurant not found</h2>
         <Button asChild className="rounded-full bg-indigo-600 hover:bg-indigo-700 shadow-md">
           <Link href="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Home</Link>
@@ -159,7 +159,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
+    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
       {/* Header Section */}
       <div className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -178,7 +178,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
               className="w-full h-full bg-cover bg-center transition-transform duration-500"
               style={{ backgroundImage: `url(${bannerImage})` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/20 to-transparent" />
             </div>
 
             {/* Restaurant Info Overlay */}
@@ -186,9 +186,9 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
               <div className="flex items-end gap-6">
                 {/* Logo */}
                 {provider.logo ? (
-                  <img src={provider.logo} alt="Logo" className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg border-4 border-white shadow-lg object-cover bg-white flex-shrink-0" />
+                  <img src={provider.logo} alt="Logo" className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg border-4 border-white shadow-lg object-cover bg-white shrink-0" />
                 ) : (
-                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg border-4 border-white shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-lg border-4 border-white shadow-lg bg-linear-to-br from-indigo-50 to-indigo-100 flex items-center justify-center shrink-0">
                     <Utensils className="h-10 w-10 text-indigo-500" />
                   </div>
                 )}
@@ -355,7 +355,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
         <div className="col-span-1 lg:col-span-1">
           <div className="sticky top-24">
             <Card className="border-none shadow-xl rounded-3xl bg-white overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-indigo-500"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-pink-500 to-indigo-500"></div>
               <CardHeader className="pb-4 border-b border-slate-100 bg-slate-50/50 pt-6 px-6">
                 <CardTitle className="flex items-center justify-between text-xl font-extrabold text-slate-800" style={{ fontFamily: "var(--font-space-grotesk)" }}>
                   <span className="flex items-center gap-2"><ShoppingCart className="h-5 w-5 text-indigo-500" /> Your Order</span>
