@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import {
     getDefaultDashboardRoute,
     getRouteOwner,
+    isValidRedirectForRole,
     isAuthRoute,
     UserRole,
 } from "./lib/authUtils";
@@ -20,6 +21,19 @@ const normalizeRole = (role?: string): UserRole | undefined => {
     if (role === "SUPER_ADMIN") return "ADMIN";
     if (role === "ADMIN" || role === "PROVIDER" || role === "CUSTOMER") return role;
     return undefined;
+};
+
+const getSafeInternalRedirectPath = (value: string | null): string | null => {
+    if (!value) {
+        return null;
+    }
+
+    // Prevent open redirects; only allow app-internal absolute paths.
+    if (!value.startsWith("/") || value.startsWith("//")) {
+        return null;
+    }
+
+    return value;
 };
 
 // ✅ FIX 2: userRole cookie must also be sameSite=none + secure in production
@@ -82,10 +96,18 @@ export async function proxy(request: NextRequest) {
 
     // Logged-in users should not hit auth routes
     if (isAuthRoute(pathname) && sessionToken) {
+        const redirectPath = getSafeInternalRedirectPath(
+            request.nextUrl.searchParams.get("redirect")
+        );
         const resolvedRole = cookieRole || (await resolveRoleFromBackend(request));
         if (resolvedRole) {
+            const destination =
+                redirectPath && isValidRedirectForRole(redirectPath, resolvedRole)
+                    ? redirectPath
+                    : getDefaultDashboardRoute(resolvedRole);
+
             const response = NextResponse.redirect(
-                new URL(getDefaultDashboardRoute(resolvedRole), request.url)
+                new URL(destination, request.url)
             );
             if (cookieRole !== resolvedRole) {
                 setRoleCookie(response, resolvedRole);

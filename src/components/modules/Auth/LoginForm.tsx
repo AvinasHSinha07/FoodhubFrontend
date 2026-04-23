@@ -24,6 +24,18 @@ import {
 } from "@/lib/authUtils";
 import { getCookie } from "cookies-next";
 
+const getSafeInternalRedirectPath = (value: string | null): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return null;
+  }
+
+  return value;
+};
+
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -50,7 +62,7 @@ export default function LoginForm() {
 
     toast.success("Successfully logged in!");
 
-    const redirectPath = searchParams.get("redirect");
+    const redirectPath = getSafeInternalRedirectPath(searchParams.get("redirect"));
     const userRole = getCookie("userRole") as UserRole | undefined;
 
     if (redirectPath && isValidRedirectForRole(redirectPath, userRole)) {
