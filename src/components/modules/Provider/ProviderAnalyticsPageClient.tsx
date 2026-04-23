@@ -83,7 +83,7 @@ export default function ProviderAnalyticsPageClient() {
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm text-gray-500">Total Orders</CardTitle>
@@ -94,10 +94,18 @@ export default function ProviderAnalyticsPageClient() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Revenue</CardTitle>
+            <CardTitle className="text-sm text-gray-500">Net Payout</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">${analytics.summary.totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">${analytics.summary.providerNetPayout.toFixed(2)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-500">Gross Earnings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">${analytics.summary.providerGrossEarning.toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -121,9 +129,9 @@ export default function ProviderAnalyticsPageClient() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Daily Orders</CardTitle>
+            <CardTitle>Daily Orders and Net Payout</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={analytics.ordersByDay}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -142,7 +150,7 @@ export default function ProviderAnalyticsPageClient() {
           <CardHeader>
             <CardTitle>Payment Status Distribution</CardTitle>
           </CardHeader>
-          <CardContent className="h-[320px]">
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie

@@ -65,7 +65,7 @@ export default function AdminAnalyticsPageClient() {
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm text-gray-500">Total Orders</CardTitle>
@@ -76,10 +76,18 @@ export default function AdminAnalyticsPageClient() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Total Revenue</CardTitle>
+            <CardTitle className="text-sm text-gray-500">Admin Net Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">${analytics.summary.totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">${analytics.summary.adminNetRevenue.toFixed(2)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-500">Platform GMV</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">${analytics.summary.gmv.toFixed(2)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -102,7 +110,7 @@ export default function AdminAnalyticsPageClient() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Orders and Revenue Trend</CardTitle>
+          <CardTitle>Orders and Net Revenue Trend</CardTitle>
         </CardHeader>
         <CardContent className="h-85">
           <ResponsiveContainer width="100%" height="100%">
@@ -148,7 +156,7 @@ export default function AdminAnalyticsPageClient() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Top Providers by Revenue</CardTitle>
+            <CardTitle>Top Providers by Net Payout</CardTitle>
           </CardHeader>
           <CardContent className="h-75">
             <ResponsiveContainer width="100%" height="100%">

@@ -9,6 +9,9 @@ export type TProviderAnalyticsOverview = {
   summary: {
     totalOrders: number;
     totalRevenue: number;
+    gmv: number;
+    providerGrossEarning: number;
+    providerNetPayout: number;
     paidOrders: number;
     pendingPayments: number;
   };

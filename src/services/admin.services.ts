@@ -47,6 +47,9 @@ export type AnalyticsOverview = {
   summary: {
     totalOrders: number;
     totalRevenue: number;
+    gmv: number;
+    adminGrossRevenue: number;
+    adminNetRevenue: number;
     paidOrders: number;
     pendingPayments: number;
   };

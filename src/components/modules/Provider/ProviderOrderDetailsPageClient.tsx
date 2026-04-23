@@ -113,7 +113,7 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
             onValueChange={(value) => handleUpdateStatus(value as OrderStatus)}
             disabled={isUpdating || nextStatuses.length === 0}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Update status" />
             </SelectTrigger>
             <SelectContent>
