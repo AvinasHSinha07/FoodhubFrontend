@@ -7,6 +7,10 @@ FoodHub Frontend is a sophisticated, interactive Next.js application that provid
 - **Frontend Live URL**: [https://foodhub-frontend-vyqi.vercel.app/](https://foodhub-frontend-vyqi.vercel.app/)
 - **Backend API Live URL**: [https://foodhubbackend-5iv9.onrender.com/](https://foodhubbackend-5iv9.onrender.com/)
 
+## 🔑 Admin Credentials
+- **Email**: `avi@gmail.com`
+- **Password**: `asdfghjk`
+
 ## ✨ Comprehensive Features
 
 ### 🌍 Dynamic Public Interfaces
