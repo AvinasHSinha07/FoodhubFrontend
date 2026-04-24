@@ -341,7 +341,7 @@ export default function MealsPageClient() {
                 {meals.map((meal) => (
                 <Card key={meal.id} className="overflow-hidden py-0 border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
                   {meal.image ? (
-                    <div className="relative h-48 overflow-hidden">
+                    <Link href={`/meals/${meal.id}`} className="block relative h-48 overflow-hidden">
                       <img
                         src={meal.image}
                         alt={meal.title}
@@ -355,11 +355,15 @@ export default function MealsPageClient() {
                           {meal.dietaryTag.replace("_", " ")}
                         </Badge>
                       )}
-                    </div>
+                    </Link>
                   ) : (
                     <div className="p-6 pb-0 flex justify-between items-start gap-4">
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-bold text-slate-900 line-clamp-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>{meal.title}</CardTitle>
+                        <CardTitle className="text-xl font-bold text-slate-900 line-clamp-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                          <Link href={`/meals/${meal.id}`} className="hover:text-indigo-600 transition-colors">
+                            {meal.title}
+                          </Link>
+                        </CardTitle>
                       </div>
                       <div className="font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-full text-sm shrink-0 flex items-center">
                         <span className="text-indigo-600 mr-0.5">$</span>{meal.price.toFixed(2)}
@@ -370,7 +374,9 @@ export default function MealsPageClient() {
                   <CardHeader className="\ flex-1">
                     {meal.image && (
                       <CardTitle className="text-xl font-bold text-slate-900 line-clamp-1" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                        {meal.title}
+                        <Link href={`/meals/${meal.id}`} className="hover:text-indigo-600 transition-colors">
+                          {meal.title}
+                        </Link>
                       </CardTitle>
                     )}
                     <CardDescription className="line-clamp-2 mt-1.5 text-slate-500 text-sm leading-relaxed">

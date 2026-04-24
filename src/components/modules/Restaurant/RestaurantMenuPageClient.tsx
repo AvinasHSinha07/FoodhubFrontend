@@ -17,6 +17,13 @@ import { IMeal } from "@/types/meal.types";
 import { queryKeys } from "@/lib/query/query-keys";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 type RestaurantMenuPageClientProps = {
   providerId: string;
@@ -25,7 +32,7 @@ type RestaurantMenuPageClientProps = {
 export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuPageClientProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { items, addToCart, updateQuantity, totalPrice, clearCart, providerId: cartProviderId } = useCart();
+  const { items, addToCart, updateQuantity, totalPrice, clearCart, providerId: cartProviderId, providerInfo } = useCart();
   const [isReplaceCartModalOpen, setIsReplaceCartModalOpen] = useState(false);
   const [pendingMeal, setPendingMeal] = useState<IMeal | null>(null);
 
@@ -116,7 +123,13 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
   }
 
   const availableMeals = provider.meals?.filter((meal: any) => meal.isAvailable) || [];
-  const reviews = provider?.meals?.flatMap((meal: any) => meal.reviews || []) || [];
+  const reviews =
+    provider?.meals?.flatMap((meal: any) =>
+      (meal.reviews || []).map((review: any) => ({
+        ...review,
+        mealTitle: meal.title,
+      }))
+    ) || [];
   const averageRating = reviews.length > 0
     ? (reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1)
     : "New";
@@ -273,7 +286,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                 return (
                   <Card key={meal.id} className="group py-0 overflow-hidden border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 rounded-3xl bg-white flex flex-col h-full">
                     {meal.image ? (
-                      <div className="h-48 w-full overflow-hidden relative">
+                      <Link href={`/meals/${meal.id}`} className="block h-48 w-full overflow-hidden relative">
                         <img src={meal.image} alt={meal.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full font-bold text-slate-900 text-sm shadow-sm flex items-center">
                           <span className="text-indigo-600 mr-0.5">$</span>{meal.price.toFixed(2)}
@@ -283,11 +296,15 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                             {meal.dietaryTag.replace("_", " ")}
                           </Badge>
                         )}
-                      </div>
+                      </Link>
                     ) : (
                       <div className="p-6 pb-0 flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "var(--font-space-grotesk)" }}>{meal.title}</CardTitle>
+                          <CardTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: "var(--font-space-grotesk)" }}>
+                            <Link href={`/meals/${meal.id}`} className="hover:text-indigo-600 transition-colors">
+                              {meal.title}
+                            </Link>
+                          </CardTitle>
                         </div>
                         <div className="font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-full text-sm shrink-0 flex items-center">
                           <span className="text-indigo-600 mr-0.5">$</span>{meal.price.toFixed(2)}
@@ -298,7 +315,9 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                     <CardHeader className="flex-1">
                       {meal.image && (
                         <CardTitle className="text-xl font-bold text-slate-900 line-clamp-1 mb-1.5" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                          {meal.title}
+                          <Link href={`/meals/${meal.id}`} className="hover:text-indigo-600 transition-colors">
+                            {meal.title}
+                          </Link>
                         </CardTitle>
                       )}
                       <CardDescription className="line-clamp-2 text-slate-500 text-sm leading-relaxed">
@@ -363,6 +382,11 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
+                {items.length > 0 && cartProviderId && cartProviderId !== providerId ? (
+                  <div className="mx-6 mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                    Cart belongs to {providerInfo?.restaurantName || "another restaurant"}. Add from this page will prompt cart replacement.
+                  </div>
+                ) : null}
                 {items.length === 0 ? (
                   <div className="p-10 text-center flex flex-col items-center">
                     <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-5 border border-slate-100">
@@ -414,6 +438,14 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                       </div>
 
                       <Button
+                        variant="outline"
+                        className="w-full h-11 rounded-2xl mb-3 font-bold"
+                        onClick={clearCart}
+                      >
+                        Clear Cart
+                      </Button>
+
+                      <Button
                         className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 group"
                         onClick={handleProceedToCheckout}
                         disabled={isProviderFetching}
@@ -437,39 +469,55 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mb-8" style={{ fontFamily: "var(--font-space-grotesk)" }}>
               Customer Reviews
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {reviews.map((review: any, idx: number) => (
-                <div key={review.id || idx} className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                  <div className="flex items-center gap-4 mb-4">
-                    {review.customer?.image ? (
-                      <img src={review.customer.image} alt={review.customer?.name} className="w-12 h-12 rounded-full object-cover shadow-sm bg-white" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg shadow-sm">
-                        {review.customer?.name?.charAt(0) || "U"}
+            <Carousel opts={{ align: "start", loop: true }} className="w-full px-12">
+              <CarouselContent>
+                {reviews.map((review: any, idx: number) => (
+                  <CarouselItem key={review.id || idx} className="md:basis-1/2 lg:basis-1/3">
+                    <div className="h-full bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                      <div className="flex items-center gap-4 mb-4">
+                        {review.customer?.image ? (
+                          <img src={review.customer.image} alt={review.customer?.name} className="w-12 h-12 rounded-full object-cover shadow-sm bg-white" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                            {review.customer?.name?.charAt(0) || "U"}
+                          </div>
+                        )}
+                        <div>
+                          <h4 className="font-bold text-slate-900">{review.customer?.name || "Anonymous User"}</h4>
+                          <div className="flex items-center text-yellow-500 mt-1">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                              <Star key={index} className={`w-4 h-4 ${index < (review.rating || 0) ? "fill-current" : "text-slate-300"}`} />
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    <div>
-                      <h4 className="font-bold text-slate-900">{review.customer?.name || "Anonymous User"}</h4>
-                      <div className="flex items-center text-yellow-500 mt-1">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <Star key={index} className={`w-4 h-4 ${index < review.rating ? "fill-current" : "text-slate-300"}`} />
-                        ))}
-                      </div>
+
+                      {review.mealTitle ? (
+                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 mb-2">
+                          For meal: {review.mealTitle}
+                        </p>
+                      ) : null}
+
+                      {review.comment ? (
+                        <p className="text-slate-600 text-sm leading-relaxed mb-3">"{review.comment}"</p>
+                      ) : (
+                        <p className="text-slate-500 text-sm leading-relaxed mb-3">No written comment.</p>
+                      )}
+
+                      {review.createdAt ? (
+                        <p className="text-slate-400 text-xs font-medium">
+                          {new Date(review.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric", month: "long", day: "numeric"
+                          })}
+                        </p>
+                      ) : null}
                     </div>
-                  </div>
-                  {review.comment && (
-                    <p className="text-slate-600 text-sm leading-relaxed mb-3">"{review.comment}"</p>
-                  )}
-                  {review.createdAt && (
-                    <p className="text-slate-400 text-xs font-medium">
-                      {new Date(review.createdAt).toLocaleDateString(undefined, {
-                        year: "numeric", month: "long", day: "numeric"
-                      })}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-0" />
+              <CarouselNext className="right-0" />
+            </Carousel>
           </div>
         </div>
       )}

@@ -41,7 +41,6 @@ export default function CustomerOrdersPageClient() {
   );
 
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState("");
   const [selectedItem, setSelectedItem] = useState<IOrderItem | null>(null);
 
   useEffect(() => {
@@ -123,8 +122,7 @@ export default function CustomerOrdersPageClient() {
     },
   });
 
-  const handleOpenReview = (orderId: string, item: IOrderItem) => {
-    setSelectedOrderId(orderId);
+  const handleOpenReview = (item: IOrderItem) => {
     setSelectedItem(item);
     setIsReviewOpen(true);
   };
@@ -247,13 +245,13 @@ export default function CustomerOrdersPageClient() {
                           </span>
                           <span className="font-medium">{item.meal?.title || "Unknown Meal"}</span>
                         </div>
-                        {order.orderStatus === "DELIVERED" && (
+                        {order.orderStatus === "DELIVERED" && !item.review && (
                           <div className="pl-12">
                             <Button
                               variant="ghost"
                               size="sm"
                               className="h-6 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 px-2"
-                              onClick={() => handleOpenReview(order.id, item)}
+                              onClick={() => handleOpenReview(item)}
                             >
                               <Star className="w-3 h-3 mr-1" /> Leave Review
                             </Button>
@@ -296,7 +294,6 @@ export default function CustomerOrdersPageClient() {
       <ReviewModal
         isOpen={isReviewOpen}
         onClose={() => setIsReviewOpen(false)}
-        orderId={selectedOrderId}
         orderItem={selectedItem}
       />
     </div>

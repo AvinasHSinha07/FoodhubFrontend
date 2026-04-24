@@ -37,6 +37,9 @@ export interface IOrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  review?: {
+    id: string;
+  } | null;
   meal?: IMeal; // Relational
 }
 

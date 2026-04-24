@@ -387,7 +387,7 @@ export default function HomeSummaryPageClient() {
       </section>
 
       {/* TESTIMONIALS SECTION */}
-      <section className="space-y-8">
+      {/* <section className="space-y-8">
         <div className="text-center sm:text-left">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-600">Customer stories</p>
           <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl" style={{ fontFamily: "var(--font-space-grotesk)" }}>
@@ -434,7 +434,7 @@ export default function HomeSummaryPageClient() {
             ))}
           </div>
         )}
-      </section>
+      </section> */}
 
       {/* HOW IT WORKS SECTION */}
       <section className="rounded-[2.5rem] bg-slate-950 px-6 py-20 text-white sm:px-12 lg:px-16 lg:py-24">

@@ -3,7 +3,7 @@ import { IResponse } from "../types/api.types";
 
 export interface ICreateReviewPayload {
   mealId: string;
-  orderId: string;
+  orderItemId: string;
   rating: number;
   comment?: string;
 }

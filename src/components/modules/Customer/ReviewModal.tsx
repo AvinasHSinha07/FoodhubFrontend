@@ -14,11 +14,10 @@ import { queryKeys } from "@/lib/query/query-keys";
 interface ReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  orderId: string;
   orderItem: IOrderItem | null;
 }
 
-export function ReviewModal({ isOpen, onClose, orderId, orderItem }: ReviewModalProps) {
+export function ReviewModal({ isOpen, onClose, orderItem }: ReviewModalProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const queryClient = useQueryClient();
@@ -31,7 +30,7 @@ export function ReviewModal({ isOpen, onClose, orderId, orderItem }: ReviewModal
     if (!orderItem) return;
 
     const result = await mutateAsync({
-      orderId,
+      orderItemId: orderItem.id,
       mealId: orderItem.mealId,
       rating,
       comment,
