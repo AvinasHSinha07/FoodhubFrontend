@@ -1,6 +1,7 @@
 import React from "react"
 import DashboardSidebar from "@/components/modules/Dashboard/DashboardSidebar"
 import DashboardNavbar from "@/components/modules/Dashboard/DashboardNavbar"
+import FoodBot from "@/components/shared/FoodBot"
 
 const DashboardLayout = ({children} : {children: React.ReactNode}) => {
   return (
@@ -20,6 +21,9 @@ const DashboardLayout = ({children} : {children: React.ReactNode}) => {
                 </div>
             </main>
         </div>
+
+        {/* AI Assistant - available globally in dashboard */}
+        <FoodBot />
     </div>
   )
 }
