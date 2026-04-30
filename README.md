@@ -48,17 +48,46 @@ FoodHub Frontend is a sophisticated, interactive Next.js application that provid
 ```bash
 src/
 ├── app/
-│   ├── (commonLayout)/     # Shared layout (Navbar, Footer) for public & customer pages
-│   ├── (dashboardLayout)/  # Protected layouts tailored for Providers and Admins
-│   ├── _actions/           # Server Actions (if any)
-│   ├── globals.css         # Global Tailwind Configuration
-│   └── layout.tsx          # Root application layout and providers wrapper
-├── components/             # Reusable UI components (buttons, inputs, cards)
-├── hooks/                  # Custom React hooks
-├── lib/                    # Library configurations (Axios clients, Auth configurations)
-├── types/                  # TypeScript interface and type definitions
-└── utils/                  # Helper utilities and formatters
+│   ├── (commonLayout)/         # Public & customer pages (Navbar/Footer included)
+│   │   ├── (authRouteGroup)/   # Auth routes: /login, /register
+│   │   ├── checkout/           # /checkout - Order review and Stripe payment
+│   │   ├── meals/              # /meals - All meals listing with filters
+│   │   ├── restaurant/         # /restaurant/[id] - Dynamic restaurant details
+│   │   └── restaurants/        # /restaurants - All restaurants listing
+│   ├── (dashboardLayout)/      # Protected layouts (Sidebar navigation)
+│   │   ├── admin/              # Admin dashboard, users, categories, analytics
+│   │   ├── customer/           # Customer dashboard, orders, profile
+│   │   └── provider/           # Provider (Restaurant) dashboard, menu, orders
+│   ├── _actions/               # Next.js Server Actions (if any)
+│   ├── favicon.ico             # App icon
+│   ├── globals.css             # Global Tailwind Configuration
+│   ├── layout.tsx              # Root application layout and providers wrapper
+│   └── page.tsx                # Home Page (Landing)
+├── components/                 # React UI Components
+│   ├── modules/                # Domain-specific page components
+│   │   ├── Admin/              # Admin dashboard components
+│   │   ├── Auth/               # Login & Registration forms
+│   │   ├── Customer/           # Customer profile & orders UI
+│   │   ├── Dashboard/          # Shared dashboard elements
+│   │   ├── Home/               # Homepage hero, sections
+│   │   ├── Meal/               # Meal cards, filters, details
+│   │   ├── Payment/            # Stripe integration components
+│   │   ├── Provider/           # Restaurant dashboard UI
+│   │   └── Restaurant/         # Restaurant cards & lists
+│   ├── shared/                 # Shared UI elements
+│   │   ├── Navbar.tsx          # Main navigation bar
+│   │   ├── Footer.tsx          # Main footer
+│   │   └── list/               # Shared listing wrappers
+│   └── ui/                     # Shadcn UI base components (buttons, dialogs, etc.)
+├── hooks/                      # Custom React hooks (e.g., auth, utility hooks)
+├── lib/                        # Library configs (Axios, Better-Auth, Stripe)
+├── providers/                  # Context providers (React Query, Theme, User Context)
+├── services/                   # API service calls (data fetching logic)
+├── types/                      # TypeScript interface and type definitions
+└── zod/                        # Zod validation schemas
 ```
+
+> **Note**: For a detailed breakdown of what UI components and sections are rendered on each specific page (Home, Meals, Checkout, Dashboards, etc.), please refer to the [PAGE_DETAILS.md](./PAGE_DETAILS.md) file.
 
 ## ⚙️ Environment Variables
 Create a `.env.local` file in the root directory and configure the following variables:

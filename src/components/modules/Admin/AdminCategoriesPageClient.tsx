@@ -68,38 +68,38 @@ export default function AdminCategoriesPageClient() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <p className="text-gray-500">Add, edit, or remove meal categories.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Manage Categories</h1>
+          <p className="text-slate-500 font-medium mt-1">Add, edit, or remove meal categories.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <Card>
-            <CardHeader className="pb-4 border-b">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Plus className="h-4 w-4" /> New Category
+      <div className="grid grid-cols-1 md:grid-cols-[350px_1fr] gap-8">
+        <div>
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm sticky top-24">
+            <CardHeader className="bg-muted/30 border-b border-border/20 pb-6 pt-8 px-8">
+              <CardTitle className="text-xl font-extrabold text-foreground flex items-center gap-2">
+                <Plus className="h-5 w-5 text-[#377771] dark:text-[#4CE0B3]" /> New Category
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
+            <CardContent className="p-8">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input placeholder="E.g., Fast Food, Deshi..." {...field} disabled={isCreating} />
+                          <Input placeholder="E.g., Fast Food, Deshi..." {...field} disabled={isCreating} className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" disabled={isCreating} className="w-full">
+                  <Button type="submit" disabled={isCreating} className="w-full h-12 rounded-[14px] bg-[#377771] hover:bg-[#4CE0B3] text-white hover:text-emerald-950 font-bold transition-all shadow-md hover:-translate-y-0.5">
                     {isCreating ? "Creating..." : "Save Category"}
                   </Button>
                 </form>
@@ -108,45 +108,45 @@ export default function AdminCategoriesPageClient() {
           </Card>
         </div>
 
-        <div className="md:col-span-2">
+        <div>
           {isLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
+            <div className="space-y-4">
+              <Skeleton className="h-[400px] w-full rounded-[24px]" />
             </div>
           ) : categories.length === 0 ? (
-            <Card className="text-center py-20 bg-gray-50">
-              <Copy className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-              <h2 className="text-xl font-semibold text-gray-700">No categories found</h2>
-              <p className="text-gray-500 mt-2">Use the form on the left to add one.</p>
+            <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
+              <div className="mx-auto h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                <Copy className="h-8 w-8 text-slate-400" />
+              </div>
+              <h2 className="text-2xl font-extrabold text-foreground">No Categories Found</h2>
+              <p className="text-slate-500 font-medium mt-2">Use the form to add one.</p>
             </Card>
           ) : (
-            <div className="bg-white rounded-md border shadow-sm">
+            <div className="bg-background rounded-[24px] border border-border/50 shadow-sm overflow-hidden">
               <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs font-semibold">
+                <thead className="bg-muted/30 border-b border-border/50 text-slate-500 uppercase text-xs font-bold tracking-widest">
                   <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">ID</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-8 py-5">Name</th>
+                    <th className="px-8 py-5">System ID</th>
+                    <th className="px-8 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-border/20">
                   {categories.map((cat) => (
-                    <tr key={cat.id} className="hover:bg-gray-50/50">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{cat.name}</div>
+                    <tr key={cat.id} className="hover:bg-muted/30 transition-colors group">
+                      <td className="px-8 py-5">
+                        <div className="font-bold text-foreground text-base group-hover:text-[#377771] dark:group-hover:text-[#4CE0B3] transition-colors">{cat.name}</div>
                       </td>
-                      <td className="px-6 py-4">
-                        <Badge variant="secondary" className="font-mono text-xs text-gray-400 font-normal">
-                          {cat.id.slice(0, 8)}...
+                      <td className="px-8 py-5">
+                        <Badge variant="secondary" className="font-mono text-xs text-slate-400 bg-muted tracking-widest px-2 py-1">
+                          {cat.id.slice(0, 8)}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-8 py-5 text-right">
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          size="icon"
+                          className="h-9 w-9 rounded-[10px] text-[#ED6A5E] hover:text-[#ED6A5E] hover:bg-[#ED6A5E]/10"
                           onClick={() => handleDelete(cat.id)}
                           disabled={isDeletingAny}
                         >

@@ -83,43 +83,51 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
 
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto py-8 space-y-4">
-        <Skeleton className="h-10 w-56" />
-        <Skeleton className="h-80 w-full" />
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <Skeleton className="h-12 w-64" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Skeleton className="h-[400px] w-full rounded-[24px]" />
+          <Skeleton className="h-[200px] w-full rounded-[24px]" />
+        </div>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <Card className="max-w-3xl mx-auto mt-10 p-8 text-center">
-        <h2 className="text-xl font-semibold">Order not found</h2>
-        <p className="text-gray-500 mt-2">This order may not exist or you may not have access.</p>
-        <Button asChild className="mt-6">
-          <Link href="/provider/orders">Back to Orders</Link>
-        </Button>
-      </Card>
+      <div className="p-6 max-w-7xl mx-auto">
+        <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
+          <h2 className="text-2xl font-extrabold text-foreground">Order Not Found</h2>
+          <p className="text-slate-500 font-medium mt-2">This order may not exist or you may not have access.</p>
+          <Button asChild className="mt-8 h-12 px-8 rounded-[14px] bg-[#377771] hover:bg-[#4CE0B3] text-white hover:text-emerald-950 font-bold transition-all shadow-md hover:-translate-y-0.5">
+            <Link href="/provider/orders">Back to Orders</Link>
+          </Button>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Manage Order #{order.id.slice(-6)}</h1>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-sm px-3 py-1">{order.orderStatus}</Badge>
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Manage Order <span className="text-[#377771] dark:text-[#4CE0B3]">#{order.id.slice(-6)}</span></h1>
+          <p className="text-slate-500 font-medium mt-1">Review items and update fulfillment status.</p>
+        </div>
+        <div className="flex items-center gap-4 bg-muted/30 p-3 rounded-[20px] border border-border/50">
+          <Badge variant="outline" className="text-sm px-4 py-1.5 rounded-[10px] font-bold border-border/50 bg-background uppercase tracking-wider">{order.orderStatus}</Badge>
           <Select
             value={order.orderStatus}
             onValueChange={(value) => handleUpdateStatus(value as OrderStatus)}
             disabled={isUpdating || nextStatuses.length === 0}
           >
-            <SelectTrigger className="w-45">
+            <SelectTrigger className="w-[180px] h-11 rounded-[12px] bg-background border-border/50 font-bold">
               <SelectValue placeholder="Update status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={order.orderStatus}>{order.orderStatus}</SelectItem>
+            <SelectContent className="rounded-[16px] border-border/50">
+              <SelectItem value={order.orderStatus} className="font-bold">{order.orderStatus}</SelectItem>
               {nextStatuses.map((status) => (
-                <SelectItem key={status} value={status}>
+                <SelectItem key={status} value={status} className="font-bold">
                   {status}
                 </SelectItem>
               ))}
@@ -128,62 +136,83 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Items</CardTitle>
-            <CardDescription>Items to prepare</CardDescription>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-8">
+        <Card className="rounded-[24px] border-border/50 bg-background shadow-sm overflow-hidden flex flex-col">
+          <CardHeader className="bg-muted/30 border-b border-border/20 pb-6 pt-8 px-8">
+            <CardTitle className="text-2xl font-extrabold text-foreground">Order Items</CardTitle>
+            <CardDescription className="text-slate-500 font-medium text-base mt-1">Items to prepare for this order</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {order.orderItems?.map((item) => (
-              <div key={item.id} className="flex justify-between items-center text-sm font-medium">
-                <span>
-                  {item.quantity}x {item.meal?.title || "Meal"}
-                </span>
-                <span>${item.totalPrice.toFixed(2)}</span>
-              </div>
-            ))}
-            <Separator />
-            <div className="flex justify-between items-center text-lg font-bold">
-              <span>Total</span>
-              <span>${order.totalPrice.toFixed(2)}</span>
+          <CardContent className="p-8 flex-1 flex flex-col">
+            <div className="space-y-4 flex-1">
+              {order.orderItems?.map((item) => (
+                <div key={item.id} className="flex justify-between items-center border-b border-border/20 pb-4 last:border-0 last:pb-0">
+                  <div className="flex gap-4 items-center">
+                    <span className="font-extrabold px-3 py-1.5 bg-muted rounded-[10px] text-sm text-foreground">
+                      {item.quantity}x
+                    </span>
+                    <span className="font-bold text-foreground text-base">{item.meal?.title || "Meal"}</span>
+                  </div>
+                  <span className="font-extrabold text-lg text-foreground">${item.totalPrice.toFixed(2)}</span>
+                </div>
+              ))}
             </div>
-            <p className="text-xs uppercase text-gray-500 tracking-wide">
-              Payment: {order.paymentMethod} / {order.paymentStatus}
-            </p>
-            {order.paymentMethod === PaymentMethod.COD && order.paymentStatus === PaymentStatus.COD_PENDING ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-3"
-                onClick={handleCollectCod}
-                disabled={isCollectingCod}
-              >
-                Mark COD Collected
-              </Button>
-            ) : null}
+            
+            <div className="mt-8 pt-8 border-t border-border/50 space-y-6">
+              <div className="flex justify-between items-center text-2xl font-extrabold">
+                <span className="text-foreground">Total Payout</span>
+                <span className="text-[#377771] dark:text-[#4CE0B3]">${order.totalPrice.toFixed(2)}</span>
+              </div>
+              <div className="p-4 bg-muted/20 rounded-[16px] border border-border/50">
+                <p className="text-xs font-bold uppercase text-slate-500 tracking-widest mb-1">Payment Status</p>
+                <p className="font-bold text-foreground">{order.paymentMethod} • <span className={order.paymentStatus === 'PAID' ? 'text-[#377771] dark:text-[#4CE0B3]' : 'text-slate-500'}>{order.paymentStatus}</span></p>
+              </div>
+              
+              {order.paymentMethod === PaymentMethod.COD && order.paymentStatus === PaymentStatus.COD_PENDING ? (
+                <Button
+                  type="button"
+                  className="w-full h-12 rounded-[14px] bg-[#ED6A5E] hover:bg-[#FF8E72] text-white font-bold transition-all shadow-md hover:-translate-y-0.5"
+                  onClick={handleCollectCod}
+                  disabled={isCollectingCod}
+                >
+                  Mark COD Collected
+                </Button>
+              ) : null}
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Customer Info</CardTitle>
-            <CardDescription>Delivery destination</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm space-y-2 text-muted-foreground">
-            <p className="font-medium text-foreground">{order.customer?.name || "Customer"}</p>
-            <p>{order.customer?.email}</p>
-            <p>{order.deliveryAddress}</p>
-            <p className="text-xs text-gray-500 pt-3 border-t border-dashed">
-              Ordered at: {new Date(order.createdAt).toLocaleString()}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="space-y-8">
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm">
+            <CardHeader className="bg-muted/30 border-b border-border/20 pb-6 pt-8 px-8">
+              <CardTitle className="text-xl font-extrabold text-foreground">Customer Info</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 space-y-6">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Name</p>
+                <p className="font-bold text-foreground text-lg">{order.customer?.name || "Customer"}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Contact</p>
+                <p className="font-medium text-foreground">{order.customer?.email}</p>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Delivery Address</p>
+                <p className="font-medium text-foreground leading-relaxed whitespace-pre-wrap p-4 bg-muted/20 rounded-[16px] border border-border/50">{order.deliveryAddress}</p>
+              </div>
+              <div className="pt-6 border-t border-border/20">
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Order Placed At</p>
+                <p className="font-medium text-foreground">{new Date(order.createdAt).toLocaleString()}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      <Button asChild variant="outline">
-        <Link href="/provider/orders">Back to Orders</Link>
-      </Button>
+      <div className="pt-4 border-t border-border/50">
+        <Button asChild variant="outline" className="h-12 px-8 rounded-[14px] border-border/50 font-bold hover:bg-muted text-foreground">
+          <Link href="/provider/orders">Back to Orders Directory</Link>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,17 +13,38 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Utensils, Star, ArrowRight, Heart } from "lucide-react";
+import { 
+  Search, 
+  MapPin, 
+  Utensils, 
+  Star, 
+  ArrowRight, 
+  Heart, 
+  TrendingUp, 
+  Sparkles, 
+  Clock, 
+  ChevronRight,
+  Filter,
+  CheckCircle2
+} from "lucide-react";
 import PaginationControls from "@/components/shared/list/PaginationControls";
 import SortControl from "@/components/shared/list/SortControl";
 import { toast } from "sonner";
 import { getApiErrorMessage } from "@/lib/api-error";
+import { motion, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function RestaurantsPageClient() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const queryString = searchParams?.toString() || "";
   const searchValueFromUrl = searchParams?.get("search")?.trim() || "";
@@ -72,6 +93,25 @@ export default function RestaurantsPageClient() {
     );
   }, [providerFavoritesResponse?.data]);
 
+  useEffect(() => {
+    if (!isLoading && providers.length > 0) {
+      gsap.fromTo(".reveal-up", 
+        { y: 40, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          duration: 0.8, 
+          stagger: 0.1, 
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: ".reveal-container",
+            start: "top 85%",
+          }
+        }
+      );
+    }
+  }, [isLoading, providers]);
+
   const toggleProviderFavoriteMutation = useMutation({
     mutationFn: (providerId: string) => FavoriteServices.toggleProviderFavorite(providerId),
     onSuccess: () => {
@@ -84,10 +124,7 @@ export default function RestaurantsPageClient() {
   });
 
   const filteredProviders = useMemo(() => {
-    if (!searchValueFromUrl) {
-      return providers;
-    }
-
+    if (!searchValueFromUrl) return providers;
     return providers.filter(
       (provider: IProviderProfile) =>
         provider.restaurantName.toLowerCase().includes(searchValueFromUrl.toLowerCase()) ||
@@ -98,35 +135,24 @@ export default function RestaurantsPageClient() {
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const nextParams = new URLSearchParams(searchParams?.toString());
     if (searchTerm.trim()) {
       nextParams.set("search", searchTerm.trim());
     } else {
       nextParams.delete("search");
     }
-
     const nextQueryString = nextParams.toString();
-    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
-      scroll: false,
-    });
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, { scroll: false });
   };
 
   const updateParams = (updates: Record<string, string | null>) => {
     const nextParams = new URLSearchParams(searchParams?.toString());
-
     Object.entries(updates).forEach(([key, value]) => {
-      if (!value) {
-        nextParams.delete(key);
-      } else {
-        nextParams.set(key, value);
-      }
+      if (!value) nextParams.delete(key);
+      else nextParams.set(key, value);
     });
-
     const nextQueryString = nextParams.toString();
-    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
-      scroll: false,
-    });
+    router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, { scroll: false });
   };
 
   const handleSortChange = (value: string) => {
@@ -140,206 +166,234 @@ export default function RestaurantsPageClient() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
-      <div className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden bg-slate-900">
+    <div ref={containerRef} className="bg-background min-h-screen pb-32">
+      {/* Cinematic Hero Section */}
+      <section className="relative pt-32 pb-24 lg:pt-48 lg:pb-36 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-125 h-125 bg-indigo-500/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-125 h-125 bg-pink-500/30 rounded-full mix-blend-screen filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-20"></div>
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm"></div>
+           <div className="absolute top-0 left-0 w-full h-full bg-[#0A0F1E]" />
+           <div className="absolute top-[-20%] left-[-10%] w-[800px] h-[800px] bg-[#ED6A5E]/10 rounded-full blur-[120px] animate-pulse" />
+           <div className="absolute bottom-[-20%] right-[-10%] w-[800px] h-[800px] bg-[#377771]/15 rounded-full blur-[120px]" />
+           <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+           <div 
+             className="absolute inset-0 bg-cover bg-center opacity-20 grayscale scale-110" 
+             style={{ backgroundImage: `url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000')` }} 
+           />
+           <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F1E] via-transparent to-background" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-            Discover Local <span className="text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-indigo-400">Culinary Stars</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 font-medium">
-            Explore highly-rated restaurants, uncover hidden gems, and find your next favorite meal.
-          </p>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center space-y-10">
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8 }}
+             className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl"
+           >
+              <Sparkles className="h-4 w-4 text-[#4CE0B3]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/70">Heritage Collection 2026</span>
+           </motion.div>
 
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative group">
-            <div className="absolute -inset-1 bg-linear-to-r from-pink-500 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-            <div className="relative flex items-center bg-white/10 backdrop-blur-xl rounded-full border border-white/20 p-2 shadow-2xl">
-              <Search className="ml-4 h-6 w-6 text-slate-300" />
-              <Input
-                placeholder="Search by restaurant name or cuisine..."
-                className="pl-4 py-6 bg-transparent border-none text-white placeholder:text-slate-400 text-lg focus-visible:ring-0 focus-visible:ring-offset-0"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
+           <motion.h1 
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8, delay: 0.1 }}
+             className="text-6xl sm:text-8xl font-black tracking-tighter text-white leading-[0.9]"
+           >
+             Curated <br /> 
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ED6A5E] via-[#FFAF87] to-[#4CE0B3]">Culinary Gems</span>
+           </motion.h1>
+
+           <motion.p 
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8, delay: 0.2 }}
+             className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed italic"
+           >
+             "Discover a world where every plate tells a story and every kitchen is a masterpiece of local tradition."
+           </motion.p>
+
+           <motion.form 
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.8, delay: 0.3 }}
+             onSubmit={handleSearch} 
+             className="max-w-3xl mx-auto relative group pt-8"
+           >
+              <div className="absolute -inset-2 bg-gradient-to-r from-[#ED6A5E] to-[#4CE0B3] rounded-[32px] blur-2xl opacity-10 group-hover:opacity-20 transition-opacity" />
+              <div className="relative flex items-center bg-[#0F172A]/80 backdrop-blur-3xl rounded-[32px] border border-white/10 p-3 shadow-2xl overflow-hidden">
+                 <div className="px-6 border-r border-white/5">
+                    <Search className="h-6 w-6 text-slate-500" />
+                 </div>
+                 <Input
+                   placeholder="Seek your next signature experience..."
+                   className="flex-1 bg-transparent border-none text-white placeholder:text-slate-500 text-xl font-medium h-14 focus-visible:ring-0"
+                   value={searchTerm}
+                   onChange={(event) => setSearchTerm(event.target.value)}
+                 />
+                 <Button type="submit" className="h-14 px-10 rounded-[22px] bg-white text-[#0A0F1E] hover:bg-[#4CE0B3] hover:text-emerald-950 font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-xl">
+                   Discover
+                 </Button>
+              </div>
+           </motion.form>
+        </div>
+      </section>
+
+      {/* Grid Content */}
+      <div className="max-w-7xl mx-auto px-6 -mt-10 relative z-20">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16 bg-background/50 backdrop-blur-xl p-4 rounded-[28px] border border-border/50 shadow-xl">
+           <div className="flex items-center gap-4 px-4">
+              <Filter className="h-5 w-5 text-slate-400" />
+              <div className="space-y-0.5">
+                 <p className="text-xs font-black uppercase tracking-widest text-slate-500">Inventory Status</p>
+                 <p className="text-sm font-bold text-foreground">{providersMeta?.total || 0} Registered Partners</p>
+              </div>
+           </div>
+           
+           <div className="flex items-center gap-4">
+              <SortControl
+                value={sortValue}
+                onValueChange={handleSortChange}
+                options={[
+                  { label: "Newest Arrivals", value: "createdAt:desc" },
+                  { label: "Heritage Partners", value: "createdAt:asc" },
+                  { label: "Alphabetical: A-Z", value: "restaurantName:asc" },
+                  { label: "Alphabetical: Z-A", value: "restaurantName:desc" },
+                ]}
               />
-              <Button type="submit" className="rounded-full px-8 py-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-md">
-                Search
-              </Button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full -mt-8 relative z-20">
-        <div className="flex justify-end mb-4 mt-6">
-          <SortControl
-            value={sortValue}
-            onValueChange={handleSortChange}
-            options={[
-              { label: "Newest", value: "createdAt:desc" },
-              { label: "Oldest", value: "createdAt:asc" },
-              { label: "Name: A-Z", value: "restaurantName:asc" },
-              { label: "Name: Z-A", value: "restaurantName:desc" },
-            ]}
-          />
+           </div>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
-                <Skeleton className="h-56 w-full rounded-2xl mb-4" />
-                <Skeleton className="h-6 w-3/4 mb-3" />
-                <Skeleton className="h-4 w-1/2 mb-6" />
-                <Skeleton className="h-12 w-full rounded-xl" />
+              <div key={n} className="bg-muted/10 rounded-[40px] p-6 space-y-6 animate-pulse border border-border/50">
+                <Skeleton className="h-64 w-full rounded-[32px]" />
+                <div className="space-y-3">
+                   <Skeleton className="h-8 w-3/4 rounded-lg" />
+                   <Skeleton className="h-4 w-1/2 rounded-lg" />
+                </div>
+                <Skeleton className="h-16 w-full rounded-[20px]" />
               </div>
             ))}
           </div>
         ) : isError ? (
-          <div className="text-center py-32 bg-white rounded-3xl shadow-sm border border-slate-100 mt-16 max-w-3xl mx-auto">
-            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-rose-300" />
+          <div className="text-center py-40 rounded-[60px] border-2 border-dashed border-destructive/20 bg-destructive/5 max-w-4xl mx-auto">
+            <div className="w-24 h-24 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Search className="w-10 h-10 text-destructive" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-3" style={{ fontFamily: "var(--font-space-grotesk)" }}>Unable to load restaurants</h3>
-            <p className="text-slate-500 text-lg">{getApiErrorMessage(error, "Please refresh and try again.")}</p>
+            <h3 className="text-3xl font-black text-foreground mb-4">Inventory Synch Failed</h3>
+            <p className="text-slate-500 text-lg font-medium max-w-md mx-auto">{getApiErrorMessage(error, "Please refresh to synchronize culinary data.")}</p>
           </div>
         ) : filteredProviders.length === 0 ? (
-          <div className="text-center py-32 bg-white rounded-3xl shadow-sm border border-slate-100 mt-16 max-w-3xl mx-auto">
-            <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-indigo-300" />
+          <div className="text-center py-40 rounded-[60px] border-2 border-dashed border-border/50 bg-muted/5 max-w-4xl mx-auto">
+            <div className="w-24 h-24 bg-[#377771]/10 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Utensils className="w-10 h-10 text-[#377771]" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-800 mb-3" style={{ fontFamily: "var(--font-space-grotesk)" }}>No restaurants found</h3>
-            <p className="text-slate-500 text-lg">Try adjusting your search terms or check back later.</p>
+            <h3 className="text-3xl font-black text-foreground mb-4">No culinary hits found</h3>
+            <p className="text-slate-500 text-lg font-medium max-w-md mx-auto">Our current curation doesn't match your specific criteria. Try a broader search.</p>
             <Button
               onClick={() => {
                 setSearchTerm("");
                 router.replace(pathname, { scroll: false });
               }}
-              variant="outline"
-              className="mt-8 rounded-full"
+              className="mt-10 h-14 px-12 rounded-[18px] bg-[#377771] text-white font-bold transition-all shadow-xl"
             >
-              Clear Search
+              Reset Discovery
             </Button>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+          <div className="reveal-container space-y-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {filteredProviders.map((provider) => {
-              const reviews = provider.meals?.flatMap((meal: any) => meal.reviews || []) || [];
-              const averageRating =
-                reviews.length > 0
+                const reviews = provider.meals?.flatMap((meal: any) => meal.reviews || []) || [];
+                const averageRating = reviews.length > 0
                   ? (reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1)
                   : "New";
-              const reviewCount = reviews.length;
+                const reviewCount = reviews.length;
 
-              return (
-                <Card key={provider.id} className="overflow-hidden py-0 border-slate-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={provider.bannerImage || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"}
-                      alt={provider.restaurantName}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-80" />
-
-                    <div className="absolute top-4 left-4 flex gap-2">
-                      {provider.cuisineType && (
-                        <Badge className="bg-white/90 text-slate-900 hover:bg-white backdrop-blur-sm border-none shadow-sm font-bold tracking-wide">
-                          {provider.cuisineType}
-                        </Badge>
-                      )}
-                      <Badge
-                        className={
-                          provider.isOpenNow
-                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none"
-                            : "bg-rose-100 text-rose-700 hover:bg-rose-100 border-none"
-                        }
-                      >
-                        {provider.isOpenNow ? "Open" : "Closed"}
-                      </Badge>
-                    </div>
-
-                    {provider.logo ? (
+                return (
+                  <Card key={provider.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30">
+                    <div className="relative h-72 overflow-hidden bg-slate-100 dark:bg-slate-900">
                       <img
-                        src={provider.logo}
-                        alt={`${provider.restaurantName} logo`}
-                        className="absolute -bottom-6 right-6 w-16 h-16 rounded-xl border-4 border-white shadow-lg object-cover bg-white z-10"
+                        src={provider.bannerImage || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"}
+                        alt={provider.restaurantName}
+                        className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110 group-hover:rotate-1"
                       />
-                    ) : (
-                      <div className="absolute -bottom-6 right-6 w-16 h-16 rounded-xl border-4 border-white shadow-lg bg-indigo-50 flex items-center justify-center z-10">
-                        <Utensils className="w-6 h-6 text-indigo-400" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1E] via-[#0A0F1E]/20 to-transparent opacity-80" />
+                      
+                      <div className="absolute bottom-6 left-6 flex items-center gap-4">
+                         <div className="relative">
+                            <div className="absolute -inset-1.5 bg-gradient-to-tr from-[#ED6A5E] to-[#4CE0B3] rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity" />
+                            {provider.logo ? (
+                              <img src={provider.logo} alt="Logo" className="relative w-16 h-16 rounded-2xl border-4 border-background bg-white object-cover shadow-2xl" />
+                            ) : (
+                              <div className="relative w-16 h-16 rounded-2xl border-4 border-background bg-slate-100 flex items-center justify-center">
+                                <Utensils className="h-6 w-6 text-slate-300" />
+                              </div>
+                            )}
+                         </div>
+                         <div className="text-white">
+                            <h3 className="font-black text-xl tracking-tight leading-none group-hover:text-[#ED6A5E] transition-colors">{provider.restaurantName}</h3>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/60 mt-1.5">{provider.cuisineType || "Heritage Kitchen"}</p>
+                         </div>
                       </div>
-                    )}
-                  </div>
 
-                  <CardHeader className="pt-8 pb-3 px-6 shrink-0 relative">
-                    <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <CardTitle className="text-2xl font-bold text-slate-900" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                          {provider.restaurantName}
-                        </CardTitle>
-                        <div className="flex items-center gap-1 mt-1 font-semibold text-sm text-yellow-500">
-                          <Star className="w-4 h-4 fill-current" />
-                          <span>{averageRating}</span>
-                          <span className="text-slate-400 ml-1 font-normal">
-                            {reviewCount > 0 ? `(${reviewCount} reviews)` : "(No reviews yet)"}
-                          </span>
-                        </div>
+                      <div className="absolute top-6 right-6 flex gap-2">
+                        <Badge className={`px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest border-none shadow-xl backdrop-blur-xl ${provider.isOpenNow ? "bg-[#4CE0B3] text-emerald-950" : "bg-destructive text-white"}`}>
+                          {provider.isOpenNow ? "Active Now" : "Currently Offline"}
+                        </Badge>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
-                        onClick={() => toggleProviderFavoriteMutation.mutate(provider.id)}
-                        aria-label="Toggle favorite restaurant"
-                      >
-                        <Heart
-                          className={`h-4 w-4 ${favoriteProviderIds.has(provider.id) ? "fill-red-500 text-red-500" : "text-slate-500"}`}
-                        />
+                    </div>
+
+                    <CardContent className="p-8 space-y-8 flex flex-col flex-1">
+                      <div className="flex justify-between items-start gap-4">
+                         <div className="space-y-4 flex-1">
+                            <div className="flex items-center gap-6">
+                               <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/30 px-3 py-1 rounded-full border border-amber-100 dark:border-amber-900/50">
+                                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                                  <span className="font-black text-sm text-amber-700 dark:text-amber-400">{averageRating}</span>
+                               </div>
+                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{reviewCount} Reviews</span>
+                            </div>
+                            <p className="text-slate-500 font-medium leading-relaxed italic line-clamp-2">
+                               "{provider.description || "A masterfully curated culinary experience defined by local tradition and seasonal excellence."}"
+                            </p>
+                         </div>
+                         <Button
+                           type="button"
+                           variant="ghost"
+                           size="icon"
+                           className="h-12 w-12 rounded-2xl hover:bg-muted"
+                           onClick={() => toggleProviderFavoriteMutation.mutate(provider.id)}
+                         >
+                           <Heart className={`h-6 w-6 transition-colors ${favoriteProviderIds.has(provider.id) ? "fill-[#ED6A5E] text-[#ED6A5E]" : "text-slate-300 hover:text-[#ED6A5E]"}`} />
+                         </Button>
+                      </div>
+
+                      <div className="space-y-4 pt-6 border-t border-border/30">
+                         <div className="flex items-center gap-3 text-slate-500">
+                            <MapPin className="h-4 w-4 text-[#ED6A5E]" />
+                            <span className="text-xs font-bold truncate">{provider.address || "Heritage Hub"}</span>
+                         </div>
+                         <div className="flex items-center gap-3 text-slate-500">
+                            <Clock className="h-4 w-4 text-[#4CE0B3]" />
+                            <span className="text-xs font-bold">{provider.estimatedReadyInMinutes || 30}m Ready Time</span>
+                         </div>
+                      </div>
+
+                      <Button asChild className="w-full h-16 rounded-[22px] bg-[#0A0F1E] dark:bg-white text-white dark:text-[#0A0F1E] hover:bg-[#ED6A5E] dark:hover:bg-[#ED6A5E] dark:hover:text-white font-black text-sm uppercase tracking-widest transition-all hover:-translate-y-1 active:scale-95 shadow-xl group/btn">
+                        <Link href={`/restaurant/${provider.id}`}>
+                           View Collections <ArrowRight className="ml-3 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
+                        </Link>
                       </Button>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="px-6 pb-6 flex-1 flex flex-col justify-between">
-                    <div className="space-y-4 mb-6">
-                      <CardDescription className="line-clamp-2 text-slate-500 leading-relaxed">
-                        {provider.description || "A wonderful place to grab a bite. Experience amazing flavors and top-tier service."}
-                      </CardDescription>
-
-                      <div className="flex items-start text-sm text-slate-600 bg-slate-50 rounded-xl p-3">
-                        <MapPin className="w-4 h-4 text-indigo-500 mr-2 mt-0.5 shrink-0" />
-                        <span className="line-clamp-2">{provider.address || "Address not provided"}</span>
-                      </div>
-
-                      <p className="text-xs text-slate-500">
-                        {provider.availabilityLabel || "Availability not configured"}
-                        {provider.estimatedReadyInMinutes
-                          ? ` • Approx ${provider.estimatedReadyInMinutes} min prep`
-                          : ""}
-                      </p>
-                    </div>
-
-                    <Button asChild className="w-full bg-slate-900 hover:bg-indigo-600 text-white rounded-xl shadow-md py-6 group-hover:shadow-lg transition-all duration-300 font-bold overflow-hidden relative">
-                      <Link href={`/restaurant/${provider.id}`}>
-                        <span className="relative z-10 flex items-center justify-center">
-                          View Full Menu
-                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </span>
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
+                    </CardContent>
+                  </Card>
+                );
               })}
             </div>
-            <PaginationControls meta={providersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
-          </>
+            <div className="pt-20 flex justify-center">
+               <PaginationControls meta={providersMeta} onPageChange={handlePageChange} isLoading={isLoading} />
+            </div>
+          </div>
         )}
       </div>
     </div>

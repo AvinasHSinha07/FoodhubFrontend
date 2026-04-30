@@ -1,10 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Minus, Plus, ShoppingCart, Star } from "lucide-react";
+import { 
+  Minus, 
+  Plus, 
+  ShoppingCart, 
+  Star, 
+  ArrowLeft, 
+  ChefHat, 
+  Clock, 
+  Flame, 
+  Share2, 
+  Heart,
+  ShieldCheck,
+  Zap,
+  Quote
+} from "lucide-react";
 import { MealServices } from "@/services/meal.services";
 import { ReviewServices } from "@/services/review.services";
 import { queryKeys } from "@/lib/query/query-keys";
@@ -22,15 +36,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import ReviewSlider from "@/components/shared/ReviewSlider";
 import { useCart } from "@/providers/CartProvider";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
 
 type ReviewItem = {
   id: string;
@@ -38,7 +48,9 @@ type ReviewItem = {
   comment?: string | null;
   customer?: {
     name?: string;
+    image?: string;
   };
+  createdAt?: string;
 };
 
 type MealDetailsPageClientProps = {
@@ -47,6 +59,7 @@ type MealDetailsPageClientProps = {
 
 export default function MealDetailsPageClient({ mealId }: MealDetailsPageClientProps) {
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
   const { addToCart, clearCart, items, totalItems, totalPrice, providerId: cartProviderId, providerInfo } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isReplaceCartModalOpen, setIsReplaceCartModalOpen] = useState(false);
@@ -67,25 +80,43 @@ export default function MealDetailsPageClient({ mealId }: MealDetailsPageClientP
   const meal = mealResponse?.data as IMeal | undefined;
   const reviews = (reviewResponse?.data || []) as ReviewItem[];
 
+  useEffect(() => {
+    if (!isMealLoading && meal) {
+      gsap.fromTo(".reveal-up", 
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }
+      );
+    }
+  }, [isMealLoading, meal]);
+
   if (isMealLoading || isReviewsLoading) {
     return (
-      <div className="max-w-5xl mx-auto py-10 px-4 space-y-6">
-        <Skeleton className="h-96 w-full rounded-xl" />
-        <Skeleton className="h-10 w-60" />
-        <Skeleton className="h-24 w-full" />
+      <div className="max-w-7xl mx-auto py-20 px-4 space-y-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <Skeleton className="h-[600px] w-full rounded-[40px]" />
+          <div className="space-y-6 pt-10">
+             <Skeleton className="h-6 w-32" />
+             <Skeleton className="h-16 w-full" />
+             <Skeleton className="h-24 w-full" />
+             <Skeleton className="h-40 w-full rounded-[24px]" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!meal) {
     return (
-      <Card className="max-w-3xl mx-auto mt-10 p-8 text-center">
-        <h2 className="text-xl font-semibold">Meal not found</h2>
-        <p className="text-gray-500 mt-2">The requested meal may not exist.</p>
-        <Button asChild className="mt-6">
-          <Link href="/meals">Back to Meals</Link>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-muted/50 rounded-full flex items-center justify-center mb-6">
+          <ChefHat className="h-10 w-10 text-slate-300" />
+        </div>
+        <h2 className="text-3xl font-extrabold text-foreground">Culinary creation not found</h2>
+        <p className="text-slate-500 font-medium mt-3 max-w-md mx-auto">This dish might have been retired from our seasonal menu. Explore our latest arrivals instead.</p>
+        <Button asChild className="mt-10 h-14 px-10 rounded-[16px] bg-[#377771] hover:bg-[#4CE0B3] text-white hover:text-emerald-950 font-bold shadow-lg transition-all active:scale-95">
+          <Link href="/meals">Discover New Flavors</Link>
         </Button>
-      </Card>
+      </div>
     );
   }
 
@@ -93,9 +124,6 @@ export default function MealDetailsPageClient({ mealId }: MealDetailsPageClientP
     reviews.length > 0
       ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
       : null;
-
-  const hasForeignProviderCart =
-    Boolean(cartProviderId) && Boolean(meal.providerId) && cartProviderId !== meal.providerId;
 
   const handleAddToCart = (qty = quantity, forceReplace = false) => {
     if (!meal.provider) {
@@ -113,7 +141,7 @@ export default function MealDetailsPageClient({ mealId }: MealDetailsPageClientP
       return;
     }
 
-    toast.success(`${meal.title} added to cart.`);
+    toast.success(`${meal.title} added to your selection.`);
   };
 
   const handleConfirmReplaceCart = () => {
@@ -122,201 +150,256 @@ export default function MealDetailsPageClient({ mealId }: MealDetailsPageClientP
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-100 pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 space-y-8">
-        <div className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            <div className="relative h-80 sm:h-96 lg:h-full bg-slate-100">
-              {meal.image ? (
-                <img src={meal.image} alt={meal.title} className="h-full w-full object-cover" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-slate-400">No Image</div>
-              )}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/45 to-transparent" />
+    <div ref={containerRef} className="min-h-screen bg-background pb-32">
+      {/* Immersive Header / Navigation */}
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
+         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <Link href="/meals" className="group flex items-center text-sm font-bold text-slate-500 hover:text-[#ED6A5E] transition-colors">
+               <ArrowLeft className="mr-3 h-5 w-5 transition-transform group-hover:-translate-x-1" /> Back to Menu
+            </Link>
+            <div className="flex items-center gap-4">
+               <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted text-slate-500">
+                  <Share2 className="h-5 w-5" />
+               </Button>
+               <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted text-slate-500">
+                  <Heart className="h-5 w-5" />
+               </Button>
             </div>
-
-            <div className="p-6 sm:p-8 lg:p-10 flex flex-col gap-7">
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none">
-                  {meal.category?.name || "Meal"}
-                </Badge>
-                {meal.dietaryTag && meal.dietaryTag !== "NONE" ? (
-                  <Badge variant="secondary" className="uppercase tracking-wide text-[11px]">
-                    {meal.dietaryTag.replace("_", " ")}
-                  </Badge>
-                ) : null}
-                <Badge
-                  variant={meal.isAvailable ? "default" : "outline"}
-                  className={meal.isAvailable ? "bg-emerald-600 hover:bg-emerald-600" : "text-slate-500"}
-                >
-                  {meal.isAvailable ? "Available" : "Unavailable"}
-                </Badge>
-              </div>
-
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">{meal.title}</h1>
-                <p className="mt-2 text-3xl font-extrabold text-indigo-700">${meal.price.toFixed(2)}</p>
-
-                <div className="mt-3 flex items-center gap-3 text-sm text-slate-600">
-                  <div className="flex items-center gap-1.5">
-                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    <span className="font-semibold">{averageRating || "New"}</span>
-                  </div>
-                  <span className="text-slate-300">|</span>
-                  <span>{reviews.length} {reviews.length === 1 ? "review" : "reviews"}</span>
-                </div>
-              </div>
-
-              <p className="text-slate-600 leading-relaxed">{meal.description}</p>
-
-              <Card className="border-slate-200 shadow-none">
-                <CardContent className="p-4 sm:p-5 space-y-4">
-                  {totalItems > 0 ? (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <p className="font-semibold text-slate-700">Current Cart</p>
-                        <p className="font-bold text-slate-900">{totalItems} item{totalItems > 1 ? "s" : ""}</p>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-slate-600">
-                        <span>{providerInfo?.restaurantName || "Restaurant"}</span>
-                        <span className="font-semibold text-slate-900">${totalPrice.toFixed(2)}</span>
-                      </div>
-                      <div className="flex gap-2 pt-1">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-8 rounded-lg"
-                          onClick={clearCart}
-                        >
-                          Clear Cart
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 rounded-lg"
-                          onClick={() => router.push("/checkout")}
-                        >
-                          Go to Checkout
-                        </Button>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {hasForeignProviderCart ? (
-                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                      Your cart currently has items from another restaurant. Adding this meal will ask to replace that cart.
-                    </p>
-                  ) : null}
-
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-slate-700">Quantity</p>
-                    <div className="inline-flex items-center rounded-xl border border-slate-200 bg-white">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-10 text-center font-bold text-slate-900">{quantity}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setQuantity((prev) => prev + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Button
-                    size="lg"
-                    className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                    onClick={() => handleAddToCart()}
-                    disabled={!meal.isAvailable}
-                  >
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    {meal.isAvailable ? "Add to Cart" : "Currently Unavailable"}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <div className="pt-1 flex flex-col sm:flex-row gap-3">
-                <Button asChild variant="outline" className="rounded-xl">
-                  <Link href={`/restaurant/${meal.providerId}`}>View Restaurant Menu</Link>
-                </Button>
-                <Button asChild variant="ghost" className="rounded-xl">
-                  <Link href="/meals">Browse More Meals</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Card className="rounded-3xl border-slate-200 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl font-black tracking-tight text-slate-900">Customer Reviews</CardTitle>
-            <CardDescription>Only reviews from customers who ordered this meal</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4">
-            {reviews.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center">
-                <p className="text-sm text-slate-500">No reviews yet for this meal.</p>
-              </div>
-            ) : (
-              <Carousel opts={{ align: "start", loop: true }} className="w-full px-12">
-                <CarouselContent>
-                  {reviews.map((review) => (
-                    <CarouselItem key={review.id} className="md:basis-1/2">
-                      <div className="h-full rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                        <div className="flex items-start justify-between gap-3 mb-3">
-                          <p className="font-semibold text-slate-900">{review.customer?.name || "Customer"}</p>
-                          <div className="flex items-center gap-1 text-amber-500">
-                            {Array.from({ length: 5 }).map((_, index) => (
-                              <Star
-                                key={index}
-                                className={`h-4 w-4 ${index < review.rating ? "fill-current" : "text-slate-300"}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        {review.comment ? (
-                          <p className="text-sm text-slate-600 leading-relaxed">{review.comment}</p>
-                        ) : (
-                          <p className="text-sm text-slate-500">No written comment.</p>
-                        )}
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-0" />
-                <CarouselNext className="right-0" />
-              </Carousel>
-            )}
-          </CardContent>
-        </Card>
-
-        <Dialog open={isReplaceCartModalOpen} onOpenChange={setIsReplaceCartModalOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Replace Current Cart?</DialogTitle>
-              <DialogDescription>
-                Your cart contains items from another restaurant. Continuing will clear your current cart and add this meal.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsReplaceCartModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleConfirmReplaceCart}>Replace and Add</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+         </div>
       </div>
+
+      <div className="max-w-7xl mx-auto px-6 pt-12 space-y-24">
+        {/* Main Product Showcase */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+          {/* Visual Showcase - Sticky on Desktop */}
+          <div className="lg:col-span-7 lg:sticky lg:top-32">
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               transition={{ duration: 1 }}
+               className="relative aspect-[4/5] sm:aspect-square lg:aspect-auto lg:h-[700px] w-full rounded-[48px] overflow-hidden bg-slate-100 dark:bg-slate-900 shadow-2xl group"
+             >
+                {meal.image ? (
+                  <img src={meal.image} alt={meal.title} className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                ) : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-4">
+                     <ChefHat className="h-20 w-20 opacity-20" />
+                     <p className="font-bold uppercase tracking-widest text-sm">Visuals coming soon</p>
+                  </div>
+                )}
+                
+                {/* Decorative Overlays */}
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+                
+                <div className="absolute bottom-10 left-10 right-10">
+                   <div className="flex flex-wrap gap-3 mb-4">
+                      {meal.dietaryTag && meal.dietaryTag !== "NONE" && (
+                        <Badge className="bg-[#4CE0B3] text-emerald-950 border-none px-4 py-1.5 rounded-full font-bold text-[11px] uppercase tracking-wider">
+                           {meal.dietaryTag.replace("_", " ")}
+                        </Badge>
+                      )}
+                      <Badge className="bg-white/20 backdrop-blur-md text-white border-white/20 px-4 py-1.5 rounded-full font-bold text-[11px] uppercase tracking-wider">
+                         Freshly Prepared
+                      </Badge>
+                   </div>
+                   <h2 className="text-4xl font-black text-white leading-tight">{meal.title}</h2>
+                </div>
+             </motion.div>
+          </div>
+
+          {/* Configuration & Details */}
+          <div className="lg:col-span-5 space-y-12">
+             <div className="reveal-up space-y-6">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-2xl bg-[#ED6A5E]/10 flex items-center justify-center">
+                      <Flame className="h-5 w-5 text-[#ED6A5E]" />
+                   </div>
+                   <span className="font-bold text-[#ED6A5E] uppercase tracking-[0.2em] text-xs">Trending Signature Dish</span>
+                </div>
+                
+                <div className="space-y-4">
+                   <div className="flex items-end justify-between gap-4">
+                      <h1 className="text-5xl font-black tracking-tight text-foreground">{meal.title}</h1>
+                      <div className="pb-1">
+                         <span className="text-4xl font-black text-[#377771] dark:text-[#4CE0B3]">${meal.price.toFixed(2)}</span>
+                      </div>
+                   </div>
+                   
+                   <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/30 px-3 py-1 rounded-full border border-amber-100 dark:border-amber-900/50">
+                         <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                         <span className="font-black text-amber-700 dark:text-amber-400">{averageRating || "New"}</span>
+                      </div>
+                      <span className="text-slate-400 font-bold text-sm uppercase tracking-widest">{reviews.length} Experiences</span>
+                      <div className="h-1 w-1 rounded-full bg-slate-300" />
+                      <span className="text-slate-500 font-bold text-sm uppercase tracking-widest">{meal.category?.name || "Premium Selection"}</span>
+                   </div>
+                </div>
+
+                <p className="text-xl text-slate-500 leading-relaxed font-medium italic border-l-4 border-[#FFAF87] pl-6 py-2">
+                   "{meal.description || "A masterfully crafted culinary experience, prepared with seasonal ingredients and artistic precision."}"
+                </p>
+             </div>
+
+             {/* Order Card */}
+             <Card className="reveal-up rounded-[32px] border-border/50 shadow-[0_20px_50px_rgba(0,0,0,0.05)] bg-background overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-linear-to-r from-[#ED6A5E] via-[#FFAF87] to-[#4CE0B3]" />
+                <CardContent className="p-10 space-y-10">
+                   <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                         <p className="font-black text-lg text-foreground">Select Quantity</p>
+                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Adjust to your appetite</p>
+                      </div>
+                      <div className="flex items-center rounded-2xl border border-border/50 bg-muted/30 p-1.5 gap-2">
+                         <Button
+                           type="button"
+                           variant="ghost"
+                           size="icon"
+                           className="h-12 w-12 rounded-xl hover:bg-white transition-all text-slate-600"
+                           onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                         >
+                           <Minus className="h-5 w-5" />
+                         </Button>
+                         <span className="w-12 text-center font-black text-2xl text-foreground">{quantity}</span>
+                         <Button
+                           type="button"
+                           variant="ghost"
+                           size="icon"
+                           className="h-12 w-12 rounded-xl hover:bg-white transition-all text-[#ED6A5E]"
+                           onClick={() => setQuantity((prev) => prev + 1)}
+                         >
+                           <Plus className="h-5 w-5" />
+                         </Button>
+                      </div>
+                   </div>
+
+                   <div className="space-y-6">
+                      <div className="flex justify-between items-center px-2">
+                         <span className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">Total Amount</span>
+                         <span className="text-3xl font-black text-foreground">${(meal.price * quantity).toFixed(2)}</span>
+                      </div>
+                      
+                      <Button
+                        size="lg"
+                        className="w-full h-16 rounded-[20px] bg-[#ED6A5E] hover:bg-[#FF8E72] text-white font-black text-lg shadow-[0_20px_40px_-10px_rgba(237,106,94,0.3)] transition-all hover:-translate-y-1 active:scale-95 group"
+                        onClick={() => handleAddToCart()}
+                        disabled={!meal.isAvailable}
+                      >
+                        <ShoppingCart className="mr-3 h-6 w-6 group-hover:rotate-12 transition-transform" />
+                        {meal.isAvailable ? "Add to Order" : "Currently Unavailable"}
+                      </Button>
+                      
+                      {!meal.isAvailable && (
+                        <p className="text-center text-xs font-bold text-destructive uppercase tracking-widest">Check back during business hours</p>
+                      )}
+                   </div>
+                </CardContent>
+             </Card>
+
+             {/* Restaurant Highlight */}
+             <div className="reveal-up p-8 rounded-[32px] bg-muted/20 border border-border/50 flex items-center justify-between group cursor-pointer hover:bg-muted/40 transition-colors">
+                <div className="flex items-center gap-6">
+                   <div className="w-16 h-16 rounded-[20px] bg-[#377771]/10 text-[#377771] flex items-center justify-center text-3xl font-black shadow-inner">
+                      {meal.provider?.restaurantName?.charAt(0) || "F"}
+                   </div>
+                   <div>
+                      <p className="text-xs font-bold text-[#ED6A5E] uppercase tracking-widest mb-1">Curated by</p>
+                      <h4 className="font-black text-2xl text-foreground">{meal.provider?.restaurantName || "Premium Partner"}</h4>
+                      <p className="text-sm font-medium text-slate-500 mt-1 flex items-center gap-1.5">
+                         <Star className="h-3.5 w-3.5 fill-[#FFAF87] text-[#FFAF87]" /> Excellence Certified
+                      </p>
+                   </div>
+                </div>
+                <Button asChild variant="ghost" size="icon" className="rounded-full group-hover:translate-x-2 transition-transform">
+                   <Link href={`/restaurant/${meal.providerId}`}>
+                      <Plus className="h-6 w-6" />
+                   </Link>
+                </Button>
+             </div>
+
+             {/* Trust Markers */}
+             <div className="reveal-up grid grid-cols-2 gap-4">
+                <div className="p-6 rounded-[24px] border border-border/50 bg-background flex flex-col gap-3">
+                   <ShieldCheck className="h-6 w-6 text-[#4CE0B3]" />
+                   <div>
+                      <p className="font-black text-sm text-foreground">Safe Handling</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase">Certified Safety</p>
+                   </div>
+                </div>
+                <div className="p-6 rounded-[24px] border border-border/50 bg-background flex flex-col gap-3">
+                   <Zap className="h-6 w-6 text-[#ED6A5E]" />
+                   <div>
+                      <p className="font-black text-sm text-foreground">Priority Prep</p>
+                      <p className="text-[11px] font-bold text-slate-400 uppercase">Ready in 20m</p>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </section>
+
+        {/* ─── Reviews ─── */}
+        {reviews.length > 0 && (
+          <ReviewSlider
+            reviews={reviews}
+            averageRating={averageRating}
+            title="Guest Feedback"
+            subtitle="Real experiences from our community"
+          />
+        )}
+
+        {/* Global Cart Status Overlay - Minimalist */}
+        {totalItems > 0 && (
+           <motion.div 
+             initial={{ y: 100, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-6"
+           >
+              <div className="bg-[#0A0F1E] text-white rounded-[24px] p-4 flex items-center justify-between shadow-[0_20px_60px_rgba(0,0,0,0.4)] border border-white/10 backdrop-blur-2xl">
+                 <div className="flex items-center gap-4 px-2">
+                    <div className="w-10 h-10 rounded-xl bg-[#ED6A5E] flex items-center justify-center shadow-lg shadow-[#ED6A5E]/20">
+                       <ShoppingCart className="h-5 w-5" />
+                    </div>
+                    <div>
+                       <p className="text-sm font-black">{totalItems} Items selected</p>
+                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total: ${totalPrice.toFixed(2)}</p>
+                    </div>
+                 </div>
+                 <div className="flex gap-2">
+                    <Button variant="ghost" onClick={clearCart} className="h-11 rounded-xl font-bold text-slate-400 hover:bg-white/5">
+                       Clear
+                    </Button>
+                    <Button onClick={() => router.push("/checkout")} className="h-11 px-8 rounded-xl bg-white text-[#0A0F1E] font-black hover:bg-[#4CE0B3] hover:text-emerald-950 transition-all">
+                       Complete Order
+                    </Button>
+                 </div>
+              </div>
+           </motion.div>
+        )}
+      </div>
+
+      {/* Cart Provider Mismatch Modal */}
+      <Dialog open={isReplaceCartModalOpen} onOpenChange={setIsReplaceCartModalOpen}>
+        <DialogContent aria-describedby="meal-replace-cart-desc" className="rounded-[40px] p-10 max-w-lg border-border/50 bg-background shadow-2xl">
+          <DialogHeader className="space-y-6">
+             <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto border border-amber-100">
+                <ChefHat className="h-10 w-10 text-amber-500" />
+             </div>
+            <DialogTitle className="text-3xl font-black text-center text-foreground">Replace your selection?</DialogTitle>
+            <DialogDescription id="meal-replace-cart-desc" className="text-lg text-slate-500 font-medium text-center leading-relaxed">
+              Your cart currently showcases creations from <span className="text-[#ED6A5E] font-bold">{providerInfo?.restaurantName || "another partner"}</span>. 
+              Selecting this dish will prioritize this kitchen and clear your previous choices.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-col sm:flex-row gap-4 mt-10">
+            <Button variant="ghost" onClick={() => setIsReplaceCartModalOpen(false)} className="h-14 rounded-2xl font-black text-slate-500 flex-1">
+              Maintain Previous
+            </Button>
+            <Button onClick={handleConfirmReplaceCart} className="h-14 px-10 rounded-2xl bg-[#ED6A5E] hover:bg-[#FF8E72] text-white font-black shadow-lg shadow-[#ED6A5E]/20 flex-1">
+              Prioritize This Kitchen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

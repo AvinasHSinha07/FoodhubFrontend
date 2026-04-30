@@ -82,70 +82,70 @@ export default function ProfileForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="restaurantName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Restaurant Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter restaurant name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <FormField
+            control={form.control}
+            name="restaurantName"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel className="font-bold text-foreground">Restaurant Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter restaurant name" {...field} className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter physical address" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel className="font-bold text-foreground">Physical Address</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter physical address" {...field} className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description (Optional)</FormLabel>
-              <FormControl>
-                <Input placeholder="A short description of your restaurant" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel className="font-bold text-foreground">Description (Optional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="A short description of your restaurant" {...field} className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="cuisineType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cuisine Type (Optional)</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. Italian, Thai, Chinese" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="cuisineType"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel className="font-bold text-foreground">Cuisine Type (Optional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g. Italian, Thai, Chinese" {...field} className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
             name="preparationTimeMinutes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Preparation Time (Minutes)</FormLabel>
+                <FormLabel className="font-bold text-foreground">Preparation Time (Minutes)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -153,9 +153,10 @@ export default function ProfileForm({
                     max={180}
                     value={field.value}
                     onChange={(event) => field.onChange(Number(event.target.value))}
+                    className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium"
                   />
                 </FormControl>
-                <p className="text-xs text-gray-500">Used for ETA on customer-facing pages.</p>
+                <p className="text-xs text-slate-500 font-medium">Used for ETA on customer-facing pages.</p>
                 <FormMessage />
               </FormItem>
             )}
@@ -166,25 +167,25 @@ export default function ProfileForm({
             name="timezone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Timezone</FormLabel>
+                <FormLabel className="font-bold text-foreground">Timezone</FormLabel>
                 <FormControl>
-                  <Input placeholder="UTC" {...field} />
+                  <Input placeholder="UTC" {...field} className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium" />
                 </FormControl>
-                <p className="text-xs text-gray-500">Example: UTC, Asia/Dhaka, America/New_York</p>
+                <p className="text-xs text-slate-500 font-medium">Example: UTC, Asia/Dhaka, America/New_York</p>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-        <div className="space-y-3 rounded-lg border p-4">
-          <h3 className="text-sm font-semibold">Weekly Availability</h3>
-          <div className="space-y-3">
+        <div className="space-y-4 rounded-[20px] border border-border/50 p-6 bg-muted/20">
+          <h3 className="text-lg font-extrabold text-foreground border-b border-border/50 pb-4">Weekly Availability</h3>
+          <div className="space-y-4 mt-4">
             {DAY_LABELS.map((dayLabel, index) => {
               const row = availabilityWindows[index] || DEFAULT_WINDOWS[index];
               return (
-                <div key={dayLabel} className="grid grid-cols-1 items-center gap-3 rounded-md border p-3 md:grid-cols-[140px_1fr_1fr_auto]">
-                  <p className="text-sm font-medium">{dayLabel}</p>
+                <div key={dayLabel} className="grid grid-cols-1 items-center gap-4 rounded-[16px] border border-border/50 bg-background p-4 md:grid-cols-[120px_1fr_1fr_auto] hover:border-border transition-colors">
+                  <p className="text-sm font-extrabold text-foreground">{dayLabel}</p>
                   <Input
                     type="time"
                     value={row.openTime}
@@ -198,6 +199,7 @@ export default function ProfileForm({
                       };
                       form.setValue("availabilityWindows", next, { shouldDirty: true });
                     }}
+                    className="h-11 rounded-[12px] bg-muted/50 border-border/50 font-medium focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
                   />
                   <Input
                     type="time"
@@ -212,8 +214,9 @@ export default function ProfileForm({
                       };
                       form.setValue("availabilityWindows", next, { shouldDirty: true });
                     }}
+                    className="h-11 rounded-[12px] bg-muted/50 border-border/50 font-medium focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
                   />
-                  <label className="flex items-center gap-2 text-sm">
+                  <label className="flex items-center gap-3 text-sm font-bold text-slate-500 cursor-pointer">
                     <Checkbox
                       checked={row.isClosed || false}
                       onCheckedChange={(checked) => {
@@ -225,6 +228,7 @@ export default function ProfileForm({
                         };
                         form.setValue("availabilityWindows", next, { shouldDirty: true });
                       }}
+                      className="rounded-[6px] w-5 h-5 border-border/50 data-[state=checked]:bg-[#ED6A5E] data-[state=checked]:border-[#ED6A5E]"
                     />
                     Closed
                   </label>
@@ -234,85 +238,91 @@ export default function ProfileForm({
           </div>
         </div>
 
-<FormField
-          control={form.control}
-          name="logo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Logo Image</FormLabel>
-              <FormControl>
-                <div className="flex gap-4 items-center">
-                  <Input 
-                    type="file" 
-                    accept="image/*"
-                    disabled={isUploadingLogo}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setIsUploadingLogo(true);
-                      try {
-                        const res = await UploadServices.uploadImage(file);
-                        field.onChange(res.data?.url || "");
-                        toast.success("Logo uploaded!");
-                      } catch (err) {
-                        toast.error("Failed to upload logo.");
-                      } finally {
-                        setIsUploadingLogo(false);
-                      }
-                    }} 
-                  />
-                  {field.value && (
-                    <img src={field.value} alt="Logo" className="w-12 h-12 object-cover rounded shadow-sm border border-gray-200" />
-                  )}
-                </div>
-              </FormControl>
-              <p className="text-xs text-gray-500">{isUploadingLogo ? "Uploading logo..." : "Upload a logo for your restaurant."}</p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <FormField
+            control={form.control}
+            name="logo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-foreground">Brand Logo</FormLabel>
+                <FormControl>
+                  <div className="flex gap-4 items-center">
+                    <Input 
+                      type="file" 
+                      accept="image/*"
+                      disabled={isUploadingLogo}
+                      className="h-12 rounded-[14px] bg-muted/50 border-border/50 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-[10px] file:border-0 file:text-sm file:font-bold file:bg-[#377771]/10 file:text-[#377771] dark:file:bg-[#4CE0B3]/10 dark:file:text-[#4CE0B3] cursor-pointer"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setIsUploadingLogo(true);
+                        try {
+                          const res = await UploadServices.uploadImage(file);
+                          field.onChange(res.data?.url || "");
+                          toast.success("Logo uploaded!");
+                        } catch (err) {
+                          toast.error("Failed to upload logo.");
+                        } finally {
+                          setIsUploadingLogo(false);
+                        }
+                      }} 
+                    />
+                    {field.value && (
+                      <img src={field.value} alt="Logo" className="w-12 h-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
+                    )}
+                  </div>
+                </FormControl>
+                <p className="text-xs text-slate-500 font-medium">{isUploadingLogo ? "Uploading logo..." : "Upload a square logo for your restaurant."}</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="bannerImage"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Banner Image</FormLabel>
-              <FormControl>
-                <div className="flex gap-4 items-center">
-                  <Input 
-                    type="file" 
-                    accept="image/*"
-                    disabled={isUploadingBanner}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setIsUploadingBanner(true);
-                      try {
-                        const res = await UploadServices.uploadImage(file);
-                        field.onChange(res.data?.url || "");
-                        toast.success("Banner uploaded!");
-                      } catch (err) {
-                        toast.error("Failed to upload banner.");
-                      } finally {
-                        setIsUploadingBanner(false);
-                      }
-                    }} 
-                  />
-                  {field.value && (
-                    <img src={field.value} alt="Banner" className="w-24 h-12 object-cover rounded shadow-sm border border-gray-200" />
-                  )}
-                </div>
-              </FormControl>
-              <p className="text-xs text-gray-500">{isUploadingBanner ? "Uploading banner..." : "Upload a promotional banner for your page."}</p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="bannerImage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-bold text-foreground">Cover Banner</FormLabel>
+                <FormControl>
+                  <div className="flex gap-4 items-center">
+                    <Input 
+                      type="file" 
+                      accept="image/*"
+                      disabled={isUploadingBanner}
+                      className="h-12 rounded-[14px] bg-muted/50 border-border/50 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-[10px] file:border-0 file:text-sm file:font-bold file:bg-[#377771]/10 file:text-[#377771] dark:file:bg-[#4CE0B3]/10 dark:file:text-[#4CE0B3] cursor-pointer"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setIsUploadingBanner(true);
+                        try {
+                          const res = await UploadServices.uploadImage(file);
+                          field.onChange(res.data?.url || "");
+                          toast.success("Banner uploaded!");
+                        } catch (err) {
+                          toast.error("Failed to upload banner.");
+                        } finally {
+                          setIsUploadingBanner(false);
+                        }
+                      }} 
+                    />
+                    {field.value && (
+                      <img src={field.value} alt="Banner" className="w-24 h-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
+                    )}
+                  </div>
+                </FormControl>
+                <p className="text-xs text-slate-500 font-medium">{isUploadingBanner ? "Uploading banner..." : "Upload a promotional cover banner (16:9)."}</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : initialData ? "Update Profile" : "Create Profile"}
-        </Button>
+        <div className="pt-6 border-t border-border/50 flex justify-end">
+          <Button type="submit" className="w-full sm:w-auto h-12 px-8 rounded-[14px] bg-[#ED6A5E] hover:bg-[#FF8E72] text-white font-bold shadow-md hover:-translate-y-0.5 transition-all" disabled={isSubmitting}>
+            {isSubmitting ? "Saving Changes..." : initialData ? "Save Profile Changes" : "Create Profile"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

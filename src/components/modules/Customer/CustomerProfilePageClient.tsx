@@ -213,128 +213,153 @@ export default function CustomerProfilePageClient() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-10 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <UserCircle className="w-8 h-8 text-orange-600" />
-        <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
+    <div className="max-w-4xl mx-auto py-10 space-y-8">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="bg-[#ED6A5E]/10 p-3 rounded-[16px]">
+          <UserCircle className="w-8 h-8 text-[#ED6A5E]" />
+        </div>
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">My Profile</h1>
+          <p className="text-slate-500 font-medium mt-1">Manage your account settings and preferences.</p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>Update your personal details, avatar, and saved checkout addresses.</CardDescription>
+      <Card className="rounded-[24px] border-border/50 shadow-sm bg-background overflow-hidden">
+        <CardHeader className="bg-muted/30 border-b border-border/20 pb-6 pt-8 px-8">
+          <CardTitle className="text-2xl font-extrabold text-foreground">Personal Information</CardTitle>
+          <CardDescription className="text-slate-500 font-medium text-base mt-1">Update your personal details, avatar, and account preferences.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-6" onSubmit={handleUpdate}>
-            <div className="space-y-3">
-              <label className="text-sm font-medium">Profile Avatar</label>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={profile?.image || ""} alt={profile?.name || "User"} />
-                  <AvatarFallback>{profile?.name?.charAt(0) || "U"}</AvatarFallback>
+        <CardContent className="p-8">
+          <form className="space-y-8" onSubmit={handleUpdate}>
+            <div className="space-y-4">
+              <label className="text-sm font-bold text-foreground">Profile Avatar</label>
+              <div className="flex items-center gap-6">
+                <Avatar className="h-20 w-20 border-4 border-background shadow-md">
+                  <AvatarImage src={profile?.image || ""} alt={profile?.name || "User"} className="object-cover" />
+                  <AvatarFallback className="bg-[#377771]/10 text-[#377771] text-2xl font-bold">{profile?.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
+                <div className="flex-1 space-y-2 max-w-sm">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    disabled={isUploadingAvatar}
+                    className="h-12 rounded-[14px] bg-muted/50 border-border/50 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-[10px] file:border-0 file:text-sm file:font-bold file:bg-[#ED6A5E]/10 file:text-[#ED6A5E] hover:file:bg-[#ED6A5E]/20 file:transition-colors cursor-pointer"
+                  />
+                  <p className="text-xs text-slate-500 font-medium">
+                    {isUploadingAvatar ? "Uploading avatar..." : "Upload a square image for best results. Max 5MB."}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="bg-border/50" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-foreground">Email Address</label>
+                <Input value={profile?.email || ""} disabled className="h-12 rounded-[14px] bg-muted border-border/50 text-slate-500 cursor-not-allowed font-medium" />
+                <p className="text-xs text-slate-500 font-medium">Your email address cannot be changed.</p>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-foreground">Account Role</label>
+                <div className="h-12 px-4 flex items-center border border-border/50 rounded-[14px] bg-muted/50 text-sm font-extrabold text-[#377771] dark:text-[#4CE0B3] capitalize tracking-wide">{profile?.role?.toLowerCase() || "Customer"}</div>
+              </div>
+
+              <div className="space-y-3 md:col-span-2">
+                <label className="text-sm font-bold text-foreground">Full Name</label>
                 <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  disabled={isUploadingAvatar}
-                  className="max-w-sm"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  required
+                  placeholder="Enter your full name"
+                  className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#ED6A5E] focus-visible:border-[#ED6A5E] font-medium"
                 />
               </div>
-              <p className="text-xs text-gray-500">
-                {isUploadingAvatar ? "Uploading avatar..." : "Upload a square image for best results."}
-              </p>
             </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email Address</label>
-              <Input value={profile?.email || ""} disabled className="bg-gray-100" />
-              <p className="text-xs text-gray-500">Your email address cannot be changed.</p>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Role</label>
-              <div className="px-3 py-2 border rounded bg-gray-50 text-sm capitalize">{profile?.role?.toLowerCase() || "Customer"}</div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-900">Name</label>
-              <Input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                required
-                placeholder="Enter your full name"
-              />
-            </div>
-
-            <div className="pt-4 border-t">
-              <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white">
-                {isUpdating ? "Updating..." : "Save Changes"}
+            <div className="pt-6 border-t border-border/50 flex justify-end">
+              <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto h-12 px-8 rounded-[14px] bg-[#ED6A5E] hover:bg-[#FF8E72] text-white font-bold shadow-md hover:-translate-y-0.5 transition-all">
+                {isUpdating ? "Updating Profile..." : "Save Changes"}
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPinHouse className="h-5 w-5 text-orange-600" /> Saved Addresses
+      <Card className="rounded-[24px] border-border/50 shadow-sm bg-background overflow-hidden">
+        <CardHeader className="bg-muted/30 border-b border-border/20 pb-6 pt-8 px-8">
+          <CardTitle className="flex items-center gap-3 text-2xl font-extrabold text-foreground">
+            <div className="bg-[#377771]/10 p-2 rounded-[12px]">
+              <MapPinHouse className="h-6 w-6 text-[#377771] dark:text-[#4CE0B3]" />
+            </div>
+            Saved Addresses
           </CardTitle>
-          <CardDescription>Manage delivery addresses and set a default one for faster checkout.</CardDescription>
+          <CardDescription className="text-slate-500 font-medium text-base mt-1">Manage delivery addresses and set a default one for faster checkout.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <form className="grid grid-cols-1 gap-3 md:grid-cols-2" onSubmit={handleSubmitAddress}>
+        <CardContent className="space-y-8 p-8">
+          <form className="grid grid-cols-1 gap-5 md:grid-cols-2 bg-muted/20 p-6 rounded-[24px] border border-border/50" onSubmit={handleSubmitAddress}>
+            <div className="md:col-span-2 mb-2">
+              <h3 className="text-lg font-bold text-foreground">{addressForm.id ? "Edit Address" : "Add New Address"}</h3>
+            </div>
             <Input
               placeholder="Label (Home, Office)"
               value={addressForm.label}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, label: event.target.value }))}
               required
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
               placeholder="Address line 1"
               value={addressForm.line1}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, line1: event.target.value }))}
               required
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
               placeholder="Address line 2 (optional)"
               value={addressForm.line2}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, line2: event.target.value }))}
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
               placeholder="City"
               value={addressForm.city}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, city: event.target.value }))}
               required
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
-              placeholder="State"
+              placeholder="State / Province"
               value={addressForm.state}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, state: event.target.value }))}
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
               placeholder="Postal code"
               value={addressForm.postalCode}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, postalCode: event.target.value }))}
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
               placeholder="Country"
               value={addressForm.country}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, country: event.target.value }))}
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
             <Input
-              placeholder="Delivery instructions"
+              placeholder="Delivery instructions (e.g. gate code)"
               value={addressForm.instructions}
               onChange={(event) => setAddressForm((prev) => ({ ...prev, instructions: event.target.value }))}
+              className="h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3]"
             />
 
-            <label className="col-span-1 flex items-center gap-2 text-sm md:col-span-2">
+            <label className="col-span-1 flex items-center gap-3 text-sm md:col-span-2 font-bold cursor-pointer mt-2">
               <input
                 type="checkbox"
                 checked={addressForm.isDefault}
+                className="w-5 h-5 rounded-[6px] border-border/50 text-[#377771] focus:ring-[#377771] bg-background cursor-pointer"
                 onChange={(event) =>
                   setAddressForm((prev) => ({
                     ...prev,
@@ -342,46 +367,58 @@ export default function CustomerProfilePageClient() {
                   }))
                 }
               />
-              Set as default address
+              Set as default delivery address
             </label>
 
-            <div className="col-span-1 flex gap-2 md:col-span-2">
-              <Button type="submit" disabled={isCreatingAddress || isUpdatingAddress}>
-                {addressForm.id ? "Update Address" : "Add Address"}
+            <div className="col-span-1 flex flex-wrap gap-3 md:col-span-2 mt-2">
+              <Button type="submit" disabled={isCreatingAddress || isUpdatingAddress} className="h-12 px-8 rounded-[14px] bg-[#377771] dark:bg-[#4CE0B3] text-white dark:text-emerald-950 hover:bg-[#2A5A55] dark:hover:bg-[#34D399] font-bold shadow-md hover:-translate-y-0.5 transition-all">
+                {addressForm.id ? "Update Address" : "Save New Address"}
               </Button>
               {addressForm.id && (
-                <Button type="button" variant="outline" onClick={resetAddressForm}>
-                  Cancel Editing
+                <Button type="button" variant="outline" onClick={resetAddressForm} className="h-12 px-8 rounded-[14px] font-bold border-border/50 text-foreground hover:bg-muted">
+                  Cancel Edit
                 </Button>
               )}
             </div>
           </form>
 
-          <Separator />
+          <Separator className="bg-border/50" />
 
-          <div className="space-y-3">
+          <div className="space-y-4">
+            <h3 className="text-xl font-extrabold text-foreground mb-4">Your Addresses</h3>
             {addresses.length === 0 ? (
-              <p className="text-sm text-gray-500">No saved addresses yet.</p>
+              <div className="p-8 text-center bg-muted/30 rounded-[24px] border border-border/50">
+                <MapPinHouse className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <p className="text-base font-bold text-slate-500">No saved addresses yet.</p>
+                <p className="text-sm font-medium text-slate-400 mt-1">Add an address above to use it during checkout.</p>
+              </div>
             ) : (
-              addresses.map((address) => (
-                <div key={address.id} className="rounded-md border p-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <p className="font-semibold">
-                        {address.label} {address.isDefault ? <span className="ml-1 text-xs text-green-600">(Default)</span> : null}
-                      </p>
-                      <p className="text-sm text-gray-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {addresses.map((address) => (
+                  <div key={address.id} className={`rounded-[20px] border p-6 flex flex-col justify-between transition-all duration-300 ${address.isDefault ? "bg-[#377771]/5 border-[#377771]/30 dark:bg-[#4CE0B3]/5 dark:border-[#4CE0B3]/30 shadow-sm" : "bg-background border-border/50 hover:border-border hover:shadow-sm"}`}>
+                    <div className="mb-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="font-extrabold text-lg text-foreground tracking-tight">{address.label}</h4>
+                        {address.isDefault && (
+                          <span className="bg-[#377771] dark:bg-[#4CE0B3] text-white dark:text-emerald-950 text-[10px] uppercase tracking-wider font-extrabold px-2 py-1 rounded-full flex items-center">
+                            <Star className="w-3 h-3 fill-current mr-1" /> Default
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                         {address.line1}
-                        {address.line2 ? `, ${address.line2}` : ""}, {address.city}
-                        {address.state ? `, ${address.state}` : ""}
-                        {address.postalCode ? `, ${address.postalCode}` : ""}, {address.country}
+                        {address.line2 ? `, ${address.line2}` : ""}<br />
+                        {address.city}{address.state ? `, ${address.state}` : ""}{address.postalCode ? ` ${address.postalCode}` : ""}<br />
+                        {address.country}
                       </p>
-                      {address.instructions ? (
-                        <p className="mt-1 text-xs text-gray-500">Instructions: {address.instructions}</p>
-                      ) : null}
+                      {address.instructions && (
+                        <div className="mt-3 bg-muted p-3 rounded-[12px] text-xs font-medium text-slate-500">
+                          <span className="font-bold text-foreground">Note:</span> {address.instructions}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50 mt-auto">
                       {!address.isDefault && (
                         <Button
                           type="button"
@@ -389,28 +426,28 @@ export default function CustomerProfilePageClient() {
                           variant="outline"
                           onClick={() => handleSetDefaultAddress(address.id)}
                           disabled={isSettingDefaultAddress}
+                          className="rounded-[10px] font-bold border-border/50 hover:bg-[#377771]/10 hover:text-[#377771] dark:hover:bg-[#4CE0B3]/10 dark:hover:text-[#4CE0B3]"
                         >
-                          <Star className="mr-1 h-3.5 w-3.5" />
-                          Set Default
+                          Make Default
                         </Button>
                       )}
-                      <Button type="button" size="sm" variant="outline" onClick={() => handleEditAddress(address)}>
+                      <Button type="button" size="sm" variant="outline" onClick={() => handleEditAddress(address)} className="rounded-[10px] font-bold border-border/50 hover:bg-muted">
                         Edit
                       </Button>
                       <Button
                         type="button"
                         size="sm"
                         variant="ghost"
-                        className="text-red-600"
+                        className="rounded-[10px] font-bold text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto"
                         onClick={() => handleDeleteAddress(address.id)}
                         disabled={isDeletingAddress}
                       >
-                        <Trash2 className="mr-1 h-3.5 w-3.5" /> Delete
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </CardContent>

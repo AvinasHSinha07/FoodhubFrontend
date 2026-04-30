@@ -48,15 +48,20 @@ export default function ProviderProfilePageClient() {
   }
 
   return (
-    <div className="p-6">
-      <Card className="max-w-2xl mx-auto shadow-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Restaurant Profile</CardTitle>
-          <CardDescription>
+    <div className="p-6 max-w-4xl mx-auto space-y-8">
+      <div>
+        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Restaurant Profile</h1>
+        <p className="text-slate-500 font-medium mt-1">Manage your restaurant identity, cover, and business hours.</p>
+      </div>
+
+      <Card className="rounded-[24px] border-border/50 shadow-sm bg-background overflow-hidden">
+        <CardHeader className="bg-muted/30 border-b border-border/20 pb-6 pt-8 px-8">
+          <CardTitle className="text-2xl font-extrabold text-foreground">Business Information</CardTitle>
+          <CardDescription className="text-slate-500 font-medium text-base mt-1">
             {profile ? "Update your restaurant details below." : "Create your restaurant profile to get started."}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-8">
           <ProfileForm initialData={profile} />
         </CardContent>
       </Card>

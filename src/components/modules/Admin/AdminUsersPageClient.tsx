@@ -89,13 +89,13 @@ export default function AdminUsersPageClient() {
   const getStatusBadge = (status: UserStatus) => {
     switch (status) {
       case UserStatus.ACTIVE:
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">Active</Badge>;
+        return <Badge className="bg-[#377771]/10 text-[#377771] border-[#377771]/20 dark:bg-[#4CE0B3]/10 dark:text-[#4CE0B3] dark:border-[#4CE0B3]/20 font-bold px-3 py-1 rounded-[8px] tracking-wide">Active</Badge>;
       case UserStatus.BLOCKED:
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-200 border-red-200">Blocked</Badge>;
+        return <Badge className="bg-[#ED6A5E]/10 text-[#ED6A5E] border-[#ED6A5E]/20 font-bold px-3 py-1 rounded-[8px] tracking-wide">Blocked</Badge>;
       case UserStatus.DELETED:
-        return <Badge variant="secondary">Deleted</Badge>;
+        return <Badge className="bg-muted text-slate-500 border-border/50 font-bold px-3 py-1 rounded-[8px] tracking-wide">Deleted</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline" className="font-bold px-3 py-1 rounded-[8px] tracking-wide">{status}</Badge>;
     }
   };
 
@@ -103,19 +103,19 @@ export default function AdminUsersPageClient() {
     switch (role) {
       case "ADMIN":
       case "SUPER_ADMIN":
-        return <Shield className="h-4 w-4 text-purple-600" />;
+        return <div className="bg-[#ED6A5E]/10 p-1.5 rounded-[8px]"><Shield className="h-4 w-4 text-[#ED6A5E]" /></div>;
       case "PROVIDER":
-        return <UserCheck className="h-4 w-4 text-blue-600" />;
+        return <div className="bg-[#377771]/10 p-1.5 rounded-[8px]"><UserCheck className="h-4 w-4 text-[#377771] dark:text-[#4CE0B3]" /></div>;
       default:
-        return <UserX className="h-4 w-4 text-gray-400" />;
+        return <div className="bg-muted p-1.5 rounded-[8px]"><UserX className="h-4 w-4 text-slate-500" /></div>;
     }
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-        <p className="text-gray-500">View and manage all platform accounts.</p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">User Management</h1>
+        <p className="text-slate-500 font-medium mt-1">View and manage all platform accounts.</p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -131,18 +131,18 @@ export default function AdminUsersPageClient() {
             name="search"
             placeholder="Search by name or email..."
             defaultValue={search}
-            className="max-w-md bg-white"
+            className="max-w-md h-12 rounded-[14px] bg-background border-border/50 focus-visible:ring-[#377771] dark:focus-visible:ring-[#4CE0B3] font-medium"
           />
         </form>
         <Select value={filterRole} onValueChange={(value) => updateParams({ role: value, page: "1" })}>
-          <SelectTrigger className="w-45 bg-white">
+          <SelectTrigger className="w-[180px] h-12 rounded-[14px] bg-background border-border/50 font-bold">
             <SelectValue placeholder="All Roles" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Roles</SelectItem>
-            <SelectItem value="CUSTOMER">Customers</SelectItem>
-            <SelectItem value="PROVIDER">Providers</SelectItem>
-            <SelectItem value="ADMIN">Admins</SelectItem>
+          <SelectContent className="rounded-[16px] border-border/50">
+            <SelectItem value="ALL" className="font-bold">All Roles</SelectItem>
+            <SelectItem value="CUSTOMER" className="font-bold">Customers</SelectItem>
+            <SelectItem value="PROVIDER" className="font-bold">Providers</SelectItem>
+            <SelectItem value="ADMIN" className="font-bold">Admins</SelectItem>
           </SelectContent>
         </Select>
         <SortControl
@@ -161,62 +161,60 @@ export default function AdminUsersPageClient() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-[400px] w-full rounded-[24px]" />
         </div>
       ) : isError ? (
-        <Card className="text-center py-20 bg-gray-50">
-          <h2 className="text-xl font-semibold text-gray-700">Unable to load users</h2>
-          <p className="text-gray-500 mt-2">{getApiErrorMessage(error, "Please refresh and try again.")}</p>
+        <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
+          <h2 className="text-2xl font-extrabold text-foreground">Unable to load users</h2>
+          <p className="text-slate-500 font-medium mt-2">{getApiErrorMessage(error, "Please refresh and try again.")}</p>
         </Card>
       ) : users.length === 0 ? (
-        <Card className="text-center py-20 bg-gray-50">
-          <h2 className="text-xl font-semibold text-gray-700">No users found</h2>
-          <p className="text-gray-500 mt-2">Try adjusting your search criteria.</p>
+        <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
+          <h2 className="text-2xl font-extrabold text-foreground">No users found</h2>
+          <p className="text-slate-500 font-medium mt-2">Try adjusting your search criteria.</p>
         </Card>
       ) : (
         <>
-          <div className="bg-white rounded-md border shadow-sm overflow-x-auto">
+          <div className="bg-background rounded-[24px] border border-border/50 shadow-sm overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 border-b text-gray-600 uppercase text-xs font-semibold">
+              <thead className="bg-muted/30 border-b border-border/50 text-slate-500 uppercase text-xs font-bold tracking-widest">
                 <tr>
-                  <th className="px-6 py-4">User</th>
-                  <th className="px-6 py-4">Role</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Joined</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-8 py-5">User</th>
+                  <th className="px-8 py-5">Role</th>
+                  <th className="px-8 py-5">Status</th>
+                  <th className="px-8 py-5">Joined</th>
+                  <th className="px-8 py-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border/20">
                 {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50/50">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{user.name}</div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
+                  <tr key={user.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-8 py-5">
+                      <div className="font-bold text-foreground text-base">{user.name}</div>
+                      <div className="text-xs font-medium text-slate-500 mt-0.5">{user.email}</div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
+                    <td className="px-8 py-5">
+                      <div className="flex items-center gap-3">
                         {getRoleIcon(user.role)}
-                        <span className="font-medium text-xs">{user.role}</span>
+                        <span className="font-bold text-sm tracking-wide">{user.role}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-8 py-5">{getStatusBadge(user.status)}</td>
+                    <td className="px-8 py-5 text-slate-500 font-medium">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-8 py-5 text-right">
                       <Select
                         defaultValue={user.status}
                         onValueChange={(val) => handleStatusChange(user.id, val as UserStatus)}
                         disabled={user.role === "SUPER_ADMIN" || isUpdating}
                       >
-                        <SelectTrigger className="w-27.5 h-8 text-xs ml-auto">
+                        <SelectTrigger className="w-[120px] h-9 rounded-[10px] text-xs font-bold bg-background border-border/50 ml-auto focus:ring-[#377771] dark:focus:ring-[#4CE0B3]">
                           <SelectValue placeholder="Status" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={UserStatus.ACTIVE}>Activate</SelectItem>
-                          <SelectItem value={UserStatus.BLOCKED}>Block</SelectItem>
+                        <SelectContent className="rounded-[12px] border-border/50">
+                          <SelectItem value={UserStatus.ACTIVE} className="font-bold text-xs">Activate</SelectItem>
+                          <SelectItem value={UserStatus.BLOCKED} className="font-bold text-xs">Block</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>

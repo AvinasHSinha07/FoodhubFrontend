@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const PIE_COLORS = ["#2563eb", "#16a34a", "#ea580c", "#7c3aed", "#dc2626", "#0891b2"];
+const PIE_COLORS = ["#377771", "#4CE0B3", "#ED6A5E", "#FF8E72", "#1E293B", "#94A3B8"];
 
 export default function AdminAnalyticsPageClient() {
   const [days, setDays] = useState(30);
@@ -52,131 +52,138 @@ export default function AdminAnalyticsPageClient() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Platform Analytics</h1>
-          <p className="text-sm text-gray-500">Revenue, payments, and order trends across FoodHub.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Platform Analytics</h1>
+          <p className="text-slate-500 font-medium mt-1">Revenue, payments, and order trends across FoodHub.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            onClick={() => refetch()} 
+            disabled={isFetching}
+            className="h-12 px-6 rounded-[14px] border-border/50 font-bold hover:bg-muted text-foreground transition-all"
+          >
             {isFetching ? "Refreshing..." : "Refresh"}
           </Button>
           <Select value={String(days)} onValueChange={(value) => setDays(Number(value))}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-[180px] h-12 rounded-[14px] bg-background border-border/50 font-bold focus:ring-[#377771] dark:focus:ring-[#4CE0B3]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7">Last 7 days</SelectItem>
-              <SelectItem value="30">Last 30 days</SelectItem>
-              <SelectItem value="90">Last 90 days</SelectItem>
+            <SelectContent className="rounded-[16px] border-border/50">
+              <SelectItem value="7" className="font-bold">Last 7 days</SelectItem>
+              <SelectItem value="30" className="font-bold">Last 30 days</SelectItem>
+              <SelectItem value="90" className="font-bold">Last 90 days</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Total Orders</CardTitle>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
+        <Card className="rounded-[20px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{analytics.summary.totalOrders}</p>
+            <p className="text-4xl font-extrabold text-foreground">{analytics.summary.totalOrders}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Admin Net Revenue</CardTitle>
+        <Card className="rounded-[20px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">Admin Net Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">${analytics.summary.adminNetRevenue.toFixed(2)}</p>
+            <p className="text-4xl font-extrabold text-[#377771] dark:text-[#4CE0B3]">${analytics.summary.adminNetRevenue.toFixed(2)}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Platform GMV</CardTitle>
+        <Card className="rounded-[20px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">Platform GMV</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">${analytics.summary.gmv.toFixed(2)}</p>
+            <p className="text-4xl font-extrabold text-foreground">${analytics.summary.gmv.toFixed(2)}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Paid Orders</CardTitle>
+        <Card className="rounded-[20px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">Paid Orders</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{analytics.summary.paidOrders}</p>
+            <p className="text-4xl font-extrabold text-foreground">{analytics.summary.paidOrders}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Pending Payments</CardTitle>
+        <Card className="rounded-[20px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending Payments</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{analytics.summary.pendingPayments}</p>
+            <p className="text-4xl font-extrabold text-[#ED6A5E]">{analytics.summary.pendingPayments}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="rounded-[24px] border-border/50 bg-background shadow-sm">
         <CardHeader>
-          <CardTitle>Orders and Net Revenue Trend</CardTitle>
+          <CardTitle className="text-xl font-extrabold text-foreground">Orders and Net Revenue Trend</CardTitle>
         </CardHeader>
-        <CardContent className="h-85">
+        <CardContent className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={analytics.ordersByDay}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip />
-              <Legend />
-              <Area yAxisId="left" type="monotone" dataKey="orders" stroke="#2563eb" fill="#93c5fd" />
-              <Area yAxisId="right" type="monotone" dataKey="revenue" stroke="#16a34a" fill="#86efac" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+              <YAxis yAxisId="left" orientation="left" stroke="#377771" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={-10} />
+              <YAxis yAxisId="right" orientation="right" stroke="#ED6A5E" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={10} />
+              <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+              <Legend wrapperStyle={{ paddingTop: '20px' }} />
+              <Area yAxisId="left" type="monotone" dataKey="orders" stroke="#377771" fill="#377771" fillOpacity={0.2} strokeWidth={3} />
+              <Area yAxisId="right" type="monotone" dataKey="revenue" stroke="#ED6A5E" fill="#ED6A5E" fillOpacity={0.2} strokeWidth={3} />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <Card className="rounded-[24px] border-border/50 bg-background shadow-sm">
           <CardHeader>
-            <CardTitle>Payment Method Mix</CardTitle>
+            <CardTitle className="text-xl font-extrabold text-foreground">Payment Method Mix</CardTitle>
           </CardHeader>
-          <CardContent className="h-75">
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={analytics.paymentMethodBreakdown}
                   dataKey="count"
                   nameKey="method"
-                  outerRadius={100}
-                  label
+                  outerRadius={110}
+                  innerRadius={70}
+                  stroke="none"
+                  paddingAngle={5}
                 >
                   {analytics.paymentMethodBreakdown.map((entry, index) => (
                     <Cell key={`${entry.method}-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-[24px] border-border/50 bg-background shadow-sm">
           <CardHeader>
-            <CardTitle>Top Providers by Net Payout</CardTitle>
+            <CardTitle className="text-xl font-extrabold text-foreground">Top Providers by Net Payout</CardTitle>
           </CardHeader>
-          <CardContent className="h-75">
+          <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics.topProviders}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="restaurantName" hide />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="revenue" fill="#7c3aed" />
+              <BarChart data={analytics.topProviders} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.2} />
+                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dx={10} />
+                <YAxis type="category" dataKey="restaurantName" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} width={120} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{fill: 'transparent'}} />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                <Bar dataKey="revenue" fill="#377771" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
         // The backend URL is retrieved from NEXT_PUBLIC_API_URL and we remove /api/v1 if it exists so we don't duplicate it.
         const apiUrl = process.env.NEXT_PUBLIC_API_URL 
             || process.env.NEXT_PUBLIC_API_BASE_URL 
-            || "http://localhost:5000/api/v1";
+            || "http://127.0.0.1:5000/api/v1";
         
         // Remove trailing /api/v1 or / so we can cleanly append it
         const backEndBase = apiUrl.replace(/\/api\/v1\/?$/, '').replace(/\/$/, '');

@@ -185,18 +185,17 @@ export default function MealsPageClient() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-20 font-sans" style={{ fontFamily: "var(--font-sora)" }}>
-      <div className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden bg-slate-900 border-b border-slate-800">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute -top-[20%] left-[10%] w-125 h-125 bg-indigo-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob"></div>
-          <div className="absolute bottom-[-10%] right-[20%] w-100 h-100 bg-pink-500/20 rounded-full mix-blend-screen filter blur-[100px] opacity-60 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 flex items-center justify-center opacity-10 rounded-full blur-3xl"></div>
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"></div>
+    <div className="bg-background min-h-screen pb-20 font-sans">
+      <div className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 overflow-hidden bg-[#0F172A] border-b border-white/5">
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute -top-40 left-10 w-[500px] h-[500px] bg-[#ED6A5E]/20 rounded-full blur-[100px] opacity-60"></div>
+          <div className="absolute -bottom-40 right-20 w-[500px] h-[500px] bg-[#377771]/30 rounded-full blur-[100px] opacity-60"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-            Explore <span className="text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-indigo-400">Amazing Dishes</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6">
+            Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ED6A5E] to-[#FFAF87]">Amazing Dishes</span>
           </h1>
           <p className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto font-medium mb-4">
             Find the perfect meal for your cravings using our advanced filters. From healthy salads to indulgent pizzas, we have it all.
@@ -206,11 +205,11 @@ export default function MealsPageClient() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-4 gap-8 -mt-8 relative z-20">
         <div className="lg:col-span-1">
-          <Card className="sticky top-24 shadow-xl border-slate-100 rounded-3xl bg-white/90 backdrop-blur-xl overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 to-pink-500"></div>
-            <CardHeader className="pb-4 border-b border-slate-100/50 bg-white/50 backdrop-blur-sm">
-              <CardTitle className="text-xl flex items-center gap-2 font-bold text-slate-800" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                <SlidersHorizontal className="w-5 h-5 text-indigo-600" />
+          <Card className="sticky top-28 shadow-lg border-border/50 rounded-[24px] bg-background/80 backdrop-blur-xl overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ED6A5E] to-[#FFAF87]"></div>
+            <CardHeader className="pb-4 border-b border-border/40 bg-background/50">
+              <CardTitle className="text-xl flex items-center gap-2 font-extrabold text-foreground">
+                <SlidersHorizontal className="w-5 h-5 text-[#ED6A5E]" />
                 Filters
               </CardTitle>
             </CardHeader>
@@ -279,10 +278,10 @@ export default function MealsPageClient() {
                 </div>
 
                 <div className="pt-4 flex flex-col gap-3">
-                  <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md font-bold transition-all">
+                  <Button type="submit" className="w-full bg-[#ED6A5E] hover:bg-[#FF8E72] text-white rounded-[14px] shadow-lg shadow-[#ED6A5E]/20 font-bold transition-all">
                     Apply Filters
                   </Button>
-                  <Button type="button" variant="outline" className="w-full border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold" onClick={handleResetFilters}>
+                  <Button type="button" variant="outline" className="w-full border-border/50 text-foreground hover:bg-muted rounded-[14px] font-bold" onClick={handleResetFilters}>
                     Reset All
                   </Button>
                 </div>
@@ -320,18 +319,18 @@ export default function MealsPageClient() {
             </div>
           ) : hasQueryError ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm col-span-full">
-              <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Utensils className="w-10 h-10 text-rose-300" />
+              <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Utensils className="w-10 h-10 text-destructive" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>Failed to load meals</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2">Failed to load meals</h3>
               <p className="text-slate-500 text-lg max-w-md mx-auto">{queryErrorMessage}</p>
             </div>
           ) : meals.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm col-span-full">
-              <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Utensils className="w-10 h-10 text-indigo-300" />
+              <div className="w-20 h-20 bg-[#377771]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Utensils className="w-10 h-10 text-[#377771]" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>No meals found</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2">No meals found</h3>
               <p className="text-slate-500 text-lg max-w-md mx-auto">Try adjusting your filters or search term to discover exactly what you're craving.</p>
               <Button onClick={handleResetFilters} variant="outline" className="mt-6 rounded-full font-bold">Clear All Filters</Button>
             </div>
@@ -339,19 +338,19 @@ export default function MealsPageClient() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {meals.map((meal) => (
-                <Card key={meal.id} className="overflow-hidden py-0 border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group rounded-3xl bg-white flex flex-col h-full">
+                <Card key={meal.id} className="overflow-hidden py-0 border-border/50 shadow-sm hover:shadow-[0_20px_40px_rgba(55,119,113,0.08)] hover:-translate-y-1.5 transition-all duration-500 group rounded-[24px] bg-background flex flex-col h-full">
                   {meal.image ? (
-                    <Link href={`/meals/${meal.id}`} className="block relative h-48 overflow-hidden">
+                    <Link href={`/meals/${meal.id}`} className="block relative pt-[70%] overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <img
                         src={meal.image}
                         alt={meal.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                       />
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full font-bold text-slate-900 text-sm shadow-sm flex items-center">
-                        <span className="text-indigo-600 mr-0.5">$</span>{meal.price.toFixed(2)}
+                      <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full font-extrabold text-[#377771] dark:text-[#4CE0B3] text-sm shadow-sm flex items-center">
+                        <span className="mr-0.5">$</span>{meal.price.toFixed(2)}
                       </div>
                       {meal.dietaryTag && meal.dietaryTag !== "NONE" && (
-                        <Badge className="absolute top-3 left-3 bg-emerald-500/90 hover:bg-emerald-600 text-white backdrop-blur-sm border-none uppercase text-[10px] tracking-wider font-bold shadow-sm">
+                        <Badge className="absolute top-3 left-3 bg-[#4CE0B3]/90 hover:bg-[#4CE0B3] text-emerald-900 backdrop-blur-sm border-none uppercase text-[10px] tracking-wider font-bold shadow-sm">
                           {meal.dietaryTag.replace("_", " ")}
                         </Badge>
                       )}
@@ -359,22 +358,22 @@ export default function MealsPageClient() {
                   ) : (
                     <div className="p-6 pb-0 flex justify-between items-start gap-4">
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-bold text-slate-900 line-clamp-2" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                          <Link href={`/meals/${meal.id}`} className="hover:text-indigo-600 transition-colors">
+                        <CardTitle className="text-xl font-extrabold text-foreground line-clamp-2">
+                          <Link href={`/meals/${meal.id}`} className="hover:text-[#ED6A5E] transition-colors">
                             {meal.title}
                           </Link>
                         </CardTitle>
                       </div>
-                      <div className="font-bold text-slate-900 bg-slate-100 px-3 py-1.5 rounded-full text-sm shrink-0 flex items-center">
-                        <span className="text-indigo-600 mr-0.5">$</span>{meal.price.toFixed(2)}
+                      <div className="font-extrabold text-[#377771] dark:text-[#4CE0B3] bg-muted px-3 py-1.5 rounded-full text-sm shrink-0 flex items-center">
+                        <span className="mr-0.5">$</span>{meal.price.toFixed(2)}
                       </div>
                     </div>
                   )}
 
-                  <CardHeader className="\ flex-1">
+                  <CardHeader className="flex-1">
                     {meal.image && (
-                      <CardTitle className="text-xl font-bold text-slate-900 line-clamp-1" style={{ fontFamily: "var(--font-space-grotesk)" }}>
-                        <Link href={`/meals/${meal.id}`} className="hover:text-indigo-600 transition-colors">
+                      <CardTitle className="text-xl font-extrabold text-foreground line-clamp-1">
+                        <Link href={`/meals/${meal.id}`} className="hover:text-[#ED6A5E] transition-colors">
                           {meal.title}
                         </Link>
                       </CardTitle>
@@ -390,11 +389,11 @@ export default function MealsPageClient() {
                     )}
                   </CardHeader>
 
-                  <CardContent className="px-5 pb-5 pt-4 mt-auto bg-white border-t border-slate-50 flex flex-col gap-4">
+                  <CardContent className="px-5 pb-5 pt-4 mt-auto bg-background border-t border-border/20 flex flex-col gap-4">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-xs text-slate-400 flex items-center min-w-0">
                         <span>By</span>
-                        <span className="font-bold text-slate-700 ml-1 truncate">{meal.provider?.restaurantName || "Unknown Chef"}</span>
+                        <span className="font-bold text-foreground ml-1 truncate">{meal.provider?.restaurantName || "Unknown Chef"}</span>
                       </p>
                       <Button
                         type="button"
@@ -405,11 +404,11 @@ export default function MealsPageClient() {
                         aria-label="Toggle favorite meal"
                       >
                         <Heart
-                          className={`h-4 w-4 ${favoriteMealIds.has(meal.id) ? "fill-red-500 text-red-500" : "text-slate-500"}`}
+                          className={`h-4 w-4 transition-colors ${favoriteMealIds.has(meal.id) ? "fill-[#ED6A5E] text-[#ED6A5E]" : "text-slate-400 hover:text-[#ED6A5E]"}`}
                         />
                       </Button>
                     </div>
-                    <Button asChild className="w-full bg-slate-100 text-indigo-700 hover:bg-indigo-600 hover:text-white rounded-xl shadow-none transition-colors duration-300 font-bold group/btn">
+                    <Button asChild className="w-full bg-muted text-[#377771] dark:text-white hover:bg-[#ED6A5E] hover:text-white rounded-[14px] shadow-none transition-all duration-300 font-bold group/btn">
                       <Link href={meal.provider?.id ? `/restaurant/${meal.provider.id}` : "/restaurants"}>
                         View Restaurant <ArrowRight className="ml-2 w-4 h-4 opacity-0 group-hover/btn:opacity-100 group-hover/btn:translate-x-1 transition-all" />
                       </Link>

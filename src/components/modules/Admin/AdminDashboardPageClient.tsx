@@ -87,67 +87,80 @@ export default function AdminDashboardPageClient() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Platform Dashboard</h1>
-          <p className="text-gray-500">Monitor overall activity and system metrics.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Platform Dashboard</h1>
+          <p className="text-slate-500 font-medium mt-1">Monitor overall activity and system metrics.</p>
         </div>
-        <Button variant="outline" onClick={handleRefresh} disabled={isFetching}>
-          {isFetching ? "Refreshing..." : "Refresh"}
+        <Button 
+          variant="outline" 
+          onClick={handleRefresh} 
+          disabled={isFetching}
+          className="h-12 px-6 rounded-[14px] border-border/50 font-bold hover:bg-muted text-foreground transition-all shrink-0"
+        >
+          {isFetching ? "Refreshing..." : "Refresh Metrics"}
         </Button>
       </div>
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-gray-400" />
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Users</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-[#377771]/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-[#377771] dark:text-[#4CE0B3]" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats.users}</div>
-              <p className="text-xs text-gray-400 mt-1">Platform-wide registered users</p>
+              <div className="text-4xl font-extrabold text-foreground">{stats.users}</div>
+              <p className="text-xs font-medium text-slate-500 mt-2">Platform-wide registered users</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Providers</CardTitle>
-              <Store className="h-4 w-4 text-gray-400" />
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Providers</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-[#ED6A5E]/10 flex items-center justify-center">
+                <Store className="h-5 w-5 text-[#ED6A5E]" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats.providers}</div>
-              <p className="text-xs text-gray-400 mt-1">Active restaurant vendors</p>
+              <div className="text-4xl font-extrabold text-foreground">{stats.providers}</div>
+              <p className="text-xs font-medium text-slate-500 mt-2">Active restaurant vendors</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Categories</CardTitle>
-              <Box className="h-4 w-4 text-gray-400" />
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Categories</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <Box className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats.categories}</div>
-              <p className="text-xs text-gray-400 mt-1">Cuisines and food types</p>
+              <div className="text-4xl font-extrabold text-foreground">{stats.categories}</div>
+              <p className="text-xs font-medium text-slate-500 mt-2">Cuisines and food types</p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Orders</CardTitle>
-              <ShoppingCart className="h-4 w-4 text-gray-400" />
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Orders</CardTitle>
+              <div className="h-10 w-10 rounded-full bg-[#377771]/10 flex items-center justify-center">
+                <ShoppingCart className="h-5 w-5 text-[#377771] dark:text-[#4CE0B3]" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats.orders}</div>
-              <p className="text-xs text-gray-400 mt-1">Life-time food orders</p>
+              <div className="text-4xl font-extrabold text-foreground">{stats.orders}</div>
+              <p className="text-xs font-medium text-slate-500 mt-2">Life-time food orders</p>
             </CardContent>
           </Card>
         </div>

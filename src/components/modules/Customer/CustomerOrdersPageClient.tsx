@@ -129,23 +129,23 @@ export default function CustomerOrdersPageClient() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PLACED": return "bg-blue-100 text-blue-800";
-      case "PREPARING": return "bg-yellow-100 text-yellow-800";
-      case "READY": return "bg-orange-100 text-orange-800";
-      case "DELIVERED": return "bg-green-100 text-green-800";
-      case "CANCELLED": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "PLACED": return "bg-[#377771]/10 text-[#377771] border-[#377771]/20";
+      case "PREPARING": return "bg-amber-100 text-amber-800 border-amber-200";
+      case "READY": return "bg-[#ED6A5E]/10 text-[#ED6A5E] border-[#ED6A5E]/20";
+      case "DELIVERED": return "bg-[#4CE0B3]/10 text-[#4CE0B3] border-[#4CE0B3]/20";
+      case "CANCELLED": return "bg-destructive/10 text-destructive border-destructive/20";
+      default: return "bg-muted text-muted-foreground border-border/50";
     }
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 max-w-5xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">My Orders</h1>
-        <p className="text-gray-500">View and track your previous food orders.</p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">My Orders</h1>
+        <p className="text-slate-500 font-medium mt-1">View and track your previous food orders.</p>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-muted/30 p-4 rounded-[20px] border border-border/50">
         <div className="flex flex-wrap gap-3">
           <Select
             value={selectedOrderStatus}
@@ -154,10 +154,10 @@ export default function CustomerOrdersPageClient() {
               updateParams({ orderStatus: value, page: "1" });
             }}
           >
-            <SelectTrigger className="w-45 bg-white">
+            <SelectTrigger className="w-45 bg-background border-border/50 rounded-[12px] font-medium h-11">
               <SelectValue placeholder="Order status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-[16px] border-border/50">
               <SelectItem value="ALL">All Statuses</SelectItem>
               <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
               <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
@@ -174,10 +174,10 @@ export default function CustomerOrdersPageClient() {
               updateParams({ paymentStatus: value, page: "1" });
             }}
           >
-            <SelectTrigger className="w-45 bg-white">
+            <SelectTrigger className="w-45 bg-background border-border/50 rounded-[12px] font-medium h-11">
               <SelectValue placeholder="Payment status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-[16px] border-border/50">
               <SelectItem value="ALL">All Payments</SelectItem>
               <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
               <SelectItem value={PaymentStatus.COD_PENDING}>COD Pending</SelectItem>
@@ -203,86 +203,88 @@ export default function CustomerOrdersPageClient() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
+          <Skeleton className="h-40 w-full rounded-[24px]" />
         </div>
       ) : orders.length === 0 ? (
-        <Card className="text-center py-20 bg-gray-50">
-          <h2 className="text-xl font-semibold text-gray-700">No Orders Found</h2>
-          <p className="text-gray-500 mt-2">You haven't placed any orders yet.</p>
+        <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
+          <RotateCcw className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <h2 className="text-2xl font-extrabold text-foreground">No Orders Found</h2>
+          <p className="text-slate-500 mt-2 font-medium">You haven't placed any orders yet.</p>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {orders.map((order) => (
-            <Card key={order.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gray-50/50">
+            <Card key={order.id} className="rounded-[24px] border-border/50 shadow-sm hover:shadow-md transition-all duration-300 bg-background overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-border/20 bg-muted/30 pb-4 pt-5 px-6">
                 <div>
-                  <CardTitle className="text-lg">
-                    Order from {order.provider?.restaurantName || "Restaurant"}
+                  <CardTitle className="text-lg font-extrabold text-foreground">
+                    {order.provider?.restaurantName || "Restaurant"}
                   </CardTitle>
-                  <CardDescription className="text-xs pt-1">
+                  <CardDescription className="text-xs font-bold text-slate-500 pt-1">
                     {new Date(order.createdAt).toLocaleString()}
                   </CardDescription>
                 </div>
                 <div className="text-right">
-                  <Badge variant="outline" className={getStatusColor(order.orderStatus)}>
+                  <Badge variant="outline" className={`${getStatusColor(order.orderStatus)} border-none font-bold uppercase tracking-wider text-[10px]`}>
                     {order.orderStatus}
                   </Badge>
-                  <p className="text-xs text-gray-500 mt-1 uppercase font-medium">
-                    {order.paymentMethod} / {order.paymentStatus}
+                  <p className="text-[10px] text-slate-500 mt-1.5 uppercase font-bold tracking-wider">
+                    {order.paymentMethod} • <span className={order.paymentStatus === 'PAID' ? 'text-[#4CE0B3]' : 'text-slate-500'}>{order.paymentStatus}</span>
                   </p>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4">
-                <div className="space-y-3">
+              <CardContent className="pt-6 px-6">
+                <div className="space-y-4">
                   {order.orderItems?.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center text-sm border-b pb-2 last:border-0 last:pb-0">
-                      <div className="flex flex-col gap-1">
-                        <div className="flex gap-3 items-center">
-                          <span className="font-medium px-2 py-0.5 bg-gray-100 rounded text-xs">
+                    <div key={item.id} className="flex justify-between items-center text-sm border-b border-border/30 pb-3 last:border-0 last:pb-0 group">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex gap-4 items-center">
+                          <span className="font-bold px-2.5 py-1 bg-muted rounded-[8px] text-xs text-foreground">
                             {item.quantity}x
                           </span>
-                          <span className="font-medium">{item.meal?.title || "Unknown Meal"}</span>
+                          <span className="font-bold text-foreground">{item.meal?.title || "Unknown Meal"}</span>
                         </div>
                         {order.orderStatus === "DELIVERED" && !item.review && (
-                          <div className="pl-12">
+                          <div className="pl-14">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-6 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 px-2"
+                              className="h-7 text-[11px] font-bold text-[#ED6A5E] hover:text-white hover:bg-[#ED6A5E] px-3 rounded-[8px] transition-all"
                               onClick={() => handleOpenReview(item)}
                             >
-                              <Star className="w-3 h-3 mr-1" /> Leave Review
+                              <Star className="w-3 h-3 mr-1.5" /> Leave Review
                             </Button>
                           </div>
                         )}
                       </div>
-                      <span className="text-gray-600 self-start">${item.totalPrice.toFixed(2)}</span>
+                      <span className="font-extrabold text-[#377771] dark:text-[#4CE0B3] self-start mt-1">${item.totalPrice.toFixed(2)}</span>
                     </div>
                   ))}
-                  <Separator className="my-2" />
-                  <div className="flex justify-between items-center font-semibold pt-1">
-                    <span>Total Paid</span>
-                    <span>${order.totalPrice.toFixed(2)}</span>
+                  
+                  <div className="flex justify-between items-center pt-4 border-t border-border/50 mt-4">
+                    <span className="font-extrabold text-foreground">Total Paid</span>
+                    <span className="text-xl font-extrabold text-[#377771] dark:text-[#4CE0B3]">${order.totalPrice.toFixed(2)}</span>
                   </div>
-                  <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Button asChild variant="outline" className="w-full">
-                      <Link href={`/customer/orders/${order.id}`}>View Order Details</Link>
+
+                  <p className="text-[11px] font-medium text-slate-500 bg-muted/50 p-2.5 rounded-[12px] mt-2 mb-4">
+                    <span className="font-bold text-foreground">Delivery to:</span> {order.deliveryAddress}
+                  </p>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
+                    <Button asChild variant="outline" className="w-full h-11 rounded-[12px] border-border/50 hover:bg-muted font-bold text-foreground">
+                      <Link href={`/customer/orders/${order.id}`}>View Details</Link>
                     </Button>
                     <Button
-                      variant="secondary"
-                      className="w-full"
+                      className="w-full h-11 rounded-[12px] bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-[#377771] dark:hover:bg-[#4CE0B3] dark:hover:text-emerald-950 font-bold transition-all shadow-sm"
                       onClick={() => reorderMutation.mutate(order.id)}
                       disabled={reorderMutation.isPending}
                     >
                       <RotateCcw className="mr-2 h-4 w-4" />
-                      {reorderMutation.isPending ? "Reordering..." : "Reorder"}
+                      {reorderMutation.isPending ? "Reordering..." : "Order Again"}
                     </Button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-dashed">
-                    <span className="font-medium">Delivery to:</span> {order.deliveryAddress}
-                  </p>
                 </div>
               </CardContent>
             </Card>

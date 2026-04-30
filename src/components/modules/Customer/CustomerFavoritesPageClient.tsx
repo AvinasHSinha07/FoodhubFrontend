@@ -92,23 +92,23 @@ export default function CustomerFavoritesPageClient() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Favorites</h1>
-          <p className="text-gray-500">Your saved meals and restaurants.</p>
-        </div>
+    <div className="p-6 max-w-6xl mx-auto space-y-8">
+      <div>
+        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">My Favorites</h1>
+        <p className="text-slate-500 font-medium mt-1">Your saved meals and restaurants.</p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-3 bg-muted/30 p-2 rounded-[20px] w-max border border-border/50">
         <Button
-          variant={activeTab === "meals" ? "default" : "outline"}
+          variant={activeTab === "meals" ? "default" : "ghost"}
+          className={`h-12 px-6 rounded-[14px] font-bold transition-all ${activeTab === 'meals' ? 'bg-[#ED6A5E] hover:bg-[#FF8E72] text-white shadow-md' : 'text-slate-500 hover:text-foreground'}`}
           onClick={() => setActiveTab("meals")}
         >
           Meals ({groupedMealFavorites.length})
         </Button>
         <Button
-          variant={activeTab === "restaurants" ? "default" : "outline"}
+          variant={activeTab === "restaurants" ? "default" : "ghost"}
+          className={`h-12 px-6 rounded-[14px] font-bold transition-all ${activeTab === 'restaurants' ? 'bg-[#377771] dark:bg-[#4CE0B3] text-white dark:text-emerald-950 shadow-md' : 'text-slate-500 hover:text-foreground'}`}
           onClick={() => setActiveTab("restaurants")}
         >
           Restaurants ({providerFavorites.length})
@@ -116,36 +116,38 @@ export default function CustomerFavoritesPageClient() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Skeleton className="h-56 w-full rounded-[24px]" />
+          <Skeleton className="h-56 w-full rounded-[24px]" />
+          <Skeleton className="h-56 w-full rounded-[24px]" />
         </div>
       ) : activeTab === "meals" ? (
         groupedMealFavorites.length === 0 ? (
-          <Card>
-            <CardContent className="py-16 text-center text-slate-500">
-              You have no favorite meals yet.
+          <Card className="rounded-[24px] border-border/50 bg-background shadow-sm">
+            <CardContent className="py-24 text-center">
+              <p className="text-2xl font-extrabold text-foreground mb-2">No Favorite Meals</p>
+              <p className="text-slate-500 font-medium text-sm">You haven't saved any meals yet.</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {groupedMealFavorites.map((favorite) => (
-              <Card key={favorite.id} className="overflow-hidden">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg line-clamp-1">{favorite.meal?.title}</CardTitle>
+              <Card key={favorite.id} className="overflow-hidden rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow group flex flex-col">
+                <CardHeader className="pb-3 border-b border-border/20 bg-muted/20 pt-6">
+                  <CardTitle className="text-xl font-extrabold line-clamp-1 group-hover:text-[#ED6A5E] transition-colors">{favorite.meal?.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-slate-500 line-clamp-2">{favorite.meal?.description}</p>
-                  <p className="text-sm font-semibold mt-2">${favorite.meal?.price?.toFixed(2)}</p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    <Button size="sm" onClick={() => handleQuickAddToCart(favorite)}>
+                <CardContent className="p-6 flex flex-col flex-1">
+                  <p className="text-sm text-slate-500 font-medium line-clamp-2 mb-3">{favorite.meal?.description}</p>
+                  <p className="text-2xl font-extrabold text-[#377771] dark:text-[#4CE0B3] mt-auto">${favorite.meal?.price?.toFixed(2)}</p>
+                  
+                  <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-border/50">
+                    <Button onClick={() => handleQuickAddToCart(favorite)} className="h-11 rounded-[12px] bg-[#ED6A5E] hover:bg-[#FF8E72] text-white font-bold w-full shadow-sm hover:-translate-y-0.5 transition-all">
                       Quick Add
                     </Button>
-                    <Button size="sm" variant="outline" asChild>
-                      <Link href={`/restaurant/${favorite.provider?.id}`}>View Restaurant</Link>
+                    <Button variant="outline" asChild className="h-11 rounded-[12px] font-bold border-border/50 hover:bg-muted text-foreground w-full">
+                      <Link href={`/restaurant/${favorite.provider?.id}`}>Menu</Link>
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleToggleMealFavorite(favorite.meal?.id)}>
+                    <Button variant="ghost" onClick={() => handleToggleMealFavorite(favorite.meal?.id)} className="col-span-2 h-10 rounded-[12px] font-bold text-destructive hover:text-destructive hover:bg-destructive/10">
                       Remove
                     </Button>
                   </div>
@@ -155,26 +157,34 @@ export default function CustomerFavoritesPageClient() {
           </div>
         )
       ) : providerFavorites.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center text-slate-500">
-            You have no favorite restaurants yet.
+        <Card className="rounded-[24px] border-border/50 bg-background shadow-sm">
+          <CardContent className="py-24 text-center">
+            <p className="text-2xl font-extrabold text-foreground mb-2">No Favorite Restaurants</p>
+            <p className="text-slate-500 font-medium text-sm">You haven't saved any restaurants yet.</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {providerFavorites.map((favorite: any) => (
-            <Card key={favorite.id}>
-              <CardContent className="pt-5">
-                <p className="text-lg font-semibold">{favorite.provider?.restaurantName}</p>
-                <p className="text-sm text-slate-500 line-clamp-2">{favorite.provider?.description || "No description provided."}</p>
+            <Card key={favorite.id} className="rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-shadow group flex flex-col">
+              <CardContent className="p-6 flex flex-col flex-1">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <p className="text-xl font-extrabold line-clamp-2 group-hover:text-[#377771] dark:group-hover:text-[#4CE0B3] transition-colors">{favorite.provider?.restaurantName}</p>
+                </div>
+                
+                <p className="text-sm text-slate-500 font-medium line-clamp-3 flex-1">{favorite.provider?.description || "No description provided."}</p>
+                
                 {favorite.provider?.cuisineType ? (
-                  <Badge className="mt-3" variant="secondary">{favorite.provider.cuisineType}</Badge>
+                  <div className="mt-4">
+                    <Badge className="bg-[#377771]/10 text-[#377771] dark:bg-[#4CE0B3]/10 dark:text-[#4CE0B3] hover:bg-[#377771]/20 border-none font-bold px-3 py-1">{favorite.provider.cuisineType}</Badge>
+                  </div>
                 ) : null}
-                <div className="flex gap-2 mt-4">
-                  <Button size="sm" asChild>
+                
+                <div className="grid grid-cols-1 gap-3 mt-6 pt-4 border-t border-border/50">
+                  <Button asChild className="h-11 rounded-[12px] bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-[#377771] dark:hover:bg-[#4CE0B3] dark:hover:text-emerald-950 font-bold w-full transition-all">
                     <Link href={`/restaurant/${favorite.provider?.id}`}>Open Menu</Link>
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleToggleProviderFavorite(favorite.provider?.id)}>
+                  <Button variant="ghost" onClick={() => handleToggleProviderFavorite(favorite.provider?.id)} className="h-10 rounded-[12px] font-bold text-destructive hover:text-destructive hover:bg-destructive/10">
                     Remove
                   </Button>
                 </div>

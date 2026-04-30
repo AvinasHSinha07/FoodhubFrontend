@@ -78,26 +78,26 @@ export default function AdminOrdersPageClient() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PLACED": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "PREPARING": return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "READY": return "bg-orange-100 text-orange-800 border-orange-200";
-      case "DELIVERED": return "bg-green-100 text-green-800 border-green-200";
-      case "CANCELLED": return "bg-red-100 text-red-800 border-red-200";
-      default: return "bg-gray-100 text-gray-800";
+      case "PLACED": return "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700";
+      case "PREPARING": return "bg-[#377771]/10 text-[#377771] border-[#377771]/20 dark:bg-[#4CE0B3]/10 dark:text-[#4CE0B3] dark:border-[#4CE0B3]/20";
+      case "READY": return "bg-[#ED6A5E]/10 text-[#ED6A5E] border-[#ED6A5E]/20";
+      case "DELIVERED": return "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800";
+      case "CANCELLED": return "bg-destructive/10 text-destructive border-destructive/20";
+      default: return "bg-muted text-slate-500 border-border/50";
     }
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Order Monitoring</h1>
-          <p className="text-gray-500">Monitor all platform food orders globally.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Order Monitoring</h1>
+          <p className="text-slate-500 font-medium mt-1">Monitor all platform food orders globally.</p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-4">
           <Select
             value={selectedOrderStatus}
             onValueChange={(value) => {
@@ -105,16 +105,16 @@ export default function AdminOrdersPageClient() {
               updateParams({ orderStatus: value, page: "1" });
             }}
           >
-            <SelectTrigger className="w-45 bg-white">
+            <SelectTrigger className="w-[180px] h-12 rounded-[14px] bg-background border-border/50 font-bold focus:ring-[#377771] dark:focus:ring-[#4CE0B3]">
               <SelectValue placeholder="Order status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Orders</SelectItem>
-              <SelectItem value={OrderStatus.PLACED}>Placed</SelectItem>
-              <SelectItem value={OrderStatus.PREPARING}>Preparing</SelectItem>
-              <SelectItem value={OrderStatus.READY}>Ready</SelectItem>
-              <SelectItem value={OrderStatus.DELIVERED}>Delivered</SelectItem>
-              <SelectItem value={OrderStatus.CANCELLED}>Cancelled</SelectItem>
+            <SelectContent className="rounded-[16px] border-border/50">
+              <SelectItem value="ALL" className="font-bold">All Orders</SelectItem>
+              <SelectItem value={OrderStatus.PLACED} className="font-bold">Placed</SelectItem>
+              <SelectItem value={OrderStatus.PREPARING} className="font-bold">Preparing</SelectItem>
+              <SelectItem value={OrderStatus.READY} className="font-bold">Ready</SelectItem>
+              <SelectItem value={OrderStatus.DELIVERED} className="font-bold">Delivered</SelectItem>
+              <SelectItem value={OrderStatus.CANCELLED} className="font-bold">Cancelled</SelectItem>
             </SelectContent>
           </Select>
 
@@ -125,17 +125,17 @@ export default function AdminOrdersPageClient() {
               updateParams({ paymentStatus: value, page: "1" });
             }}
           >
-            <SelectTrigger className="w-45 bg-white">
+            <SelectTrigger className="w-[180px] h-12 rounded-[14px] bg-background border-border/50 font-bold focus:ring-[#377771] dark:focus:ring-[#4CE0B3]">
               <SelectValue placeholder="Payment status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Payments</SelectItem>
-              <SelectItem value={PaymentStatus.PENDING}>Pending</SelectItem>
-              <SelectItem value={PaymentStatus.COD_PENDING}>COD Pending</SelectItem>
-              <SelectItem value={PaymentStatus.PAID}>Paid</SelectItem>
-              <SelectItem value={PaymentStatus.COD_COLLECTED}>COD Collected</SelectItem>
-              <SelectItem value={PaymentStatus.FAILED}>Failed</SelectItem>
-              <SelectItem value={PaymentStatus.REFUNDED}>Refunded</SelectItem>
+            <SelectContent className="rounded-[16px] border-border/50">
+              <SelectItem value="ALL" className="font-bold">All Payments</SelectItem>
+              <SelectItem value={PaymentStatus.PENDING} className="font-bold">Pending</SelectItem>
+              <SelectItem value={PaymentStatus.COD_PENDING} className="font-bold">COD Pending</SelectItem>
+              <SelectItem value={PaymentStatus.PAID} className="font-bold">Paid</SelectItem>
+              <SelectItem value={PaymentStatus.COD_COLLECTED} className="font-bold">COD Collected</SelectItem>
+              <SelectItem value={PaymentStatus.FAILED} className="font-bold">Failed</SelectItem>
+              <SelectItem value={PaymentStatus.REFUNDED} className="font-bold">Refunded</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -155,72 +155,76 @@ export default function AdminOrdersPageClient() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-48 w-full rounded-[24px]" />
+          <Skeleton className="h-48 w-full rounded-[24px]" />
+          <Skeleton className="h-48 w-full rounded-[24px]" />
         </div>
       ) : orders.length === 0 ? (
-        <Card className="text-center py-20 bg-gray-50">
-          <ShoppingBag className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-          <h2 className="text-xl font-semibold text-gray-700">No orders found</h2>
-          <p className="text-gray-500 mt-2">Adjust your filters or wait for new orders to arrive.</p>
+        <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
+          <div className="mx-auto h-16 w-16 bg-muted rounded-full flex items-center justify-center mb-6">
+            <ShoppingBag className="h-8 w-8 text-slate-400" />
+          </div>
+          <h2 className="text-2xl font-extrabold text-foreground">No Orders Found</h2>
+          <p className="text-slate-500 font-medium mt-2">Adjust your filters or wait for new orders to arrive.</p>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {orders.map((order) => (
-            <Card key={order.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b bg-gray-50/30 gap-4">
+            <Card key={order.id} className="rounded-[24px] border-border/50 bg-background shadow-sm hover:shadow-md transition-all overflow-hidden group">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-border/20 bg-muted/20 px-8 pt-8 gap-4">
                 <div>
-                  <div className="flex items-center gap-3">
-                    <CardTitle className="text-lg">#{order.id.slice(0, 8)}</CardTitle>
-                    <Badge variant="outline" className={getStatusColor(order.orderStatus)}>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <CardTitle className="text-xl font-extrabold text-foreground tracking-tight">#{order.id.slice(0, 8)}</CardTitle>
+                    <Badge variant="outline" className={`font-bold px-3 py-1 rounded-[8px] tracking-wide ${getStatusColor(order.orderStatus)}`}>
                       {order.orderStatus}
                     </Badge>
-                    <Badge variant="secondary" className="uppercase text-[10px] tracking-widest">
+                    <Badge variant="secondary" className="uppercase text-[10px] font-bold tracking-widest px-2 py-1 rounded-[6px] bg-background border border-border/50">
                       {order.paymentMethod} / {order.paymentStatus}
                     </Badge>
                   </div>
-                  <CardDescription className="text-xs mt-1">
+                  <CardDescription className="text-sm font-medium text-slate-500 mt-2">
                     {new Date(order.createdAt).toLocaleString()}
                   </CardDescription>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold">${order.totalPrice.toFixed(2)}</p>
-                  <p className="text-xs text-gray-500">{order.orderItems?.length || 0} items</p>
+                <div className="text-left sm:text-right">
+                  <p className="text-3xl font-extrabold text-[#377771] dark:text-[#4CE0B3]">${order.totalPrice.toFixed(2)}</p>
+                  <p className="text-sm font-medium text-slate-500 mt-1">{order.orderItems?.length || 0} items</p>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="w-full md:w-5/12 bg-white border p-3 rounded-lg flex items-start gap-3 shadow-sm">
-                    <div className="p-2 bg-blue-50 rounded-full text-blue-500 shrink-0">
-                      <UserCheck className="h-4 w-4" />
+              <CardContent className="p-8">
+                <div className="flex flex-col lg:flex-row items-stretch justify-between gap-8">
+                  <div className="w-full lg:w-[45%] bg-muted/30 border border-border/50 p-5 rounded-[16px] flex items-start gap-4">
+                    <div className="p-3 bg-background rounded-[12px] border border-border/50 text-[#377771] dark:text-[#4CE0B3] shrink-0">
+                      <UserCheck className="h-5 w-5" />
                     </div>
-                    <div className="overflow-hidden">
-                      <p className="text-xs uppercase font-semibold text-gray-500 tracking-wider mb-1">Customer</p>
-                      <p className="font-medium text-sm truncate">{order.customer?.name || "Unknown"}</p>
-                      <p className="text-xs text-gray-500 truncate">{order.customer?.email}</p>
-                      <p className="text-xs text-gray-600 mt-2 line-clamp-2 bg-gray-50 p-1.5 rounded">{order.deliveryAddress}</p>
+                    <div className="overflow-hidden w-full">
+                      <p className="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Customer Details</p>
+                      <p className="font-bold text-foreground text-base truncate">{order.customer?.name || "Unknown"}</p>
+                      <p className="text-sm font-medium text-slate-500 truncate mt-0.5">{order.customer?.email}</p>
+                      <p className="text-sm font-medium text-foreground mt-3 line-clamp-2 bg-background border border-border/50 p-2.5 rounded-[10px]">{order.deliveryAddress}</p>
                     </div>
                   </div>
 
-                  <ArrowRight className="hidden md:block h-6 w-6 text-gray-300 shrink-0" />
+                  <div className="hidden lg:flex items-center justify-center">
+                    <ArrowRight className="h-8 w-8 text-slate-300 dark:text-slate-700" />
+                  </div>
 
-                  <div className="w-full md:w-5/12 bg-white border p-3 rounded-lg flex items-start gap-3 shadow-sm">
-                    <div className="p-2 bg-orange-50 rounded-full text-orange-500 shrink-0">
-                      <Store className="h-4 w-4" />
+                  <div className="w-full lg:w-[45%] bg-muted/30 border border-border/50 p-5 rounded-[16px] flex items-start gap-4">
+                    <div className="p-3 bg-background rounded-[12px] border border-border/50 text-[#ED6A5E] shrink-0">
+                      <Store className="h-5 w-5" />
                     </div>
-                    <div className="overflow-hidden">
-                      <p className="text-xs uppercase font-semibold text-gray-500 tracking-wider mb-1">Provider</p>
-                      <p className="font-medium text-sm truncate">{order.provider?.restaurantName || "Unknown"}</p>
-                      <ul className="text-xs text-gray-600 mt-2 divide-y border-t pt-1 space-y-1 w-full">
+                    <div className="overflow-hidden w-full">
+                      <p className="text-xs font-bold uppercase text-slate-500 tracking-wider mb-2">Provider & Items</p>
+                      <p className="font-bold text-foreground text-base truncate">{order.provider?.restaurantName || "Unknown"}</p>
+                      <ul className="text-sm font-medium text-foreground mt-3 divide-y divide-border/20 border-t border-border/50 pt-2 space-y-2 w-full">
                         {order.orderItems?.slice(0, 2).map((item, idx) => (
                           <li key={idx} className="flex justify-between items-center py-1">
-                            <span className="truncate pr-2">{item.quantity}x {item.meal?.title}</span>
-                            <span className="shrink-0 text-gray-400">${item.unitPrice}</span>
+                            <span className="truncate pr-2"><span className="text-slate-500 mr-2">{item.quantity}x</span> {item.meal?.title}</span>
+                            <span className="shrink-0 text-slate-500 font-bold">${item.unitPrice.toFixed(2)}</span>
                           </li>
                         ))}
                         {(order.orderItems?.length || 0) > 2 && (
-                          <li className="text-gray-400 italic py-1">+ {(order.orderItems?.length || 0) - 2} more items</li>
+                          <li className="text-slate-400 italic py-1 text-xs">+ {(order.orderItems?.length || 0) - 2} more items</li>
                         )}
                       </ul>
                     </div>
