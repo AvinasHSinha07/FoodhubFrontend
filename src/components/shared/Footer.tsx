@@ -29,13 +29,13 @@ export default function Footer() {
               Elevating the food delivery experience. Premium meals from top restaurants delivered with care and speed.
             </p>
             <div className="flex items-center gap-4 mt-2">
-              <Link href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-[#377771] hover:text-white transition-colors duration-300">
+              <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-[#377771] hover:text-white transition-colors duration-300">
                 <FaInstagram className="h-4 w-4" />
               </Link>
-              <Link href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-[#377771] hover:text-white transition-colors duration-300">
+              <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-[#377771] hover:text-white transition-colors duration-300">
                 <FaTwitter className="h-4 w-4" />
               </Link>
-              <Link href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-[#377771] hover:text-white transition-colors duration-300">
+              <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-800 hover:bg-[#377771] hover:text-white transition-colors duration-300">
                 <FaFacebook className="h-4 w-4" />
               </Link>
             </div>

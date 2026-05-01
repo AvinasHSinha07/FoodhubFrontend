@@ -536,8 +536,8 @@ export default function HomeSummaryPageClient() {
           <p className="text-lg text-slate-500">
             Our intelligent algorithms analyze your past orders to recommend new dishes and hidden gems you are guaranteed to love.
           </p>
-          <Button className="mt-4 rounded-[14px] bg-[#377771] dark:bg-[#4CE0B3] hover:bg-[#2c615c] dark:hover:bg-[#4CE0B3]/90 text-white dark:text-emerald-950 px-8 h-12 font-bold">
-            Build Your Profile
+          <Button asChild className="mt-4 rounded-[14px] bg-[#377771] dark:bg-[#4CE0B3] hover:bg-[#2c615c] dark:hover:bg-[#4CE0B3]/90 text-white dark:text-emerald-950 px-8 h-12 font-bold">
+            <Link href="/register">Build Your Profile</Link>
           </Button>
         </div>
       </section>
