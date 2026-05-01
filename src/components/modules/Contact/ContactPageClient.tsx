@@ -43,7 +43,7 @@ export default function ContactPageClient() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FFFDF9] overflow-hidden">
+    <main className="min-h-screen bg-[#FFFDF9] dark:bg-background overflow-hidden">
       {/* Hero */}
       <section className="relative py-24 lg:py-28 px-4 sm:px-6 lg:px-8 text-center">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[700px] rounded-full bg-[#ED6A5E] blur-[200px] opacity-[0.05] pointer-events-none" />
@@ -53,7 +53,7 @@ export default function ContactPageClient() {
             <MessageSquare className="h-3.5 w-3.5" /> Get In Touch
           </motion.span>
           <motion.h1 {...fadeUp} transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827]">
+            className="text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827] dark:text-foreground">
             We&apos;d Love to{" "}
             <span className="bg-gradient-to-r from-[#ED6A5E] to-[#FFAF87] bg-clip-text text-transparent">
               Hear From You
@@ -72,14 +72,14 @@ export default function ContactPageClient() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {contactCards.map((card, i) => (
               <motion.div key={card.title} {...fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group rounded-2xl bg-white border border-[#ECECEC] p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                className="group rounded-2xl bg-white dark:bg-slate-900 border border-[#ECECEC] dark:border-slate-800 p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{ background: `radial-gradient(circle at 0% 0%, ${card.color}08, transparent 60%)` }} />
                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl"
                   style={{ backgroundColor: `${card.color}15` }}>
                   <card.icon className="h-5 w-5" style={{ color: card.color }} />
                 </div>
-                <h3 className="font-bold text-[#111827] text-sm">{card.title}</h3>
+                <h3 className="font-bold text-[#111827] dark:text-foreground text-sm">{card.title}</h3>
                 <p className="text-xs text-[#94A3B8] mt-0.5 mb-2">{card.desc}</p>
                 <p className="text-sm font-semibold" style={{ color: card.color }}>{card.value}</p>
               </motion.div>
@@ -93,33 +93,33 @@ export default function ContactPageClient() {
         <div className="mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-5 gap-8">
             <motion.div {...fadeUp} transition={{ duration: 0.6 }}
-              className="lg:col-span-3 rounded-3xl bg-white border border-[#ECECEC] p-8 lg:p-10 shadow-sm">
-              <h2 className="text-2xl font-extrabold text-[#111827] mb-2">Send a Message</h2>
+              className="lg:col-span-3 rounded-3xl bg-white dark:bg-slate-900 border border-[#ECECEC] dark:border-slate-800 p-8 lg:p-10 shadow-sm">
+              <h2 className="text-2xl font-extrabold text-[#111827] dark:text-foreground mb-2">Send a Message</h2>
               <p className="text-sm text-[#64748B] mb-8">We&apos;ll respond within one business day.</p>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">Your Name</label>
+                    <label className="block text-sm font-semibold text-[#111827] dark:text-foreground mb-1.5">Your Name</label>
                     <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      placeholder="John Doe" className="h-11 rounded-xl border-[#ECECEC] focus-visible:ring-[#ED6A5E] bg-[#F8F8F8]" />
+                      placeholder="John Doe" className="h-11 rounded-xl border-[#ECECEC] dark:border-slate-800 focus-visible:ring-[#ED6A5E] bg-[#F8F8F8] dark:bg-slate-950 dark:text-foreground" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#111827] mb-1.5">Email</label>
+                    <label className="block text-sm font-semibold text-[#111827] dark:text-foreground mb-1.5">Email</label>
                     <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      placeholder="john@example.com" className="h-11 rounded-xl border-[#ECECEC] focus-visible:ring-[#ED6A5E] bg-[#F8F8F8]" />
+                      placeholder="john@example.com" className="h-11 rounded-xl border-[#ECECEC] dark:border-slate-800 focus-visible:ring-[#ED6A5E] bg-[#F8F8F8] dark:bg-slate-950 dark:text-foreground" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#111827] mb-1.5">Subject</label>
+                  <label className="block text-sm font-semibold text-[#111827] dark:text-foreground mb-1.5">Subject</label>
                   <select value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    className="w-full h-11 rounded-xl border border-[#ECECEC] bg-[#F8F8F8] px-3 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#ED6A5E]/30">
+                    className="w-full h-11 rounded-xl border border-[#ECECEC] dark:border-slate-800 bg-[#F8F8F8] dark:bg-slate-950 px-3 text-sm text-[#111827] dark:text-foreground focus:outline-none focus:ring-2 focus:ring-[#ED6A5E]/30">
                     {subjects.map((s) => <option key={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#111827] mb-1.5">Message</label>
+                  <label className="block text-sm font-semibold text-[#111827] dark:text-foreground mb-1.5">Message</label>
                   <textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    placeholder="Tell us how we can help..." className="w-full rounded-xl border border-[#ECECEC] bg-[#F8F8F8] px-4 py-3 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#ED6A5E]/30 resize-none" />
+                    placeholder="Tell us how we can help..." className="w-full rounded-xl border border-[#ECECEC] dark:border-slate-800 bg-[#F8F8F8] dark:bg-slate-950 px-4 py-3 text-sm text-[#111827] dark:text-foreground focus:outline-none focus:ring-2 focus:ring-[#ED6A5E]/30 resize-none" />
                 </div>
                 <Button type="submit" disabled={loading}
                   className="w-full h-12 bg-[#ED6A5E] hover:bg-[#FF8E72] text-white rounded-xl font-semibold shadow-lg shadow-[#ED6A5E]/20 transition-all hover:-translate-y-0.5 disabled:opacity-70">
@@ -143,8 +143,8 @@ export default function ContactPageClient() {
                   </a>
                 </div>
               </div>
-              <div className="rounded-3xl bg-white border border-[#ECECEC] p-6 shadow-sm">
-                <h3 className="font-bold text-[#111827] mb-4 flex items-center gap-2">
+              <div className="rounded-3xl bg-white dark:bg-slate-900 border border-[#ECECEC] dark:border-slate-800 p-6 shadow-sm">
+                <h3 className="font-bold text-[#111827] dark:text-foreground mb-4 flex items-center gap-2">
                   <Clock className="h-4 w-4 text-[#377771]" /> Support Hours
                 </h3>
                 {[
@@ -152,7 +152,7 @@ export default function ContactPageClient() {
                   { day: "Saturday", hours: "10:00 AM – 4:00 PM" },
                   { day: "Sunday", hours: "Closed" },
                 ].map((row) => (
-                  <div key={row.day} className="flex justify-between text-sm py-2 border-b border-[#ECECEC] last:border-0">
+                  <div key={row.day} className="flex justify-between text-sm py-2 border-b border-[#ECECEC] dark:border-slate-800 last:border-0">
                     <span className="text-[#64748B]">{row.day}</span>
                     <span className={`font-semibold ${row.hours === "Closed" ? "text-[#ED6A5E]" : "text-[#377771]"}`}>{row.hours}</span>
                   </div>

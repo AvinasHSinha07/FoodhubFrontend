@@ -130,7 +130,7 @@ export default function ProviderOrdersPageClient() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PLACED": return "bg-[#377771]/10 text-[#377771] border-[#377771]/20";
+      case "PLACED": return "bg-[#377771]/10 dark:bg-[#4CE0B3]/10 text-[#377771] dark:text-[#4CE0B3] border-[#377771]/20 dark:border-[#4CE0B3]/20";
       case "PREPARING": return "bg-amber-100 text-amber-800 border-amber-200";
       case "READY": return "bg-[#ED6A5E]/10 text-[#ED6A5E] border-[#ED6A5E]/20";
       case "DELIVERED": return "bg-[#4CE0B3]/10 text-[#4CE0B3] border-[#4CE0B3]/20";
@@ -213,7 +213,7 @@ export default function ProviderOrdersPageClient() {
         <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
           <h2 className="text-2xl font-extrabold text-foreground">Complete Your Provider Profile</h2>
           <p className="text-slate-500 font-medium mt-2">Create your profile first to start receiving orders.</p>
-          <Button asChild className="mt-8 h-12 px-8 rounded-[14px] bg-[#377771] hover:bg-[#4CE0B3] text-white hover:text-emerald-950 font-bold transition-all shadow-md hover:-translate-y-0.5">
+          <Button asChild className="mt-8 h-12 px-8 rounded-[14px] bg-[#377771] dark:bg-[#4CE0B3] hover:bg-[#4CE0B3] dark:hover:bg-[#377771] text-white dark:text-emerald-950 dark:hover:text-white font-bold transition-all shadow-md hover:-translate-y-0.5">
             <Link href="/provider/profile">Set Up Profile</Link>
           </Button>
         </Card>

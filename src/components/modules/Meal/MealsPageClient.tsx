@@ -422,9 +422,9 @@ export default function MealsPageClient() {
               <p className="text-slate-500 text-lg max-w-md mx-auto">{queryErrorMessage}</p>
             </div>
           ) : meals.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm col-span-full">
-              <div className="w-20 h-20 bg-[#377771]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Utensils className="w-10 h-10 text-[#377771]" />
+            <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm col-span-full">
+              <div className="w-20 h-20 bg-[#377771]/10 dark:bg-[#4CE0B3]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Utensils className="w-10 h-10 text-[#377771] dark:text-[#4CE0B3]" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-2">No meals found</h3>
               <p className="text-slate-500 text-lg max-w-md mx-auto">Try adjusting your filters or search term to discover exactly what you're craving.</p>

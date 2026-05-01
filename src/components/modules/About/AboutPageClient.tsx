@@ -56,7 +56,7 @@ const team = [
 
 export default function AboutPageClient() {
   return (
-    <main className="min-h-screen bg-[#FFFDF9] overflow-hidden">
+    <main className="min-h-screen bg-[#FFFDF9] dark:bg-background overflow-hidden">
       {/* Hero */}
       <section className="relative py-24 lg:py-32 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -72,7 +72,7 @@ export default function AboutPageClient() {
           <motion.h1
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.1 }}
-            className="text-5xl lg:text-7xl font-extrabold tracking-tight text-[#111827] leading-tight"
+            className="text-5xl lg:text-7xl font-extrabold tracking-tight text-[#111827] dark:text-foreground leading-tight"
           >
             Food Delivered with{" "}
             <span className="bg-gradient-to-r from-[#ED6A5E] to-[#FFAF87] bg-clip-text text-transparent">
@@ -101,7 +101,7 @@ export default function AboutPageClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="relative group rounded-2xl bg-white border border-[#ECECEC] p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                className="relative group rounded-2xl bg-white dark:bg-slate-900 border border-[#ECECEC] dark:border-slate-800 p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
               >
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -113,7 +113,7 @@ export default function AboutPageClient() {
                 >
                   <stat.icon className="h-7 w-7" style={{ color: stat.color }} />
                 </div>
-                <p className="text-4xl font-extrabold text-[#111827]" style={{ color: stat.color }}>
+                <p className="text-4xl font-extrabold text-[#111827] dark:text-foreground" style={{ color: stat.color }}>
                   {stat.value}
                 </p>
                 <p className="mt-1 text-sm font-medium text-[#64748B]">{stat.label}</p>
@@ -133,7 +133,7 @@ export default function AboutPageClient() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-4xl font-extrabold text-[#111827] mb-6 leading-tight">
+              <h2 className="text-4xl font-extrabold text-[#111827] dark:text-foreground mb-6 leading-tight">
                 Our Mission is to <br />
                 <span className="text-[#ED6A5E]">Transform</span> How You Eat
               </h2>
@@ -176,7 +176,7 @@ export default function AboutPageClient() {
       </section>
 
       {/* Values */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F8F8F8]/50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#F8F8F8]/50 dark:bg-slate-900/20">
         <div className="mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -184,7 +184,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-4xl font-extrabold text-[#111827]">Our Core Values</h2>
+            <h2 className="text-4xl font-extrabold text-[#111827] dark:text-foreground">Our Core Values</h2>
             <p className="mt-4 text-[#64748B] max-w-xl mx-auto">
               These principles guide every decision we make, from the restaurants we partner with to the
               features we build.
@@ -198,7 +198,7 @@ export default function AboutPageClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className={`group rounded-2xl bg-gradient-to-br ${v.bg} border border-white p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
+                className={`group rounded-2xl bg-gradient-to-br ${v.bg} dark:bg-slate-900 border border-white dark:border-slate-800 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
               >
                 <div
                   className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl"
@@ -206,7 +206,7 @@ export default function AboutPageClient() {
                 >
                   <v.icon className="h-6 w-6" style={{ color: v.color }} />
                 </div>
-                <h3 className="font-bold text-[#111827] mb-2">{v.title}</h3>
+                <h3 className="font-bold text-[#111827] dark:text-foreground mb-2">{v.title}</h3>
                 <p className="text-sm text-[#64748B] leading-relaxed">{v.desc}</p>
               </motion.div>
             ))}
@@ -223,7 +223,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-4xl font-extrabold text-[#111827]">Meet the Team</h2>
+            <h2 className="text-4xl font-extrabold text-[#111827] dark:text-foreground">Meet the Team</h2>
             <p className="mt-4 text-[#64748B] max-w-xl mx-auto">
               The passionate people behind FoodHub who work every day to make your dining experience better.
             </p>
@@ -244,7 +244,7 @@ export default function AboutPageClient() {
                 >
                   {member.initials}
                 </div>
-                <h3 className="font-bold text-[#111827]">{member.name}</h3>
+                <h3 className="font-bold text-[#111827] dark:text-foreground">{member.name}</h3>
                 <p className="text-sm text-[#64748B] mt-1">{member.role}</p>
               </motion.div>
             ))}

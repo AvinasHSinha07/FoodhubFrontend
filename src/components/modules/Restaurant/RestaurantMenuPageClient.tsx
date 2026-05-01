@@ -165,7 +165,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
         </div>
         <h2 className="text-4xl font-black text-foreground mb-4">Kitchen not found</h2>
         <p className="text-slate-500 font-medium max-w-md mx-auto mb-10">We couldn't find this specific kitchen. It might have changed locations or moved to a different district.</p>
-        <Button asChild className="h-14 px-10 rounded-[18px] bg-[#377771] hover:bg-[#4CE0B3] text-white hover:text-emerald-950 font-bold shadow-xl transition-all active:scale-95">
+        <Button asChild className="h-14 px-10 rounded-[18px] bg-[#377771] dark:bg-[#4CE0B3] hover:bg-[#4CE0B3] dark:hover:bg-[#377771] text-white dark:text-emerald-950 dark:hover:text-white font-bold shadow-xl transition-all active:scale-95">
           <Link href="/restaurants"><ArrowLeft className="mr-3 h-5 w-5" /> Back to Restaurants</Link>
         </Button>
       </div>
@@ -231,7 +231,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
           </Link>
           <div className="flex items-center gap-4">
              {provider.isOpenNow && (
-               <Badge className="bg-[#4CE0B3]/10 text-[#377771] border-none px-4 py-1.5 rounded-full font-black text-[11px] uppercase tracking-widest animate-pulse">
+               <Badge className="bg-[#4CE0B3]/10 text-[#377771] dark:text-[#4CE0B3] border-none px-4 py-1.5 rounded-full font-black text-[11px] uppercase tracking-widest animate-pulse">
                  Live Selection
                </Badge>
              )}
@@ -345,7 +345,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                 {availableMeals.map((meal: IMeal) => {
                   const qty = getCartQuantity(meal.id);
                   return (
-                    <Card key={meal.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30">
+                    <Card key={meal.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30 dark:hover:border-[#4CE0B3]/30">
                       <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-900">
                         {meal.image ? (
                           <img src={meal.image} alt={meal.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />

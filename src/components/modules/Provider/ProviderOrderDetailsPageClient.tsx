@@ -99,7 +99,7 @@ export default function ProviderOrderDetailsPageClient({ orderId }: ProviderOrde
         <Card className="text-center py-24 bg-background border-border/50 rounded-[24px] shadow-sm">
           <h2 className="text-2xl font-extrabold text-foreground">Order Not Found</h2>
           <p className="text-slate-500 font-medium mt-2">This order may not exist or you may not have access.</p>
-          <Button asChild className="mt-8 h-12 px-8 rounded-[14px] bg-[#377771] hover:bg-[#4CE0B3] text-white hover:text-emerald-950 font-bold transition-all shadow-md hover:-translate-y-0.5">
+          <Button asChild className="mt-8 h-12 px-8 rounded-[14px] bg-[#377771] dark:bg-[#4CE0B3] hover:bg-[#4CE0B3] dark:hover:bg-[#377771] text-white dark:text-emerald-950 dark:hover:text-white font-bold transition-all shadow-md hover:-translate-y-0.5">
             <Link href="/provider/orders">Back to Orders</Link>
           </Button>
         </Card>

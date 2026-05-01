@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import { CartProvider } from "@/providers/CartProvider";
 import LenisProvider from "@/providers/LenisProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -28,14 +29,21 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex flex-col font-sans min-h-screen" suppressHydrationWarning>
-        <QueryProvider>
-          <CartProvider>
-            <LenisProvider>
-              {children}
-            </LenisProvider>
-            <Toaster position="top-center" richColors />
-          </CartProvider>
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryProvider>
+            <CartProvider>
+              <LenisProvider>
+                {children}
+              </LenisProvider>
+              <Toaster position="top-center" richColors />
+            </CartProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

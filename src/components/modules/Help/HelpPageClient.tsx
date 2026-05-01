@@ -65,7 +65,7 @@ export default function HelpPageClient() {
   );
 
   return (
-    <main className="min-h-screen bg-[#FFFDF9]">
+    <main className="min-h-screen bg-[#FFFDF9] dark:bg-background">
       {/* Hero */}
       <section className="relative py-24 lg:py-28 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[700px] rounded-full bg-[#377771] blur-[200px] opacity-[0.06] pointer-events-none" />
@@ -75,7 +75,7 @@ export default function HelpPageClient() {
             <HelpCircle className="h-3.5 w-3.5" /> Help Center
           </motion.span>
           <motion.h1 {...fadeUp} transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827]">
+            className="text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827] dark:text-foreground">
             How Can We{" "}
             <span className="bg-gradient-to-r from-[#377771] to-[#4CE0B3] bg-clip-text text-transparent">
               Help You?
@@ -95,7 +95,7 @@ export default function HelpPageClient() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search your question…"
-              className="w-full h-14 rounded-2xl border border-[#ECECEC] bg-white pl-12 pr-6 text-[#111827] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#377771]/30 text-sm"
+              className="w-full h-14 rounded-2xl border border-[#ECECEC] dark:border-slate-800 bg-white dark:bg-slate-900 pl-12 pr-6 text-[#111827] dark:text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-[#377771]/30 text-sm"
             />
           </motion.div>
         </div>
@@ -107,11 +107,11 @@ export default function HelpPageClient() {
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
             {categories.map((cat, i) => (
               <motion.button key={cat.label} {...fadeUp} transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="group flex flex-col items-center gap-2 rounded-2xl bg-white border border-[#ECECEC] p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                className="group flex flex-col items-center gap-2 rounded-2xl bg-white dark:bg-slate-900 border border-[#ECECEC] dark:border-slate-800 p-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                 <div className="h-10 w-10 flex items-center justify-center rounded-xl" style={{ backgroundColor: `${cat.color}15` }}>
                   <cat.icon className="h-5 w-5" style={{ color: cat.color }} />
                 </div>
-                <span className="text-xs font-semibold text-[#64748B] group-hover:text-[#111827] transition-colors">{cat.label}</span>
+                <span className="text-xs font-semibold text-[#64748B] group-hover:text-[#111827] dark:group-hover:text-foreground transition-colors">{cat.label}</span>
               </motion.button>
             ))}
           </div>
@@ -122,7 +122,7 @@ export default function HelpPageClient() {
       <section className="px-4 sm:px-6 lg:px-8 pb-24">
         <div className="mx-auto max-w-3xl">
           <motion.h2 {...fadeUp} transition={{ duration: 0.5 }}
-            className="text-3xl font-extrabold text-[#111827] mb-2 text-center">
+            className="text-3xl font-extrabold text-[#111827] dark:text-foreground mb-2 text-center">
             Frequently Asked Questions
           </motion.h2>
           <motion.p {...fadeUp} transition={{ duration: 0.5, delay: 0.1 }}
@@ -135,15 +135,15 @@ export default function HelpPageClient() {
             {filtered.map((faq, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                className="rounded-2xl border border-[#ECECEC] bg-white overflow-hidden shadow-sm">
+                className="rounded-2xl border border-[#ECECEC] dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
                 <button
                   onClick={() => setOpenIdx(openIdx === i ? null : i)}
                   className="w-full flex items-center justify-between px-6 py-5 text-left group"
                 >
-                  <span className={`font-semibold text-sm transition-colors ${openIdx === i ? "text-[#377771]" : "text-[#111827] group-hover:text-[#377771]"}`}>
+                  <span className={`font-semibold text-sm transition-colors ${openIdx === i ? "text-[#377771] dark:text-[#4CE0B3]" : "text-[#111827] dark:text-foreground group-hover:text-[#377771] dark:group-hover:text-[#4CE0B3]"}`}>
                     {faq.q}
                   </span>
-                  <ChevronDown className={`h-5 w-5 shrink-0 ml-4 transition-transform duration-300 ${openIdx === i ? "rotate-180 text-[#377771]" : "text-[#94A3B8]"}`} />
+                  <ChevronDown className={`h-5 w-5 shrink-0 ml-4 transition-transform duration-300 ${openIdx === i ? "rotate-180 text-[#377771] dark:text-[#4CE0B3]" : "text-[#94A3B8]"}`} />
                 </button>
                 <AnimatePresence initial={false}>
                   {openIdx === i && (
@@ -153,7 +153,7 @@ export default function HelpPageClient() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <p className="px-6 pb-5 text-sm text-[#64748B] leading-relaxed border-t border-[#ECECEC] pt-4">
+                      <p className="px-6 pb-5 text-sm text-[#64748B] leading-relaxed border-t border-[#ECECEC] dark:border-slate-800 pt-4">
                         {faq.a}
                       </p>
                     </motion.div>

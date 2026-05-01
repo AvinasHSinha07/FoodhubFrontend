@@ -10,10 +10,14 @@ import {
   ChefHat,
   Sparkles,
   RotateCcw,
+  MessageSquareText,
+  Zap,
+  Info,
 } from "lucide-react";
 import { ChatServices, TChatMessage } from "@/services/chat.services";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type TDisplayMessage = {
@@ -25,10 +29,10 @@ type TDisplayMessage = {
 
 // ── Quick Prompt Chips ─────────────────────────────────────────────────────────
 const QUICK_PROMPTS = [
-  "🍕 What meals do you have?",
-  "🌱 Any vegan options?",
-  "🍜 Show me restaurants",
-  "⏱️ How fast is delivery?",
+  "🍕 What's on the menu?",
+  "🌱 Vegan options?",
+  "🍜 Best restaurants?",
+  "⏱️ Delivery time?",
 ];
 
 // ── Greeting ──────────────────────────────────────────────────────────────────
@@ -36,13 +40,13 @@ const INITIAL_MESSAGE: TDisplayMessage = {
   id: "init",
   role: "model",
   content:
-    "Hey there! 👋 I'm **FoodBot**, your personal assistant at FoodHub.\n\nI know exactly what meals and restaurants we have right now — ask me anything!",
+    "Hey! I'm **FoodBot**, your concierge at FoodHub. I can help you find the perfect meal or check on restaurant availability. What are you craving today?",
   timestamp: new Date(),
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const renderMarkdown = (text: string) => {
-  let html = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  let html = text.replace(/\*\*(.*?)\*\*/g, "<strong class='font-black text-foreground'>$1</strong>");
   html = html.replace(/\n/g, "<br />");
   return html;
 };
@@ -50,7 +54,6 @@ const renderMarkdown = (text: string) => {
 const formatTime = (date: Date) =>
   date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-// Converts display messages to API history format, skipping the initial greeting
 const toApiHistory = (msgs: TDisplayMessage[]): TChatMessage[] =>
   msgs.slice(1).map((m) => ({ role: m.role, parts: m.content }));
 
@@ -65,16 +68,14 @@ export default function FoodBot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Scroll to bottom whenever messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Focus input when panel opens
   useEffect(() => {
     if (isOpen) {
       setHasUnread(false);
-      setTimeout(() => inputRef.current?.focus(), 300);
+      setTimeout(() => inputRef.current?.focus(), 400);
     }
   }, [isOpen]);
 
@@ -89,34 +90,29 @@ export default function FoodBot() {
         timestamp: new Date(),
       };
 
-      // Capture history BEFORE adding new user message
       const apiHistory = toApiHistory(messages);
-
       setMessages((prev) => [...prev, userMsg]);
       setInput("");
       setIsLoading(true);
 
       try {
         const result = await ChatServices.sendMessage(text.trim(), apiHistory);
-
         const botMsg: TDisplayMessage = {
           id: `model-${Date.now()}`,
           role: "model",
           content: result.reply,
           timestamp: new Date(),
         };
-
         setMessages((prev) => [...prev, botMsg]);
       } catch (err) {
         console.error("[FoodBot] Error:", err);
-        toast.error("FoodBot is temporarily unavailable. Please try again.");
+        toast.error("Assistant offline. Please try again later.");
         setMessages((prev) => prev.filter((m) => m.id !== userMsg.id));
         setInput(text);
       } finally {
         setIsLoading(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isLoading, messages]
   );
 
@@ -132,57 +128,57 @@ export default function FoodBot() {
 
   return (
     <>
-      {/* ── Floating Trigger Button ── */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      {/* ── Trigger Button ── */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 pointer-events-none">
         <AnimatePresence>
-          {!isOpen && (
+          {!isOpen && hasUnread && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.9 }}
-              transition={{ duration: 0.25 }}
-              className="hidden sm:block bg-background/90 backdrop-blur-xl border border-border/60 text-foreground text-xs font-bold px-4 py-2 rounded-full shadow-lg"
+              initial={{ opacity: 0, x: 20, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 20, scale: 0.8 }}
+              className="hidden md:flex items-center gap-3 bg-white dark:bg-slate-900 border border-border/50 shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] px-5 py-3 rounded-2xl pointer-events-auto"
             >
-              Ask FoodBot anything 🍽️
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4CE0B3]/10 text-[#4CE0B3]">
+                <Zap className="h-4 w-4 fill-current" />
+              </div>
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-[#ED6A5E]">FoodHub AI</p>
+                <p className="text-[13px] font-bold text-foreground">Need help ordering?</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 rounded-full text-muted-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHasUnread(false);
+                }}
+              >
+                <X className="h-3 w-3" />
+              </Button>
             </motion.div>
           )}
         </AnimatePresence>
 
         <motion.button
           id="foodbot-trigger"
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen((v) => !v)}
-          className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] text-white shadow-[0_8px_32px_rgba(237,106,94,0.45)] flex items-center justify-center focus:outline-none focus:ring-4 focus:ring-[#ED6A5E]/30"
-          aria-label="Open FoodBot chat"
+          className={cn(
+            "pointer-events-auto relative w-16 h-16 rounded-[22px] flex items-center justify-center transition-all duration-500 shadow-2xl",
+            isOpen 
+              ? "bg-slate-900 text-white rotate-0" 
+              : "bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] text-white"
+          )}
         >
-          <AnimatePresence mode="wait">
-            {isOpen ? (
-              <motion.div
-                key="close"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <X className="h-6 w-6" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="open"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <BrainCircuit className="h-6 w-6" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Unread indicator */}
+          {isOpen ? <X className="h-7 w-7" /> : <BrainCircuit className="h-7 w-7" />}
+          
           {hasUnread && !isOpen && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#4CE0B3] rounded-full border-2 border-background animate-pulse" />
+            <span className="absolute -top-1 -right-1 flex h-5 w-5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4CE0B3] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-5 w-5 bg-[#4CE0B3] border-2 border-white dark:border-slate-950"></span>
+            </span>
           )}
         </motion.button>
       </div>
@@ -192,164 +188,136 @@ export default function FoodBot() {
         {isOpen && (
           <motion.div
             id="foodbot-panel"
-            initial={{ opacity: 0, y: 24, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-            className="fixed bottom-28 right-6 z-50 w-[min(420px,calc(100vw-24px))] flex flex-col rounded-[28px] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.2)] border border-border/50"
-            style={{ height: "min(600px, calc(100vh - 140px))" }}
+            initial={{ opacity: 0, y: 32, scale: 0.9, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: 32, scale: 0.9, filter: "blur(10px)" }}
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
+            className="fixed bottom-28 right-6 z-50 w-[min(440px,calc(100vw-32px))] flex flex-col rounded-[32px] overflow-hidden bg-white/80 dark:bg-slate-950/80 backdrop-blur-2xl border border-white/20 dark:border-slate-800 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)]"
+            style={{ height: "min(640px, calc(100vh - 160px))" }}
           >
-            {/* Header */}
-            <div className="relative flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-[#0A0F1E] to-[#1a2035] flex-shrink-0">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#ED6A5E]/10 to-[#377771]/10 pointer-events-none" />
-
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-[14px] bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] shadow-lg flex-shrink-0">
-                <ChefHat className="h-5 w-5 text-white" />
-              </div>
-
-              <div className="flex-1 min-w-0 relative">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-black text-white text-sm">FoodBot</h3>
-                  <div className="flex items-center gap-1 bg-[#4CE0B3]/20 px-2 py-0.5 rounded-full">
-                    <span className="w-1.5 h-1.5 bg-[#4CE0B3] rounded-full animate-pulse" />
-                    <span className="text-[10px] font-bold text-[#4CE0B3] uppercase tracking-wider">
-                      Live Data
-                    </span>
+            {/* Mesh Header */}
+            <div className="relative p-6 flex-shrink-0 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#ED6A5E]/10 via-[#FFAF87]/5 to-[#4CE0B3]/10 dark:from-[#ED6A5E]/20 dark:to-[#377771]/20 opacity-50" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#ED6A5E]/20 blur-3xl rounded-full translate-x-10 -translate-y-10" />
+              
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] shadow-xl text-white">
+                    <ChefHat className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+                      FoodBot
+                      <span className="flex h-2 w-2 rounded-full bg-[#4CE0B3]">
+                        <span className="animate-ping h-full w-full rounded-full bg-[#4CE0B3] opacity-75"></span>
+                      </span>
+                    </h3>
+                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Personal Concierge</p>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-400 truncate">
-                  Powered by Gemini AI · Knows your real menu
-                </p>
-              </div>
 
-              <div className="relative flex items-center gap-1">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={handleReset}
-                  className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl"
-                  title="Reset conversation"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setIsOpen(false)}
-                  className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-1 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-2xl p-1 border border-border/40">
+                  <Button variant="ghost" size="icon" onClick={handleReset} className="h-8 w-8 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all">
+                    <RotateCcw className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-8 w-8 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all">
+                    <X className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </div>
               </div>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto bg-background px-4 py-5 space-y-4">
-              {messages.map((msg) => (
+            {/* Messages */}
+            <div 
+              data-lenis-prevent
+              className="flex-1 overflow-y-auto px-6 py-4 space-y-6 scroll-smooth scrollbar-thin scrollbar-thumb-border dark:scrollbar-thumb-slate-800"
+            >
+              {messages.map((msg, idx) => (
                 <motion.div
                   key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className={`flex gap-3 ${
-                    msg.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  initial={{ opacity: 0, x: msg.role === "user" ? 10 : -10, y: 10 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.05 }}
+                  className={cn("flex flex-col gap-1.5", msg.role === "user" ? "items-end" : "items-start")}
                 >
-                  {/* Bot Avatar */}
-                  {msg.role === "model" && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] flex items-center justify-center shadow-md mt-0.5">
-                      <Sparkles className="h-4 w-4 text-white" />
-                    </div>
-                  )}
-
-                  {/* Bubble */}
-                  <div
-                    className={`max-w-[82%] flex flex-col ${
-                      msg.role === "user" ? "items-end" : "items-start"
-                    }`}
-                  >
-                    <div
-                      className={`px-4 py-3 rounded-[18px] text-sm leading-relaxed ${
-                        msg.role === "user"
-                          ? "bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] text-white rounded-br-[6px] shadow-md"
-                          : "bg-muted/60 border border-border/40 text-foreground rounded-bl-[6px]"
-                      }`}
-                      dangerouslySetInnerHTML={{
-                        __html: renderMarkdown(msg.content),
-                      }}
+                  <div className={cn(
+                    "relative group max-w-[85%] px-5 py-3.5 rounded-[24px] text-[15px] leading-relaxed font-medium shadow-sm",
+                    msg.role === "user" 
+                      ? "bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] text-white rounded-br-[4px]" 
+                      : "bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 text-foreground rounded-bl-[4px]"
+                  )}>
+                    {msg.role === "model" && (
+                      <div className="absolute -left-2 top-0 text-[#ED6A5E] opacity-20 pointer-events-none">
+                        <Sparkles className="h-8 w-8" />
+                      </div>
+                    )}
+                    <div 
+                      className="relative z-10"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }} 
                     />
-                    <span className="text-[10px] text-muted-foreground mt-1 px-1">
-                      {formatTime(msg.timestamp)}
-                    </span>
                   </div>
+                  <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest px-1">
+                    {formatTime(msg.timestamp)}
+                  </span>
                 </motion.div>
               ))}
 
-              {/* Typing Indicator */}
               {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-3 justify-start"
-                >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] flex items-center justify-center shadow-md">
-                    <Sparkles className="h-4 w-4 text-white" />
-                  </div>
-                  <div className="bg-muted/60 border border-border/40 px-4 py-3.5 rounded-[18px] rounded-bl-[6px] flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-[#ED6A5E] rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-[#ED6A5E] rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-[#ED6A5E] rounded-full animate-bounce [animation-delay:300ms]" />
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-2">
+                  <div className="bg-white dark:bg-slate-900 border border-border/40 dark:border-slate-800 px-5 py-4 rounded-[24px] rounded-bl-[4px] w-20 flex justify-center items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-[#ED6A5E] rounded-full animate-bounce" />
+                    <span className="w-1.5 h-1.5 bg-[#ED6A5E] rounded-full animate-bounce [animation-delay:0.2s]" />
+                    <span className="w-1.5 h-1.5 bg-[#ED6A5E] rounded-full animate-bounce [animation-delay:0.4s]" />
                   </div>
                 </motion.div>
               )}
-
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick Prompts — shown only on first open */}
-            {messages.length === 1 && (
-              <div className="px-4 py-3 bg-background border-t border-border/40 flex gap-2 overflow-x-auto scrollbar-none flex-shrink-0">
-                {QUICK_PROMPTS.map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => sendMessage(prompt)}
-                    className="flex-shrink-0 text-xs font-semibold px-3 py-2 rounded-full bg-muted/60 hover:bg-[#ED6A5E]/10 hover:text-[#ED6A5E] hover:border-[#ED6A5E]/30 border border-border/50 text-foreground transition-all whitespace-nowrap"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Bottom Actions */}
+            <div className="p-6 bg-white/40 dark:bg-slate-950/40 backdrop-blur-md flex-shrink-0 space-y-4">
+              {messages.length === 1 && !isLoading && (
+                <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  {QUICK_PROMPTS.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => sendMessage(prompt)}
+                      className="text-[11px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-border/50 dark:border-slate-800 hover:border-[#ED6A5E] dark:hover:border-[#ED6A5E] hover:text-[#ED6A5E] transition-all text-muted-foreground shadow-sm active:scale-95"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-            {/* Input Area */}
-            <form
-              onSubmit={handleSubmit}
-              className="flex items-center gap-2 px-4 py-3 bg-background border-t border-border/40 flex-shrink-0"
-            >
-              <input
-                ref={inputRef}
-                id="foodbot-input"
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about meals, restaurants, delivery..."
-                disabled={isLoading}
-                className="flex-1 min-w-0 bg-muted/50 border border-border/50 rounded-[14px] px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-[#ED6A5E]/30 focus:border-[#ED6A5E]/50 transition-all disabled:opacity-50"
-              />
-              <Button
-                id="foodbot-send"
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="h-10 w-10 rounded-[14px] bg-gradient-to-br from-[#ED6A5E] to-[#FF8E72] hover:from-[#FF8E72] hover:to-[#ED6A5E] text-white flex-shrink-0 disabled:opacity-40 shadow-md hover:-translate-y-0.5 transition-all"
-                size="icon"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </form>
+              <form onSubmit={handleSubmit} className="relative flex items-center">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Type a message..."
+                  disabled={isLoading}
+                  className="w-full h-14 pl-12 pr-16 bg-white dark:bg-slate-900 border border-border/50 dark:border-slate-800 rounded-[20px] text-[15px] font-medium outline-none focus:ring-2 focus:ring-[#ED6A5E]/20 transition-all placeholder:text-muted-foreground/50 disabled:opacity-50"
+                />
+                <div className="absolute left-4 text-muted-foreground">
+                  <MessageSquareText className="h-5 w-5" />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  size="icon"
+                  className="absolute right-2 h-10 w-10 rounded-2xl bg-[#ED6A5E] hover:bg-[#FF8E72] text-white shadow-lg shadow-[#ED6A5E]/20 transition-all active:scale-90"
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+              </form>
+
+              <div className="flex items-center justify-center gap-1.5 opacity-40">
+                <Info className="h-3 w-3" />
+                <span className="text-[9px] font-bold uppercase tracking-widest">FoodBot can make mistakes. Verify critical info.</span>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

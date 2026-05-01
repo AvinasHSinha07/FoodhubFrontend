@@ -285,8 +285,8 @@ export default function RestaurantsPageClient() {
           </div>
         ) : filteredProviders.length === 0 ? (
           <div className="text-center py-40 rounded-[60px] border-2 border-dashed border-border/50 bg-muted/5 max-w-4xl mx-auto">
-            <div className="w-24 h-24 bg-[#377771]/10 rounded-full flex items-center justify-center mx-auto mb-8">
-              <Utensils className="w-10 h-10 text-[#377771]" />
+            <div className="w-24 h-24 bg-[#377771]/10 dark:bg-[#4CE0B3]/10 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Utensils className="w-10 h-10 text-[#377771] dark:text-[#4CE0B3]" />
             </div>
             <h3 className="text-3xl font-black text-foreground mb-4">No culinary hits found</h3>
             <p className="text-slate-500 text-lg font-medium max-w-md mx-auto">Our current curation doesn't match your specific criteria. Try a broader search.</p>
@@ -295,7 +295,7 @@ export default function RestaurantsPageClient() {
                 setSearchTerm("");
                 router.replace(pathname, { scroll: false });
               }}
-              className="mt-10 h-14 px-12 rounded-[18px] bg-[#377771] text-white font-bold transition-all shadow-xl"
+              className="mt-10 h-14 px-12 rounded-[18px] bg-[#377771] dark:bg-[#4CE0B3] text-white dark:text-emerald-950 font-bold transition-all shadow-xl hover:-translate-y-1"
             >
               Reset Discovery
             </Button>
@@ -311,7 +311,7 @@ export default function RestaurantsPageClient() {
                 const reviewCount = reviews.length;
 
                 return (
-                  <Card key={provider.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30">
+                  <Card key={provider.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30 dark:hover:border-[#4CE0B3]/30">
                     <div className="relative h-72 overflow-hidden bg-slate-100 dark:bg-slate-900">
                       <img
                         src={provider.bannerImage || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"}

@@ -464,7 +464,7 @@ export default function HomeSummaryPageClient() {
               <CardContent className="p-8 flex flex-col gap-6">
                 <div className="flex justify-between items-start">
                   <div className="flex gap-4 items-center">
-                    <div className="h-16 w-16 rounded-[16px] bg-[#377771]/10 text-[#377771] flex items-center justify-center text-2xl font-bold">
+                    <div className="h-16 w-16 rounded-[16px] bg-[#377771]/10 dark:bg-[#4CE0B3]/10 text-[#377771] dark:text-[#4CE0B3] flex items-center justify-center text-2xl font-bold">
                       {provider.restaurantName?.charAt(0)}
                     </div>
                     <div>
@@ -508,7 +508,7 @@ export default function HomeSummaryPageClient() {
             ))}
           </div>
         </div>
-        <div className="bg-[#377771] rounded-[32px] p-12 text-white shadow-2xl relative overflow-hidden">
+        <div className="bg-[#377771] dark:bg-slate-900 rounded-[32px] p-12 text-white shadow-2xl relative overflow-hidden border border-transparent dark:border-slate-800">
            <div className="absolute top-0 right-0 w-64 h-64 bg-[#4CE0B3]/20 blur-3xl rounded-full"></div>
            <h3 className="text-3xl font-bold mb-8 relative z-10">How it works</h3>
            <div className="space-y-8 relative z-10">
@@ -536,7 +536,7 @@ export default function HomeSummaryPageClient() {
           <p className="text-lg text-slate-500">
             Our intelligent algorithms analyze your past orders to recommend new dishes and hidden gems you are guaranteed to love.
           </p>
-          <Button className="mt-4 rounded-[14px] bg-[#377771] hover:bg-[#2c615c] text-white px-8 h-12">
+          <Button className="mt-4 rounded-[14px] bg-[#377771] dark:bg-[#4CE0B3] hover:bg-[#2c615c] dark:hover:bg-[#4CE0B3]/90 text-white dark:text-emerald-950 px-8 h-12 font-bold">
             Build Your Profile
           </Button>
         </div>
@@ -549,7 +549,7 @@ export default function HomeSummaryPageClient() {
           <h3 className="text-3xl font-bold mb-4">Flawless Delivery Experience</h3>
           <p className="text-slate-500 mb-8">Watch your order arrive in real-time. Our professional delivery partners ensure your premium meals are handled with care.</p>
           <div className="p-4 rounded-[16px] bg-white dark:bg-slate-800 shadow-sm border border-border/50 flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-[#4CE0B3]/20 flex items-center justify-center text-[#377771]"><CheckCircle2 className="h-5 w-5"/></div>
+            <div className="h-10 w-10 rounded-full bg-[#4CE0B3]/20 flex items-center justify-center text-[#377771] dark:text-[#4CE0B3]"><CheckCircle2 className="h-5 w-5"/></div>
             <div>
               <p className="font-bold text-sm">Order #8821 Arriving</p>
               <p className="text-xs text-slate-500">Driver is 2 minutes away</p>
@@ -570,7 +570,7 @@ export default function HomeSummaryPageClient() {
               </div>
               <p className="text-lg font-medium text-slate-700 dark:text-slate-300 italic mb-6">"FoodHub completely changed how we order dinner. The curation is incredible, and the app feels so premium compared to everything else."</p>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-[#377771] text-white flex items-center justify-center font-bold">S</div>
+                <div className="h-10 w-10 rounded-full bg-[#377771] dark:bg-[#4CE0B3] text-white dark:text-emerald-950 flex items-center justify-center font-bold">S</div>
                 <div>
                   <p className="font-bold text-sm">Sarah Jenkins</p>
                   <p className="text-xs text-slate-500">Pro Member</p>
@@ -582,11 +582,11 @@ export default function HomeSummaryPageClient() {
       </section>
 
       {/* 11. RESTAURANT PARTNER CTA */}
-      <section className="reveal-section rounded-[32px] bg-gradient-to-br from-[#377771] to-[#1F4541] p-12 lg:p-20 text-white flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl">
+      <section className="reveal-section rounded-[32px] bg-gradient-to-br from-[#377771] to-[#1F4541] dark:from-[#0F172A] dark:to-[#1E293B] dark:border dark:border-slate-800 p-12 lg:p-20 text-white flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl">
         <div className="max-w-xl">
           <h2 className="text-4xl font-extrabold mb-4">Grow your restaurant with FoodHub.</h2>
           <p className="text-[#4CE0B3] text-lg mb-8">Access thousands of premium customers and manage your business with our top-tier provider dashboard.</p>
-          <Button asChild className="bg-white text-[#377771] hover:bg-slate-100 h-14 px-8 rounded-[14px]">
+          <Button asChild className="bg-white text-[#377771] hover:bg-slate-100 dark:bg-slate-800 dark:text-[#4CE0B3] dark:hover:bg-slate-700 h-14 px-8 rounded-[14px]">
             <Link href="/register?role=PROVIDER">Partner With Us</Link>
           </Button>
         </div>
