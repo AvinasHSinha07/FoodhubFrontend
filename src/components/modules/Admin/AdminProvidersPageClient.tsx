@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Store, Search } from "lucide-react";
 import { queryKeys } from "@/lib/query/query-keys";
+import { Button } from "@/components/ui/button";
 
 type ProviderRow = {
   id: string;
