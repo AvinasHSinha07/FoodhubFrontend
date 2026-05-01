@@ -18,6 +18,8 @@ export const queryKeys = {
   provider: (id: string) => ["provider", id] as const,
   adminCoupons: (queryString = "") => ["admin-coupons", queryString] as const,
   adminAnalytics: (days: number) => ["admin-analytics", days] as const,
+  adminAiInsights: (days: number) => ["admin-ai-insights", days] as const,
+
   mealFavorites: (queryString: string) => ["meal-favorites", queryString] as const,
   providerFavorites: (queryString: string) => ["provider-favorites", queryString] as const,
   mealFavoriteState: (mealId: string) => ["meal-favorite-state", mealId] as const,

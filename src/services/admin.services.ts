@@ -149,6 +149,10 @@ const getAdminAnalyticsOverview = async (days = 30): Promise<IResponse<Analytics
   return httpClient.get<AnalyticsOverview>(`/admin/analytics/overview?days=${days}`);
 };
 
+const getAdminAiInsights = async (days = 30): Promise<IResponse<{ insight: string }>> => {
+  return httpClient.get<{ insight: string }>(`/admin/analytics/ai-insights?days=${days}`);
+};
+
 export const AdminServices = {
   getAllUsers,
   updateUserStatus,
@@ -158,4 +162,5 @@ export const AdminServices = {
   updateCoupon,
   deleteCoupon,
   getAdminAnalyticsOverview,
+  getAdminAiInsights,
 };
