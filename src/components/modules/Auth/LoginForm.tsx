@@ -112,6 +112,66 @@ export default function LoginForm() {
         <Button type="submit" className="w-full mt-4" disabled={isPending}>
           {isPending ? "Signing in..." : "Sign in"}
         </Button>
+
+        <div className="flex flex-col space-y-2 pt-4">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white/80 dark:bg-slate-900/80 px-2 text-slate-500">
+                Demo Accounts
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              disabled={isPending}
+              onClick={() => {
+                const creds = { email: "avi@gmail.com", password: "asdfghjk" };
+                form.setValue("email", creds.email);
+                form.setValue("password", creds.password);
+                onSubmit(creds);
+              }}
+            >
+              Admin
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              disabled={isPending}
+              onClick={() => {
+                const creds = { email: "avinash1@gmail.com", password: "asdfghjk" };
+                form.setValue("email", creds.email);
+                form.setValue("password", creds.password);
+                onSubmit(creds);
+              }}
+            >
+              Provider
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              disabled={isPending}
+              onClick={() => {
+                const creds = { email: "avinashsinha751@gmail.com", password: "asdfghjk" };
+                form.setValue("email", creds.email);
+                form.setValue("password", creds.password);
+                onSubmit(creds);
+              }}
+            >
+              Customer
+            </Button>
+          </div>
+        </div>
       </form>
     </Form>
   );
