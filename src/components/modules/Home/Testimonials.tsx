@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Testimonials() {
   const reviews = [
     {
@@ -33,9 +35,11 @@ export default function Testimonials() {
           {reviews.map((rev) => (
             <div key={rev.id} className="bg-white rounded-2xl p-8 shadow-sm border border-orange-100 hover:shadow-md transition-shadow">
               <div className="flex flex-col items-center">
-                <img 
+                <Image 
                   src={rev.img} 
                   alt={rev.name} 
+                  width={80}
+                  height={80}
                   className="w-20 h-20 rounded-full mb-4 shadow-sm border-2 border-orange-200"
                 />
                 <h3 className="font-bold text-lg text-gray-900">{rev.name}</h3>

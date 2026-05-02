@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -311,7 +312,7 @@ export default function RestaurantsPageClient() {
                 const reviewCount = reviews.length;
 
                 return (
-                  <Card key={provider.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30 dark:hover:border-[#4CE0B3]/30">
+                  <Card key={provider.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30 dark:hover:border-[#4CE0B3]/30 py-0">
                     <div className="relative h-72 overflow-hidden bg-slate-100 dark:bg-slate-900">
                       <img
                         src={provider.bannerImage || "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"}
@@ -324,7 +325,7 @@ export default function RestaurantsPageClient() {
                          <div className="relative">
                             <div className="absolute -inset-1.5 bg-gradient-to-tr from-[#ED6A5E] to-[#4CE0B3] rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity" />
                             {provider.logo ? (
-                              <img src={provider.logo} alt="Logo" className="relative w-16 h-16 rounded-2xl border-4 border-background bg-white object-cover shadow-2xl" />
+                              <Image src={provider.logo} alt="Logo" width={64} height={64} className="relative w-16 h-16 rounded-2xl border-4 border-background bg-white object-cover shadow-2xl" />
                             ) : (
                               <div className="relative w-16 h-16 rounded-2xl border-4 border-background bg-slate-100 flex items-center justify-center">
                                 <Utensils className="h-6 w-6 text-slate-300" />
@@ -382,7 +383,7 @@ export default function RestaurantsPageClient() {
 
                       <Button asChild className="w-full h-16 rounded-[22px] bg-[#0A0F1E] dark:bg-white text-white dark:text-[#0A0F1E] hover:bg-[#ED6A5E] dark:hover:bg-[#ED6A5E] dark:hover:text-white font-black text-sm uppercase tracking-widest transition-all hover:-translate-y-1 active:scale-95 shadow-xl group/btn">
                         <Link href={`/restaurant/${provider.id}`}>
-                           View Collections <ArrowRight className="ml-3 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
+                           View Menu<ArrowRight className="ml-3 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
                         </Link>
                       </Button>
                     </CardContent>

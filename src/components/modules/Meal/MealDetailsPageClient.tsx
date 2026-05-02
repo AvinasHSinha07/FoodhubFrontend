@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -180,7 +181,7 @@ export default function MealDetailsPageClient({ mealId }: MealDetailsPageClientP
                className="relative aspect-[4/5] sm:aspect-square lg:aspect-auto lg:h-[700px] w-full rounded-[48px] overflow-hidden bg-slate-100 dark:bg-slate-900 shadow-2xl group"
              >
                 {meal.image ? (
-                  <img src={meal.image} alt={meal.title} className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                  <Image src={meal.image} alt={meal.title} fill className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-4">
                      <ChefHat className="h-20 w-20 opacity-20" />

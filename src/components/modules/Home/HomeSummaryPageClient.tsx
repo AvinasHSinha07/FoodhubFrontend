@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -213,7 +214,7 @@ export default function HomeSummaryPageClient() {
                 <div className="flex -space-x-2">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="w-6 h-6 rounded-full border-2 border-[#0A0F1E] bg-slate-200 overflow-hidden">
-                      <img src={`https://i.pravatar.cc/100?img=${i + 15}`} alt="User" />
+                      <Image src={`https://i.pravatar.cc/100?img=${i + 15}`} alt="User" width={24} height={24} />
                     </div>
                   ))}
                 </div>
@@ -291,9 +292,11 @@ export default function HomeSummaryPageClient() {
                 
                 {/* The Main Plate Showcase */}
                 <div className="absolute inset-16 rounded-full overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] ring-1 ring-white/20 transition-transform duration-700 group-hover:scale-105">
-                  <img
+                  <Image
                     src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1000"
                     alt="Signature Dish"
+                    width={550}
+                    height={550}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1E] via-transparent to-transparent opacity-60" />
@@ -400,10 +403,10 @@ export default function HomeSummaryPageClient() {
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {summary?.featuredMeals?.map((meal: any) => (
-            <Card key={meal.id} className="group overflow-hidden border border-border/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_60px_rgba(255,255,255,0.03)] bg-background">
+            <Card key={meal.id} className="py-0 group overflow-hidden border border-border/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_60px_rgba(255,255,255,0.03)] bg-background">
               <Link href={`/meals/${meal.id}`} className="block relative pt-[85%] overflow-hidden bg-slate-100 dark:bg-slate-800">
                 {meal.image && (
-                  <img src={meal.image} alt={meal.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <Image src={meal.image} alt={meal.title} fill className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 

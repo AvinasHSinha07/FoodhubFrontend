@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Truck, Heart, Shield, Zap, Star, Users, ChefHat, Award } from "lucide-react";
 
@@ -48,10 +49,10 @@ const values = [
 ];
 
 const team = [
-  { name: "Sarah Chen", role: "Co-Founder & CEO", initials: "SC", color: "#ED6A5E" },
-  { name: "Marcus Rivera", role: "Co-Founder & CTO", initials: "MR", color: "#377771" },
-  { name: "Aisha Patel", role: "Head of Operations", initials: "AP", color: "#4CE0B3" },
-  { name: "James Okafor", role: "Head of Design", initials: "JO", color: "#FFAF87" },
+  { name: "Sarah Chen", role: "Co-Founder & CEO", initials: "SC", color: "#ED6A5E", avatar: "https://i.pravatar.cc/150?u=sarah_chen" },
+  { name: "Marcus Rivera", role: "Co-Founder & CTO", initials: "MR", color: "#377771", avatar: "https://i.pravatar.cc/150?u=marcus_rivera" },
+  { name: "Aisha Patel", role: "Head of Operations", initials: "AP", color: "#4CE0B3", avatar: "https://i.pravatar.cc/150?u=aisha_patel" },
+  { name: "James Okafor", role: "Head of Design", initials: "JO", color: "#FFAF87", avatar: "https://i.pravatar.cc/150?u=james_okafor" },
 ];
 
 export default function AboutPageClient() {
@@ -239,10 +240,10 @@ export default function AboutPageClient() {
                 className="group text-center"
               >
                 <div
-                  className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-3xl text-white text-2xl font-extrabold shadow-lg transition-transform group-hover:scale-105"
-                  style={{ backgroundColor: member.color, boxShadow: `0 12px 40px ${member.color}30` }}
+                  className="mx-auto mb-4 relative flex h-24 w-24 items-center justify-center rounded-3xl overflow-hidden shadow-lg transition-transform group-hover:scale-105"
+                  style={{ boxShadow: `0 12px 40px ${member.color}30` }}
                 >
-                  {member.initials}
+                  <Image src={member.avatar} alt={member.name} fill className="object-cover" sizes="96px" />
                 </div>
                 <h3 className="font-bold text-[#111827] dark:text-foreground">{member.name}</h3>
                 <p className="text-sm text-[#64748B] mt-1">{member.role}</p>

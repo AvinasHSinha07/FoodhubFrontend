@@ -178,7 +178,7 @@ export default function AdminOrdersPageClient() {
                     <Badge variant="outline" className={`font-bold px-3 py-1 rounded-[8px] tracking-wide ${getStatusColor(order.orderStatus)}`}>
                       {order.orderStatus}
                     </Badge>
-                    <Badge variant="secondary" className="uppercase text-[10px] font-bold tracking-widest px-2 py-1 rounded-[6px] bg-background border border-border/50">
+                    <Badge variant="secondary" className="uppercase text-[10px] text-white font-bold tracking-widest px-2 py-1 rounded-[6px] bg-background border border-border/50">
                       {order.paymentMethod} / {order.paymentStatus}
                     </Badge>
                   </div>

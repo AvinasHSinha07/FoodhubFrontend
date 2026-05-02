@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -234,7 +235,7 @@ export default function MealForm({
                       }} 
                     />
                     {field.value && (
-                      <img src={field.value} alt="Preview" className="h-12 w-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
+                      <Image src={field.value} alt="Preview" width={48} height={48} className="h-12 w-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
                     )}
                   </div>
                 </FormControl>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -264,7 +265,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                     <div className="relative shrink-0">
                        <div className="absolute -inset-2 bg-gradient-to-tr from-[#ED6A5E] to-[#4CE0B3] rounded-[36px] blur-xl opacity-30 animate-pulse" />
                        {provider.logo ? (
-                         <img src={provider.logo} alt="Logo" className="relative w-24 h-24 sm:w-40 sm:h-40 rounded-[32px] border-4 border-[#0A0F1E] bg-white object-cover shadow-2xl" />
+                         <Image src={provider.logo} alt="Logo" width={160} height={160} className="relative w-24 h-24 sm:w-40 sm:h-40 rounded-[32px] border-4 border-[#0A0F1E] bg-white object-cover shadow-2xl" />
                        ) : (
                          <div className="relative w-24 h-24 sm:w-40 sm:h-40 rounded-[32px] border-4 border-[#0A0F1E] bg-slate-900 flex items-center justify-center shadow-2xl">
                            <Utensils className="h-12 w-12 text-slate-700" />
@@ -348,7 +349,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                     <Card key={meal.id} className="reveal-up group relative overflow-hidden rounded-[40px] border-border/50 bg-background shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 flex flex-col h-full border hover:border-[#377771]/30 dark:hover:border-[#4CE0B3]/30">
                       <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-900">
                         {meal.image ? (
-                          <img src={meal.image} alt={meal.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          <Image src={meal.image} alt={meal.title} fill className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center text-slate-300">
                              <Utensils className="h-10 w-10 opacity-20" />
@@ -489,7 +490,7 @@ export default function RestaurantMenuPageClient({ providerId }: RestaurantMenuP
                          <div key={item.meal.id} className="flex gap-5 items-start group">
                             <div className="h-20 w-20 rounded-[20px] overflow-hidden bg-muted shrink-0 border border-border/50 shadow-sm relative group-hover:shadow-md transition-shadow">
                                {item.meal.image ? (
-                                 <img src={item.meal.image} alt={item.meal.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
+                                 <Image src={item.meal.image} alt={item.meal.title} width={80} height={80} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
                                ) : (
                                  <Utensils className="h-8 w-8 m-6 text-slate-400" />
                                )}

@@ -8,6 +8,31 @@ const nextConfig: NextConfig = {
                 hostname: "res.cloudinary.com",
                 pathname: "/**",   // ✅ allow all cloudinary paths
             },
+            {
+                protocol: "http",
+                hostname: "res.cloudinary.com",
+                pathname: "/**",   // ✅ allow http cloudinary paths
+            },
+            {
+                protocol: "https",
+                hostname: "images.unsplash.com",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "i.pravatar.cc",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "randomuser.me",
+                pathname: "/**",
+            },
+            {
+                protocol: "https",
+                hostname: "via.placeholder.com",
+                pathname: "/**",
+            }
         ],
     },
 

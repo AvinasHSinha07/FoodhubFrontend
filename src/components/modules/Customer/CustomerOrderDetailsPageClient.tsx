@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { OrderServices } from "@/services/order.services";
@@ -165,7 +166,7 @@ export default function CustomerOrderDetailsPageClient({ orderId }: CustomerOrde
                     <div className="flex gap-4 items-center">
                       <div className="w-14 h-14 rounded-[16px] bg-muted flex items-center justify-center font-extrabold text-slate-500 border border-border/50 shadow-sm relative overflow-hidden">
                          {item.meal?.image ? (
-                           <img src={item.meal.image} alt={item.meal.title} className="w-full h-full object-cover" />
+                           <Image src={item.meal.image} alt={item.meal.title} width={56} height={56} className="w-full h-full object-cover" />
                          ) : (
                            <span className="text-lg">{item.quantity}x</span>
                          )}

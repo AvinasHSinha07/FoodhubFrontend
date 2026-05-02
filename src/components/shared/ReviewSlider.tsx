@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -151,7 +152,7 @@ function ReviewCard({ review, showMealTag }: { review: ReviewItem; showMealTag: 
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full shrink-0 overflow-hidden border border-border/50 bg-muted flex items-center justify-center font-bold text-sm text-muted-foreground">
             {review.customer?.image ? (
-              <img src={review.customer.image} alt={review.customer.name} className="w-full h-full object-cover" />
+              <Image src={review.customer.image} alt={review.customer.name || "Customer"} width={40} height={40} className="w-full h-full object-cover" />
             ) : (
               initials
             )}

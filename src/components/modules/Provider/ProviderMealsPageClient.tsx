@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";import Image from "next/image";import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -134,7 +133,7 @@ export default function ProviderMealsPageClient() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-[8px] bg-muted overflow-hidden shrink-0">
                           {meal.image ? (
-                            <img src={meal.image} alt={meal.title} className="w-full h-full object-cover" />
+                            <Image src={meal.image} alt={meal.title} width={40} height={40} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center bg-[#377771]/10 text-[#377771] dark:bg-[#4CE0B3]/10 dark:text-[#4CE0B3] font-bold text-xs">No Img</div>
                           )}

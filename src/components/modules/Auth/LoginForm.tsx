@@ -129,7 +129,7 @@ export default function LoginForm() {
               type="button"
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-xs  hover:text-white"
               disabled={isPending}
               onClick={() => {
                 const creds = { email: "avi@gmail.com", password: "asdfghjk" };
@@ -144,7 +144,7 @@ export default function LoginForm() {
               type="button"
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-xs hover:text-white"
               disabled={isPending}
               onClick={() => {
                 const creds = { email: "avinash1@gmail.com", password: "asdfghjk" };
@@ -159,7 +159,7 @@ export default function LoginForm() {
               type="button"
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-xs hover:text-white"
               disabled={isPending}
               onClick={() => {
                 const creds = { email: "avinashsinha751@gmail.com", password: "asdfghjk" };

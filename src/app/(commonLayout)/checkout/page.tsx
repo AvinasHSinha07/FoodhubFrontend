@@ -15,6 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, ShoppingBag, Lock, MapPin, Utensils, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { PaymentServices } from "@/services/payment.services";
 import { UserServices } from "@/services/user.services";
 import { loadStripe } from "@stripe/stripe-js";
@@ -417,7 +418,7 @@ export default function CheckoutPage() {
                     <div key={item.meal.id} className="flex gap-4 items-start">
                       <div className="h-16 w-16 rounded-xl overflow-hidden bg-white/10 shrink-0 border border-white/10">
                         {item.meal.image ? (
-                          <img src={item.meal.image} alt={item.meal.title} className="h-full w-full object-cover" />
+                          <Image src={item.meal.image} alt={item.meal.title} width={64} height={64} className="h-full w-full object-cover" />
                         ) : (
                           <Utensils className="h-8 w-8 m-4 text-white/50" />
                         )}

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -268,7 +269,7 @@ export default function ProfileForm({
                       }} 
                     />
                     {field.value && (
-                      <img src={field.value} alt="Logo" className="w-12 h-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
+                      <Image src={field.value} alt="Logo" width={48} height={48} className="w-12 h-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
                     )}
                   </div>
                 </FormControl>
@@ -307,7 +308,7 @@ export default function ProfileForm({
                       }} 
                     />
                     {field.value && (
-                      <img src={field.value} alt="Banner" className="w-24 h-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
+                      <Image src={field.value} alt="Banner" width={96} height={48} className="w-24 h-12 object-cover rounded-[10px] shadow-sm border border-border/50 shrink-0" />
                     )}
                   </div>
                 </FormControl>
