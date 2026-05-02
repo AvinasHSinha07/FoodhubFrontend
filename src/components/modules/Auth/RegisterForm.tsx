@@ -18,6 +18,7 @@ import {
 import { RegisterFormData, registerSchema } from "@/zod/auth.validation";
 import { AuthServices } from "@/services/auth.services";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import GoogleLoginButton from "@/components/modules/Auth/GoogleLoginButton";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -118,6 +119,20 @@ export default function RegisterForm() {
             <Button type="submit" className="w-full mt-6" disabled={isPending}>
               {isPending ? "Creating account..." : "Sign up"}
             </Button>
+
+            {/* Google OAuth */}
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white/80 dark:bg-slate-900/80 px-2 text-slate-500">
+                  or
+                </span>
+              </div>
+            </div>
+
+            <GoogleLoginButton label="Sign up with Google" />
           </form>
         </Form>
       </CardContent>
